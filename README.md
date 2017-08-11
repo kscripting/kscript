@@ -225,6 +225,7 @@ The intial shebang could be left out by running the script directly with `kscrip
 println("Hello from Kotlin with 5g of heap memory running in server mode!")
 ```
 
+If environmental variable `KOTLIN_OPTS` is set, it will override the value set in the scriptlet.
 
 ### Scripts with a main method do not run with `kscript`?
 
