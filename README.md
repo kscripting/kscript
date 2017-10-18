@@ -235,6 +235,7 @@ By means of the `//ENTRY` directive, `kscript` can be used a application launche
 println("Hello from Kotlin with 5g of heap memory running in server mode!")
 ```
 
+If environmental variable `KOTLIN_OPTS` is set, it will override the value set in the scriptlet.
 
 Support
 -------

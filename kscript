@@ -232,7 +232,11 @@ if [ -n "$dependencies" ] && [ -z "$classpath" ];then
 fi
 
 ## Extract kotlin arguments
-kotlin_opts=$(grep -F "//KOTLIN_OPTS" ${scriptFile} | head -n1 | cut -f2- -d' ')
+if [ -n "${KOTLIN_OPTS}" ];then
+  kotlin_opts=$KOTLIN_OPTS
+else
+  kotlin_opts="$(grep -F "//KOTLIN_OPTS" ${scriptFile} | head -n1 | cut -f2- -d' ')"
+fi
 
 
 ## Optionally enter interactive mode
