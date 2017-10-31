@@ -6,7 +6,7 @@ KSCRIPT_VERSION=2.0.2
 
 
 ## resolve application jar path from script location and convert to windows path when using cygwin
-jarPath=$(dirname $0)/kscript.jar
+jarPath=$(dirname $(readlink -f $0))/kscript.jar
 if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
 
 ## run it using command substitution to have just the user process once kscript is done
