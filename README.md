@@ -255,6 +255,27 @@ Yes, `kscript` supports an `//INLCUDE` directive. Absolute and relative paths, a
 ```
 For an actual example see [here](test/resources/includes/include_variations.kts).
 
+
+## Why isn't kscript using annotations instead of comment directives to configure scripts?
+
+Indeed using annotations would be cleaner. And kscript provides annotations to be used instead of comment directives. Example
+
+```kotlin
+// annotation-driven script configuration
+@file:DependsOn("de.mpicbg.scicomp:kutils:0.4")
+
+// comment directive
+//DEPS de.mpicbg.scicomp:kutils:0.4
+```
+See [here](https://github.com/holgerbrandl/kscript_annotations) for a complete listing of supported annotations.
+
+To enable the use of these annotations in Intellij, the user must add the following artifact (hosted on jcenter) to the project dependencies:
+```
+com.github.holgerbrandl:kscript-annotations:1.0
+```
+
+`kscript` will automatically detect an annotation-driven script, and if so will add this artifact to the dependencies internally.
+
 Support
 -------
 

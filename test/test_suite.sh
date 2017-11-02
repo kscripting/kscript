@@ -49,6 +49,7 @@ assert "source ${KSCRIPT_HOME}/test/resources/local_script_file.sh" "kscript roc
 
 ## make sure that it runs with local script files
 assert "kscript ${KSCRIPT_HOME}/test/resources/multi_line_deps.kts" "kscript is  cool!"
+assert "echo foo" "bar" # known to fail
 
 ## scripts with dashes in the file name should work as well
 assert "kscript ${KSCRIPT_HOME}/test/resources/dash-test.kts" "dash alarm!"
