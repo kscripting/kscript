@@ -239,9 +239,16 @@ fun collectRuntimeOptions(scriptText: List<String>): String {
             filter { it.startsWith(koptsPrefix) }.
             map { it.replaceFirst(koptsPrefix, "").trim() }.
             joinToString(" ").
-            plus(kscriptOpts ?: "")
+            append( suffix = kscriptOpts, separator = " ")
 }
 
+/**
+ * Append the specified suffix to this string if it is not null.
+ *
+ * @param Separator Separtator between this and suffix (if suffis is not null).
+ */
+private fun String.append( suffix:String?, separator:String="" ): String =
+    if ( suffix == null ) this else this + separator + suffix
 
 /** Determine the latest version by checking github repo and print info if newer version is availabe. */
 private fun versionCheck() {
