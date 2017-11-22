@@ -4,9 +4,20 @@
 # version tag for backward compatibility with kscript v1.x
 KSCRIPT_VERSION=2.2.1
 
+# Find kscript directory ($KSCRIPT_HOME).
+# On linux (and cygwin) "KSCRIPT_HOME=$(basedir $(readlink -f $0))" works,
+# but Macos' readlink is very different.
+# This works on linux, cygwin, and macos:
+KSCRIPT_HOME=$(cd -P -- "$(dirname -- "$0")" && pwd -P) && KSCRIPT_HOME=$KSCRIPT_HOME/$(basename -- "$0")
+while [[ -h "$KSCRIPT_HOME" ]]; do
+    DIR=$(dirname -- "$KSCRIPT_HOME")
+    SYM=$(readlink "$KSCRIPT_HOME")
+    KSCRIPT_HOME=$(cd "$DIR" && cd "$(dirname -- "$SYM")" && pwd)/$(basename -- "$SYM")
+done
+KSCRIPT_HOME=$(dirname -- "$KSCRIPT_HOME")
 
-## resolve application jar path from script location and convert to windows path when using cygwin
-jarPath=$(dirname $0)/kscript.jar
+## resolve application jar path from $KSCRIPT_HOME and convert to windows path when using cygwin
+jarPath="${KSCRIPT_HOME}/kscript.jar"
 if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
 
 ## run it using command substitution to have just the user process once kscript is done
