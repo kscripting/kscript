@@ -9,20 +9,19 @@ import java.net.URL
  */
 
 /** Resolve include declarations in a script file. Resolved script will be put into another temporary script */
-fun resolveIncludes(template: File?): File? {
-    if (template == null) return null
+fun resolveIncludes(template: File): File = resolveIncludesInternal(template)
 
-    // recursively replace //INCLUDES
-    return resolveIncludesInternal(template)?.run { resolveIncludes(this) } ?: template
-}
-
-private fun resolveIncludesInternal(template: File): File? {
+private fun resolveIncludesInternal(template: File): File {
     val scriptLines = template.readText().lines()
 
-    // don't do a thing if there's not INCLUDE in the script
-    if (scriptLines.find { it.startsWith("//INCLUDE ") } == null) return null
+    if (scriptLines.find { it.startsWith("//INCLUDE ") } == null) {
+        return template
+    }
 
     val sb = StringBuilder()
+
+    // collect up the set of imports in this
+    val imports : MutableSet<String> = emptySet<String>().toMutableSet()
 
     scriptLines.map {
         if (it.startsWith("//INCLUDE")) {
@@ -37,20 +36,32 @@ private fun resolveIncludesInternal(template: File): File? {
             }
 
             try {
-                sb.appendln(includeURL.readText())
+                // collect the import or emit
+                sb.appendln(includeURL.readText().lines().forEach {
+                    if (it.startsWith("import")) {
+                        imports.add(it)
+                    } else {
+                        sb.appendln(it)
+                    }
+                })
             } catch (e: FileNotFoundException) {
                 errorMsg("Failed to resolve //INCLUDE '${include}'")
                 System.err.println(e.message?.lines()!!.map { it.prependIndent("[ERROR] ") })
-
                 quit(1)
             }
+        } else if (it.startsWith("import")) {
+            imports.add(it)
         } else {
-            // if it's not a directive we simply skip emit the line as it is
-            sb.appendln(it)
+            // if its not an include directive or an import or a bang line, emit as is
+            if (it.startsWith("#")) {  } else { sb.appendln(it) }
         }
     }
 
-    return createTmpScript(sb.toString())
+    val impsb = StringBuilder()
+    imports.map { impsb.appendln(it) }
+
+    val final = impsb.appendln(sb.toString())
+    return createTmpScript(final.toString())
 }
 
 
