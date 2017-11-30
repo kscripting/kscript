@@ -37,13 +37,13 @@ private fun resolveIncludesInternal(template: File): File {
 
             try {
                 // collect the import or emit
-                sb.appendln(includeURL.readText().lines().forEach {
+                includeURL.readText().lines().forEach {
                     if (it.startsWith("import")) {
                         imports.add(it)
                     } else {
                         sb.appendln(it)
                     }
-                })
+                }
             } catch (e: FileNotFoundException) {
                 errorMsg("Failed to resolve //INCLUDE '${include}'")
                 System.err.println(e.message?.lines()!!.map { it.prependIndent("[ERROR] ") })
