@@ -10,8 +10,8 @@ class ConsolidateImports {
     @Test
     fun test_consolidate_imports() {
         val classLoader = javaClass.classLoader
-        val file  = this.javaClass.getResource("/consolidate_includes/script.kts").file
-        val expected  = this.javaClass.getResource("/consolidate_includes/expected.kts")
+        val file  = this.javaClass.getResource("/consolidate_includes/input.script").file
+        val expected  = this.javaClass.getResource("/consolidate_includes/expected.script")
         val result = resolveIncludes(File(file))
 
         assertThat(result.readText(),`is`(expected.readText()))

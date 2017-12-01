@@ -1,8 +1,8 @@
 #!/usr/bin/env kscript
 //DEPS com.eclipsesource.minimal-json:minimal-json:0.9.4
-//INCLUDE file1.kt
-//INCLUDE file2.kt
-//INCLUDE file3.kt
+//INCLUDE file1
+//INCLUDE file2
+//INCLUDE file3
 
 import my.cool.class
 
