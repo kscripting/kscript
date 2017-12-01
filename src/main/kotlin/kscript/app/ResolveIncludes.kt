@@ -12,6 +12,7 @@ import java.net.URL
 fun resolveIncludes(template: File): File = resolveIncludesInternal(template)
 
 private fun resolveIncludesInternal(template: File): File {
+    val IMPORT_TEXT = "import "
     val scriptLines = template.readText().lines()
 
     if (scriptLines.find { it.startsWith("//INCLUDE ") } == null) {
@@ -38,7 +39,7 @@ private fun resolveIncludesInternal(template: File): File {
             try {
                 // collect the import or emit
                 includeURL.readText().lines().forEach {
-                    if (it.startsWith("import")) {
+                    if (it.startsWith(IMPORT_TEXT)) {
                         imports.add(it)
                     } else {
                         sb.appendln(it)
@@ -49,7 +50,7 @@ private fun resolveIncludesInternal(template: File): File {
                 System.err.println(e.message?.lines()!!.map { it.prependIndent("[ERROR] ") })
                 quit(1)
             }
-        } else if (it.startsWith("import")) {
+        } else if (it.startsWith(IMPORT_TEXT)) {
             imports.add(it)
         } else {
             // if its not an include directive or an import or a bang line, emit as is
