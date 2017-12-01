@@ -26,7 +26,6 @@ install:
   - sudo add-apt-repository -y ppa:openjdk-r/ppa
   - sudo apt-get update
   - sudo apt-get install openjdk-8-jdk
-  - sudo apt-get install maven2
   # workaround for missing cacerts in openjdk
   - sudo dpkg --purge --force-depends ca-certificates-java
   - sudo apt-get install ca-certificates-java
@@ -42,7 +41,7 @@ install:
 #  - bash -c 'source "/home/travis/.sdkman/bin/sdkman-init.sh"; yes | sdk install java 8u144-oracle'
 #  - bash -c 'source "/home/travis/.sdkman/bin/sdkman-init.sh"; yes | sdk install java 8u144-zulu'
 #  - sudo apt-get install -y openjdk-8-jdk
-#  - sdk install maven
+  - sdk install maven
   - sdk install kotlin
   - sdk install gradle
 
