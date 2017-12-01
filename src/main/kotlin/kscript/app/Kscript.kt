@@ -418,7 +418,7 @@ fun prepareScript(scriptResource: String, enableSupportApi: Boolean): File {
 
 
     // support //INCLUDE directive (see https://github.com/holgerbrandl/kscript/issues/34)
-    scriptFile = resolveIncludes(scriptFile!!)
+    if (scriptFile != null) scriptFile = resolveIncludes(scriptFile)
 
     // just proceed if the script file is a regular file at this point
     errorIf(scriptFile == null || !scriptFile.canRead()) {
