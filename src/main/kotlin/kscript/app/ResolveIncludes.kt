@@ -54,7 +54,7 @@ private fun resolveIncludesInternal(template: File): File {
             imports.add(it)
         } else {
             // if its not an include directive or an import or a bang line, emit as is
-            if (it.startsWith("#")) {  } else { sb.appendln(it) }
+            if (!it.startsWith("#!/")) { sb.appendln(it) } else { }
         }
     }
 
