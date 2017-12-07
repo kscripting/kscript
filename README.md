@@ -381,6 +381,8 @@ kscript --idea CountRecords.kts
 ```
 This will open [IntelliJ IDEA](https://www.jetbrains.com/idea/) with a minimalistic project containing just your (1) `<script>` and  (2) a generated `gradle.build` file:
 
+This assumes that you have a command line launcher named `idea`. Add one from Intellij via the `tools -> Create Command-line Launcher` option.
+
 ![](misc/readme_images/minus_idea.png)
 
 
