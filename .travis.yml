@@ -43,7 +43,6 @@ install:
 #  - sudo apt-get install -y openjdk-8-jdk
   - sdk install maven
   - sdk install kotlin
-  - sdk install gradle
 
   ## install assert.h
   - wget https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh && chmod +x assert.sh
@@ -53,7 +52,7 @@ install:
   - export PATH=$KSCRIPT_HOME::$PATH
 
   # build it
-  - cd $KSCRIPT_HOME && gradle shadowJar
+  - cd $KSCRIPT_HOME && ./gradlew shadowJar
 
 
   - which kscript

@@ -215,6 +215,6 @@ assert_end custom_interpreters
 ##  run junit-test suite
 
 # exit code of `true` is expected to be 0 (see https://github.com/lehmannro/assert.sh)
-assert_raises "gradle test"
+assert_raises "./gradlew test"
 
 assert_end junit_tests
