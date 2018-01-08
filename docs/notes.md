@@ -68,7 +68,7 @@ task getDeps(type: Copy) {
   into 'runtime/'
 }
 ```
-Download the dependencies (and their dependencies) into the folder runtime when you execute `gradle getDeps`.
+Download the dependencies (and their dependencies) into the folder runtime when you execute `./gradlew getDeps`.
 
 
 https://github.com/andrewoma/kotlin-scripting-kickstarter

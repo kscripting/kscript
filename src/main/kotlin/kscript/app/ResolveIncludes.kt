@@ -72,7 +72,7 @@ private fun extractIncludeTarget(incDirective: String) = when {
  * Usage Example:
  * ```
  * cd $KSCRIPT_HOME
- * gradle shadowJar
+ * ./gradlew shadowJar
  * resolve_inc() { kotlin -classpath build/libs/kscript-0.1-SNAPSHOT-all.jar kscript.app.ResolveIncludesKt "$@";}
  * resolve_inc /Users/brandl/projects/kotlin/kscript/test/resources/includes/include_variations.kts
  * cat $(resolve_inc /Users/brandl/projects/kotlin/kscript/test/resources/includes/include_variations.kts 2>&1)

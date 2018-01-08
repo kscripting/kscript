@@ -34,7 +34,7 @@ docker attach `docker ps -q -l` # reattach the terminal & stdin
 cd kscript
 export KSCRIPT_HOME=$(pwd)
 
-gradle shadowJar
+./gradlew shadowJar
 
 wget https://raw.githubusercontent.com/lehmannro/assert.sh/master/assert.sh
 chmod u+x assert.sh

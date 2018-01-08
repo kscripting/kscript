@@ -24,7 +24,7 @@ echo "new version is $kscript_version"
 
 cd $KSCRIPT_HOME
 
-gradle clean shadowJar
+./gradlew clean shadowJar
 
 ## compile binary distribution (including jar and wrapper-script)
 mkdir -p $KSCRIPT_ARCHIVE/kscript-${kscript_version}/bin
@@ -42,7 +42,7 @@ open ${KSCRIPT_ARCHIVE}
 #Java SE 6.0 = 50 (0x32 hex) (from https://en.wikipedia.org/wiki/Java_class_file)
 #Default is 50, see https://kotlinlang.org/docs/reference/using-gradle.html#attributes-common-for-jvm-and-js
 ## to insepct do
-#gradle clean shadowJar && cp build/libs/kscript-0.1-SNAPSHOT-all.jar kscript.jar
+#./gradlew clean shadowJar && cp build/libs/kscript-0.1-SNAPSHOT-all.jar kscript.jar
 #rm -rf kscript_target_test
 #cp -f kscript.jar kscript_target_test.zip
 #unzip kscript_target_test.zip -d kscript_target_test

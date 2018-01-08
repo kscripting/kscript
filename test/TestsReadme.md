@@ -33,7 +33,7 @@ which assert.sh || exit 1
 cd ${KSCRIPT_HOME}
 
 ## build it
-gradle shadowJar
+./gradlew shadowJar
 
 
 ## clean up the environment

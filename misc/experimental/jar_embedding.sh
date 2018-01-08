@@ -4,7 +4,7 @@
 cd /Users/brandl/projects/kotlin/kscript/misc/experimental
 
 #cp kscript2 kscriptJarStub
-(cd ../../ && gradle shadowJar)
+(cd ../../ && ./gradlew shadowJar)
 
 cat kscriptJarStub /Users/brandl/projects/kotlin/kscript/build/libs/kscript-0.1-SNAPSHOT-all.jar > kscriptJar && chmod +x kscriptJar
 
