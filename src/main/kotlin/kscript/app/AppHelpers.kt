@@ -211,45 +211,23 @@ fun launchIdeaWithKscriptlet(scriptFile: File, dependencies: List<String>, custo
     val stringifiedRepos = customRepos.map { "    maven {\n        url '${it.url}'\n    }\n" }.joinToString("\n")
 
     val gradleScript = """
-group 'com.github.holgerbrandl.kscript.editor'
-version '0.1-SNAPSHOT'
-
-apply plugin: 'java'
-apply plugin: 'kotlin'
-
-
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:${'$'}kotlin_version"
-$stringifiedDeps
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.10"
 }
 
 repositories {
-    mavenCentral()
     mavenLocal()
     jcenter()
 $stringifiedRepos
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs 'src'
-        }
-    }
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib"
+$stringifiedDeps
 }
 
-buildscript {
-    ext.kotlin_version = '1.2.0'
-
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${'$'}kotlin_version"
-    }
-}
-"""
+sourceSets.main.java.srcDirs 'src'
+    """.trimIndent()
 
     File(tmpProjectDir, "build.gradle").writeText(gradleScript)
 
