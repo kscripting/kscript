@@ -41,6 +41,7 @@ Options:
  -t --text               Enable stdin support API for more streamlined text processing
  --idea                  Open script in temporary Intellij session
  -s --silent             Suppress status logging to stderr
+ -J<arg>                 -J is stripped and <arg> passed to Java as-is
 
 Copyright : 2017 Holger Brandl
 License   : MIT
