@@ -6,7 +6,7 @@ import java.net.URLClassLoader
 
 // https://dzone.com/articles/add-jar-file-java-load-path
 
-class JarFileLoader(urls: Array<URL>) : URLClassLoader(urls) {
+class JarFileLoader(urls: Array<URL> = arrayOf()) : URLClassLoader(urls) {
     fun addFile(path: String) {
         val urlPath = "jar:file://$path!/"
         addURL(URL(urlPath))
