@@ -205,9 +205,6 @@ fun main(args: Array<String>) {
         classpath.split(CP_SEPARATOR_CHAR).forEach { cl.addFile(it) }
     }
     cl.addFile(jarFile)
-    // passing string is not working for cygwin or git-bash
-    val scriptRuntime = File("${KOTLIN_HOME}${File.separatorChar}lib${File.separatorChar}kotlin-script-runtime.jar")
-    cl.addFile(scriptRuntime)
     val mainMethod = cl.loadClass(execClassName).getDeclaredMethod("main", Array<String>::class.java)
     mainMethod.invoke(cl, userArgs.toTypedArray())
 }

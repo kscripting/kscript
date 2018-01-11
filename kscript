@@ -22,7 +22,11 @@ abs_kscript_path=$(resolve_symlink $(absolute_path $0))
 
 ## resolve application jar path from script location and convert to windows path when using cygwin
 jarPath=$(dirname $abs_kscript_path)/kscript.jar
-if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
+kotlin_home=$KOTLIN_HOME
+if [[ $(uname) == CYGWIN* ]]; then
+    jarPath=$(cygpath -w ${jarPath})
+    kotlin_home=$(cygpath -w ${KOTLIN_HOME})
+fi
 
 ## run it
-exec kotlin -classpath ${jarPath} kscript.app.KscriptKt "$@"
+KOTLIN_HOME=${kotlin_home} exec java -jar ${jarPath} "$@"
