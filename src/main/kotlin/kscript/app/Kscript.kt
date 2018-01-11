@@ -83,28 +83,7 @@ fun main(args: Array<String>) {
     // optionally self-update kscript ot the newest version
     // (if not local copy is not being maintained by sdkman)
     if (docopt.getBoolean(("self-update"))) {
-        if (true || evalBash("which kscript | grep .sdkman").stdout.isNotBlank()) {
-            info("Installing latest version of kscript...")
-            //            println("sdkman_auto_answer=true && sdk install kscript")
-
-            // create update script
-            val updateScript = File(KSCRIPT_CACHE_DIR, "self_update.sh").apply {
-                writeText("""
-                #!/usr/bin/env bash
-                export SDKMAN_DIR="${"$"}{HOME}/.sdkman"
-                source "${"$"}{SDKMAN_DIR}/bin/sdkman-init.sh"
-                sdkman_auto_answer=true && sdk install kscript
-                """.trimIndent())
-                setExecutable(true)
-            }
-
-            println(updateScript.absolutePath)
-        } else {
-            info("Self-update is currently just supported via sdkman.")
-            info("Please download a new release from https://github.com/holgerbrandl/kscript")
-            // todo port sdkman-indpendent self-update
-        }
-
+        selfUpdate()
         quit(0)
     }
 
@@ -123,7 +102,7 @@ fun main(args: Array<String>) {
 
     //  Create temopary dev environment
     if (docopt.getBoolean("idea")) {
-        println(launchIdeaWithKscriptlet(scriptFile, dependencies, customRepos))
+        evalBash(launchIdeaWithKscriptlet(scriptFile, dependencies, customRepos))
         exitProcess(0)
     }
 
@@ -232,11 +211,41 @@ fun main(args: Array<String>) {
         }
     }
 
+    // run the main method
+    val cl = JarFileLoader(arrayOf<URL>())
+    if (classpath != null && classpath.isNotEmpty()) {
+        classpath.split(CP_SEPARATOR_CHAR).forEach { cl.addFile(it) }
+    }
+    cl.addFile(jarFile)
+    // passing string is not working for cygwin or git-bash
+    val scriptRuntime = File("${KOTLIN_HOME}${File.separatorChar}lib${File.separatorChar}kotlin-script-runtime.jar")
+    cl.addFile(scriptRuntime)
+    val mainMethod = cl.loadClass(execClassName).getDeclaredMethod("main", Array<String>::class.java)
+    mainMethod.invoke(cl, userArgs.toTypedArray())
+}
 
-    // print the final command to be run by exec
-    val joinedUserArgs = userArgs.joinToString(" ")
+private fun selfUpdate() {
+    if (true || evalBash("which kscript | grep .sdkman").stdout.isNotBlank()) {
+        info("Installing latest version of kscript...")
+        //            println("sdkman_auto_answer=true && sdk install kscript")
 
-    println("kotlin ${kotlinOpts} -classpath ${jarFile}${CP_SEPARATOR_CHAR}${KOTLIN_HOME}${File.separatorChar}lib${File.separatorChar}kotlin-script-runtime.jar${CP_SEPARATOR_CHAR}${classpath} ${execClassName} ${joinedUserArgs} ")
+        // create update script
+        val updateScript = File(KSCRIPT_CACHE_DIR, "self_update.sh").apply {
+            writeText("""
+                #!/usr/bin/env bash
+                export SDKMAN_DIR="${"$"}{HOME}/.sdkman"
+                source "${"$"}{SDKMAN_DIR}/bin/sdkman-init.sh"
+                sdkman_auto_answer=true && sdk install kscript
+                """.trimIndent())
+            setExecutable(true)
+        }
+
+        evalBash(updateScript.absolutePath)
+    } else {
+        info("Self-update is currently just supported via sdkman.")
+        info("Please download a new release from https://github.com/holgerbrandl/kscript")
+        // todo port sdkman-indpendent self-update
+    }
 }
 
 
