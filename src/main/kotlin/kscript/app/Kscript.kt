@@ -109,21 +109,6 @@ fun main(args: Array<String>) {
 
     val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled)
 
-    // Extract kotlin arguments
-    val kotlinOpts = script.collectRuntimeOptions()
-
-
-    //  Optionally enter interactive mode
-    if (docopt.getBoolean("interactive")) {
-        System.err.println("Creating REPL from ${scriptFile}")
-        //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
-
-        val optionalCP = if (classpath != null && classpath.isNotEmpty()) "-classpath ${classpath}" else ""
-        println("kotlinc ${kotlinOpts} ${optionalCP}")
-
-        exitProcess(0)
-    }
-
     val scriptFileExt = scriptFile.extension
     val scriptCheckSum = md5(scriptFile)
 
@@ -166,6 +151,8 @@ fun main(args: Array<String>) {
     }
 
 
+    val kotlinc: Kotlinc by lazy { Kotlinc(KOTLIN_HOME!!)}
+
     // If scriplet jar ist not cached yet, build it
     if (!jarFile.isFile) {
         // disabled logging because it seems too much
@@ -178,12 +165,9 @@ fun main(args: Array<String>) {
         // }).forEach { it.delete() }
 
 
-        requireInPath("kotlinc")
-
-
         // create main-wrapper for kts scripts
 
-        val wrapperSrcArg = if (scriptFileExt == "kts") {
+        val wrapperFile = if (scriptFileExt == "kts") {
             val mainKotlin = File(createTempDir("kscript"), execClassName + ".kt")
 
             val classReference = (script.pckg ?: "") + className
@@ -199,20 +183,24 @@ fun main(args: Array<String>) {
                 }
             }
             """.trimIndent())
+            mainKotlin
+        } else null
 
-            "'${mainKotlin.absolutePath}'"
-        } else {
-            ""
-        }
+        kotlinc.compile(jarFile, scriptFile, wrapperFile, classpath)
+    }
 
-        val scriptCompileResult = evalBash("kotlinc -classpath '$classpath' -d '${jarFile.absolutePath}' '${scriptFile.absolutePath}' ${wrapperSrcArg}")
-        with(scriptCompileResult) {
-            errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
-        }
+    //  Optionally enter interactive mode
+    if (docopt.getBoolean("interactive")) {
+        System.err.println("Creating REPL from ${scriptFile}")
+        //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
+
+        val optionalCP = if (classpath != null && classpath.isNotEmpty()) "-classpath ${classpath}" else ""
+        kotlinc.interactiveShell(jarFile, classpath)
+        exitProcess(0)
     }
 
     // run the main method
-    val cl = JarFileLoader(arrayOf<URL>())
+    val cl = JarFileLoader()
     if (classpath != null && classpath.isNotEmpty()) {
         classpath.split(CP_SEPARATOR_CHAR).forEach { cl.addFile(it) }
     }
