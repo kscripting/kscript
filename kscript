@@ -28,5 +28,29 @@ if [[ $(uname) == CYGWIN* ]]; then
     kotlin_home=$(cygpath -w ${KOTLIN_HOME})
 fi
 
+# from 'kotlinc'
+
+[ -n "$JAVA_OPTS" ] || JAVA_OPTS="-Xmx256M -Xms32M"
+
+declare -a java_args
+declare -a kscript_args
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -D*)
+      java_args=("${java_args[@]}" "$1")
+      shift
+      ;;
+    -J*)
+      java_args=("${java_args[@]}" "${1:2}")
+      shift
+      ;;
+    *)
+      kscript_args=("${kscript_args[@]}" "$1")
+      shift
+      ;;
+  esac
+done
+
 ## run it
-KOTLIN_HOME=${kotlin_home} exec java -jar ${jarPath} "$@"
+KOTLIN_HOME=${kotlin_home} exec java $JAVA_OPTS "${java_args[@]}" -jar ${jarPath} "${kscript_args[@]}"
