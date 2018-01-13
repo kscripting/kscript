@@ -109,9 +109,6 @@ fun main(args: Array<String>) {
 
     val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled)
 
-    // Extract kotlin arguments
-    val kotlinOpts = script.collectRuntimeOptions()
-
     val scriptFileExt = scriptFile.extension
     val scriptCheckSum = md5(scriptFile)
 
