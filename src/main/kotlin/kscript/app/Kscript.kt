@@ -41,6 +41,7 @@ Options:
  -t --text               Enable stdin support API for more streamlined text processing
  --idea                  Open script in temporary Intellij session
  -s --silent             Suppress status logging to stderr
+ -J<arg>                 -J is stripped and <arg> passed to Java as-is
 
 Copyright : 2017 Holger Brandl
 License   : MIT
@@ -83,28 +84,7 @@ fun main(args: Array<String>) {
     // optionally self-update kscript ot the newest version
     // (if not local copy is not being maintained by sdkman)
     if (docopt.getBoolean(("self-update"))) {
-        if (true || evalBash("which kscript | grep .sdkman").stdout.isNotBlank()) {
-            info("Installing latest version of kscript...")
-            //            println("sdkman_auto_answer=true && sdk install kscript")
-
-            // create update script
-            val updateScript = File(KSCRIPT_CACHE_DIR, "self_update.sh").apply {
-                writeText("""
-                #!/usr/bin/env bash
-                export SDKMAN_DIR="${"$"}{HOME}/.sdkman"
-                source "${"$"}{SDKMAN_DIR}/bin/sdkman-init.sh"
-                sdkman_auto_answer=true && sdk install kscript
-                """.trimIndent())
-                setExecutable(true)
-            }
-
-            println(updateScript.absolutePath)
-        } else {
-            info("Self-update is currently just supported via sdkman.")
-            info("Please download a new release from https://github.com/holgerbrandl/kscript")
-            // todo port sdkman-indpendent self-update
-        }
-
+        selfUpdate()
         quit(0)
     }
 
@@ -123,27 +103,12 @@ fun main(args: Array<String>) {
 
     //  Create temopary dev environment
     if (docopt.getBoolean("idea")) {
-        println(launchIdeaWithKscriptlet(scriptFile, dependencies, customRepos))
+        evalBash(launchIdeaWithKscriptlet(scriptFile, dependencies, customRepos))
         exitProcess(0)
     }
 
 
     val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled)
-
-    // Extract kotlin arguments
-    val kotlinOpts = script.collectRuntimeOptions()
-
-
-    //  Optionally enter interactive mode
-    if (docopt.getBoolean("interactive")) {
-        System.err.println("Creating REPL from ${scriptFile}")
-        //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
-
-        val optionalCP = if (classpath != null && classpath.isNotEmpty()) "-classpath ${classpath}" else ""
-        println("kotlinc ${kotlinOpts} ${optionalCP}")
-
-        exitProcess(0)
-    }
 
     val scriptFileExt = scriptFile.extension
     val scriptCheckSum = md5(scriptFile)
@@ -187,6 +152,8 @@ fun main(args: Array<String>) {
     }
 
 
+    val kotlinc: Kotlinc by lazy { Kotlinc(KOTLIN_HOME!!)}
+
     // If scriplet jar ist not cached yet, build it
     if (!jarFile.isFile) {
         // disabled logging because it seems too much
@@ -199,12 +166,9 @@ fun main(args: Array<String>) {
         // }).forEach { it.delete() }
 
 
-        requireInPath("kotlinc")
-
-
         // create main-wrapper for kts scripts
 
-        val wrapperSrcArg = if (scriptFileExt == "kts") {
+        val wrapperFile = if (scriptFileExt == "kts") {
             val mainKotlin = File(createTempDir("kscript"), execClassName + ".kt")
 
             val classReference = (script.pckg ?: "") + className
@@ -220,23 +184,54 @@ fun main(args: Array<String>) {
                 }
             }
             """.trimIndent())
+            mainKotlin
+        } else null
 
-            "'${mainKotlin.absolutePath}'"
-        } else {
-            ""
-        }
-
-        val scriptCompileResult = evalBash("kotlinc -classpath '$classpath' -d '${jarFile.absolutePath}' '${scriptFile.absolutePath}' ${wrapperSrcArg}")
-        with(scriptCompileResult) {
-            errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
-        }
+        kotlinc.compile(jarFile, scriptFile, wrapperFile, classpath)
     }
 
+    //  Optionally enter interactive mode
+    if (docopt.getBoolean("interactive")) {
+        System.err.println("Creating REPL from ${scriptFile}")
+        //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
 
-    // print the final command to be run by exec
-    val joinedUserArgs = userArgs.joinToString(" ")
+        val optionalCP = if (classpath != null && classpath.isNotEmpty()) "-classpath ${classpath}" else ""
+        kotlinc.interactiveShell(jarFile, classpath)
+        exitProcess(0)
+    }
 
-    println("kotlin ${kotlinOpts} -classpath ${jarFile}${CP_SEPARATOR_CHAR}${KOTLIN_HOME}${File.separatorChar}lib${File.separatorChar}kotlin-script-runtime.jar${CP_SEPARATOR_CHAR}${classpath} ${execClassName} ${joinedUserArgs} ")
+    // run the main method
+    val cl = JarFileLoader()
+    if (classpath != null && classpath.isNotEmpty()) {
+        classpath.split(CP_SEPARATOR_CHAR).forEach { cl.addFile(it) }
+    }
+    cl.addFile(jarFile)
+    val mainMethod = cl.loadClass(execClassName).getDeclaredMethod("main", Array<String>::class.java)
+    mainMethod.invoke(cl, userArgs.toTypedArray())
+}
+
+private fun selfUpdate() {
+    if (true || evalBash("which kscript | grep .sdkman").stdout.isNotBlank()) {
+        info("Installing latest version of kscript...")
+        //            println("sdkman_auto_answer=true && sdk install kscript")
+
+        // create update script
+        val updateScript = File(KSCRIPT_CACHE_DIR, "self_update.sh").apply {
+            writeText("""
+                #!/usr/bin/env bash
+                export SDKMAN_DIR="${"$"}{HOME}/.sdkman"
+                source "${"$"}{SDKMAN_DIR}/bin/sdkman-init.sh"
+                sdkman_auto_answer=true && sdk install kscript
+                """.trimIndent())
+            setExecutable(true)
+        }
+
+        evalBash(updateScript.absolutePath)
+    } else {
+        info("Self-update is currently just supported via sdkman.")
+        info("Please download a new release from https://github.com/holgerbrandl/kscript")
+        // todo port sdkman-indpendent self-update
+    }
 }
 
 
