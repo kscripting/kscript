@@ -53,4 +53,4 @@ while [ $# -gt 0 ]; do
 done
 
 ## run it
-KOTLIN_HOME=${kotlin_home} exec java $JAVA_OPTS "${java_args[@]}" -jar ${jarPath} "${kscript_args[@]}"
+KOTLIN_HOME=${kotlin_home} KSCRIPT_JAR=${jarPath} exec java $JAVA_OPTS "${java_args[@]}" -jar ${jarPath} "${kscript_args[@]}"
