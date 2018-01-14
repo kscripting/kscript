@@ -180,35 +180,3 @@ fun Script.collectRepos(): List<MavenRepo> {
 
     // todo add credential support https://stackoverflow.com/questions/36282168/how-to-add-custom-maven-repository-to-gradle
 }
-
-
-//
-// Runtime Configuration
-//
-
-
-/**
- * Collect runtime options declared using //KOTLIN_OPTS or @file:KotlinOpts
- */
-fun Script.collectRuntimeOptions(): String {
-    val koptsPrefix = "//KOTLIN_OPTS "
-
-    var kotlinOpts = lines.
-        filter { it.startsWith(koptsPrefix) }.
-        map { it.replaceFirst(koptsPrefix, "").trim() }
-
-    //support for @file:KotlinOpts see #47
-    val annotatonPrefix = "^@file:KotlinOpts[(]".toRegex()
-    kotlinOpts += lines
-        .filter { it.contains(annotatonPrefix) }
-        .map { it.replaceFirst(annotatonPrefix, "").split(")")[0] }
-        .map { it.trim(' ', '"') }
-
-
-    // Append $KSCRIPT_KOTLIN_OPTS if defined in the parent environment
-    System.getenv()["KSCRIPT_KOTLIN_OPTS"]?.run {
-        kotlinOpts = kotlinOpts + this
-    }
-
-    return kotlinOpts.joinToString(" ")
-}

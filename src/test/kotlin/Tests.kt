@@ -70,28 +70,6 @@ class Tests {
 
     }
 
-
-    // combine kotlin opts spread over multiple lines
-    @Test
-    fun optsCollect() {
-        val lines = listOf(
-            "//KOTLIN_OPTS -foo 3 'some file.txt'",
-            "//KOTLIN_OPTS  --bar"
-        )
-
-        Script(lines).collectRuntimeOptions() shouldBe "-foo 3 'some file.txt' --bar"
-    }
-
-    @Test
-    fun annotOptsCollect() {
-        val lines = listOf(
-            "//KOTLIN_OPTS -foo 3 'some file.txt'",
-            """@file:KotlinOpts("--bar")"""
-        )
-
-        Script(lines).collectRuntimeOptions() shouldBe "-foo 3 'some file.txt' --bar"
-    }
-
     @Test
     fun detectEntryPoint() {
         assertTrue(isEntryPointDirective("//ENTRY Foo"))
