@@ -165,6 +165,8 @@ fun main(args: Array<String>) {
     }
 
 
+    val kotlinc: Kotlinc by lazy { Kotlinc(KOTLIN_HOME!!)}
+
     // If scriplet jar ist not cached yet, build it
     if (!jarFile.isFile) {
         // disabled logging because it seems too much
@@ -177,12 +179,9 @@ fun main(args: Array<String>) {
         // }).forEach { it.delete() }
 
 
-        requireInPath("kotlinc")
-
-
         // create main-wrapper for kts scripts
 
-        val wrapperSrcArg = if (scriptFileExt == "kts") {
+        val wrapperFile = if (scriptFileExt == "kts") {
             val mainKotlin = File(createTempDir("kscript"), execClassName + ".kt")
 
             val classReference = (script.pckg ?: "") + className
@@ -198,16 +197,10 @@ fun main(args: Array<String>) {
                 }
             }
             """.trimIndent())
+            mainKotlin
+        } else null
 
-            "'${mainKotlin.absolutePath}'"
-        } else {
-            ""
-        }
-
-        val scriptCompileResult = evalBash("kotlinc -classpath '$classpath' -d '${jarFile.absolutePath}' '${scriptFile.absolutePath}' ${wrapperSrcArg}")
-        with(scriptCompileResult) {
-            errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
-        }
+        kotlinc.compile(jarFile, scriptFile, wrapperFile, classpath)
     }
 
     //  Optionally enter interactive mode
@@ -215,8 +208,12 @@ fun main(args: Array<String>) {
         System.err.println("Creating REPL from ${scriptFile}")
         //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
 
-        val optionalCP = if (classpath != null && classpath.isNotEmpty()) "-classpath ${classpath}" else ""
-        writeToFollowUpFile("kotlinc ${kotlinOpts} ${optionalCP}")
+        if (kotlinOpts.isNotEmpty()) {
+            val optionalCP = if (classpath != null && classpath.isNotEmpty()) "-classpath ${classpath}" else ""
+            writeToFollowUpFile("kotlinc ${kotlinOpts} ${optionalCP}")
+            exitProcess(0)
+        }
+        kotlinc.interactiveShell(jarFile, classpath)
         exitProcess(0)
     }
 
