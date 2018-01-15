@@ -122,10 +122,10 @@ export -f resolve_deps
 assert_stderr "resolve_deps log4j:log4j:1.2.14" "${HOME}/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar"
 
 ## impossible version
-assert "resolve_deps log4j:log4j:9.8.76" "false"
+assert_raises "resolve_deps log4j:log4j:9.8.76" 1
 
 ## wrong format should exit with 1
-assert "resolve_deps log4j:1.0" "false"
+assert_raises "resolve_deps log4j:1.0" 1
 
 assert_stderr "resolve_deps log4j:1.0" "[ERROR] Invalid dependency locator: 'log4j:1.0'.  Expected format is groupId:artifactId:version[:classifier]"
 

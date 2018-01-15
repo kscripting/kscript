@@ -24,5 +24,20 @@ abs_kscript_path=$(resolve_symlink $(absolute_path $0))
 jarPath=$(dirname $abs_kscript_path)/kscript.jar
 if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
 
-## run it using command substitution to have just the user process once kscript is done
-exec $(kotlin -classpath ${jarPath} kscript.app.KscriptKt "$@")
+followupFile=followup-$$
+
+## run it
+FOLLOWUP_FILE=$followupFile kotlin -classpath ${jarPath} kscript.app.KscriptKt "$@"
+result=$?
+
+followupPath=${HOME}/.kscript/${followupFile}
+
+
+
+if [[ -f $followupPath ]]; then
+    cmd=$(cat $followupPath)
+    "${RMCMD:=rm}" -f $followupPath
+    exec $cmd
+else
+    exit $result
+fi
