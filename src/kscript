@@ -22,7 +22,6 @@ abs_kscript_path=$(resolve_symlink $(absolute_path $0))
 
 ## resolve application jar path from script location and convert to windows path when using cygwin
 jarPath=$(dirname $abs_kscript_path)/kscript.jar
-if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
 
 ## prefer KOTLIN_HOME instead of PATH to resolve `kotlin` location (see #145)
 if [[ -z "$KOTLIN_HOME" ]]; then KOTLIN_EXEC="kotlin"; else KOTLIN_EXEC="$KOTLIN_HOME/bin/kotlin"; fi
@@ -30,5 +29,34 @@ if [[ -z "$KOTLIN_HOME" ]]; then KOTLIN_EXEC="kotlin"; else KOTLIN_EXEC="$KOTLIN
 ## expose the name of the script being run to the script itself
 export KSCRIPT_FILE="$1"
 
-## run it using command substitution to have just the user process once kscript is done
-eval "exec $(${KOTLIN_EXEC} -classpath ${jarPath} kscript.app.KscriptKt "$@")"
+if [[ $(uname) == CYGWIN* ]]; then
+    jarPath=$(cygpath -w ${jarPath})
+    [[ ! -z $KOTLIN_HOME ]] && KOTLIN_HOME=$(cygpath -w ${KOTLIN_HOME})
+fi
+
+# from 'kotlinc'
+
+[ -n "$JAVA_OPTS" ] || JAVA_OPTS="-Xmx256M -Xms32M"
+
+declare -a java_args
+declare -a kscript_args
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -D*)
+      java_args=("${java_args[@]}" "$1")
+      shift
+      ;;
+    -J*)
+      java_args=("${java_args[@]}" "$1")
+      shift
+      ;;
+    *)
+      kscript_args=("${kscript_args[@]}" "$1")
+      shift
+      ;;
+  esac
+done
+
+## run it
+exec ${KOTLIN_EXEC} "${java_args[@]}" -classpath ${jarPath} kscript.app.KscriptKt "${kscript_args[@]}"

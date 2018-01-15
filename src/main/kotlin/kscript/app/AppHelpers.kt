@@ -9,6 +9,9 @@ import java.security.MessageDigest
 import java.util.function.Consumer
 import kotlin.system.exitProcess
 
+val IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows")
+
+fun joinToPathString(vararg parts: String) = parts.joinToString("${File.separatorChar}")
 
 data class ProcessResult(val command: String, val exitCode: Int, val stdout: String, val stderr: String) {
 
@@ -116,7 +119,6 @@ fun errorIf(value: Boolean, lazyMessage: () -> Any) {
 }
 
 fun quit(status: Int): Nothing {
-    print(if (status == 0) "true" else "false")
     exitProcess(status)
 }
 
