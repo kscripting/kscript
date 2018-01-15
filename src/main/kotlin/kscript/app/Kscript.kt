@@ -1,6 +1,5 @@
 package kscript.app
 
-import kscript.app.ShellUtils.requireInPath
 import org.docopt.DocOptWrapper
 import org.intellij.lang.annotations.Language
 import java.io.BufferedReader
@@ -43,7 +42,8 @@ Options:
  -s --silent             Suppress status logging to stderr
  --package               Package script and dependencies into self-dependent binary
  --add-bootstrap-header  Prepend bash header that installs kscript if necessary
-
+ -J<arg>                 -J is stripped and <arg> passed to Java as-is (if no KOTLIN_OPTS is given)
+ -Dname=value            Set a system JVM property (if no KOTLIN_OPTS is given)
 
 Copyright : 2017 Holger Brandl
 License   : MIT
@@ -150,28 +150,16 @@ fun main(args: Array<String>) {
 
     //  Create temporary dev environment
     if (docopt.getBoolean("idea")) {
-        println(launchIdeaWithKscriptlet(rawScript, dependencies, customRepos, includeURLs))
+        evalBash(launchIdeaWithKscriptlet(rawScript, dependencies, customRepos, includeURLs))
         exitProcess(0)
     }
 
 
     val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled) ?: ""
-    val optionalCpArg = if (classpath.isNotEmpty()) "-classpath '${classpath}'" else ""
 
     // Extract kotlin arguments
-    val kotlinOpts = script.collectRuntimeOptions()
-    val compilerOpts = script.collectCompilerOptions()
-
-
-    //  Optionally enter interactive mode
-    if (docopt.getBoolean("interactive")) {
-        infoMsg("Creating REPL from ${scriptFile}")
-        //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
-
-        println("kotlinc ${compilerOpts} ${kotlinOpts} ${optionalCpArg}")
-
-        exitProcess(0)
-    }
+    val kotlinOpts by lazy { argsToList(script.collectRuntimeOptions()) }
+    val compilerOpts = argsToList(script.collectCompilerOptions())
 
     val scriptFileExt = scriptFile.extension
     val scriptCheckSum = md5(scriptFile)
@@ -211,12 +199,12 @@ fun main(args: Array<String>) {
 
 
     // infer KOTLIN_HOME if not set
-    val KOTLIN_HOME = System.getenv("KOTLIN_HOME") ?: guessKotlinHome()
-
-    errorIf(KOTLIN_HOME == null) {
-        "KOTLIN_HOME is not set and could not be inferred from context"
+    val KOTLIN_HOME = System.getenv("KOTLIN_HOME") ?: guessKotlinHome() ?: run {
+        errorMsg("KOTLIN_HOME is not set and could not be inferred from context")
+        quit(1)
     }
 
+    val kotlinRunner = KotlinRunner(KOTLIN_HOME)
 
     // If scriplet jar ist not cached yet, build it
     if (!jarFile.isFile) {
@@ -230,12 +218,9 @@ fun main(args: Array<String>) {
         // }).forEach { it.delete() }
 
 
-        requireInPath("kotlinc")
-
-
         // create main-wrapper for kts scripts
 
-        val wrapperSrcArg = if (scriptFileExt == "kts") {
+        val wrapperFile = if (scriptFileExt == "kts") {
             val mainKotlin = File(createTempDir("kscript"), execClassName + ".kt")
 
             val classReference = (script.pckg ?: "") + className
@@ -251,21 +236,11 @@ fun main(args: Array<String>) {
                 }
             }
             """.trimIndent())
-
-            "'${mainKotlin.absolutePath}'"
-        } else {
-            ""
-        }
-
-        val scriptCompileResult = evalBash("kotlinc ${compilerOpts} ${optionalCpArg} -d '${jarFile.absolutePath}' '${scriptFile.absolutePath}' ${wrapperSrcArg}")
-        with(scriptCompileResult) {
-            errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
-        }
+            mainKotlin
+        } else null
+        val sourceFiles = listOfNotNull(scriptFile, wrapperFile)
+        kotlinRunner.compile(compilerOpts, jarFile, sourceFiles, classpath)
     }
-
-
-    // print the final command to be run by eval+exec
-    val joinedUserArgs = userArgs.map { "\"${it.replace("\"", "\\\"")}\"" }.joinToString(" ")
 
     //if requested try to package the into a standalone binary
     if (docopt.getBoolean("package")) {
@@ -280,11 +255,16 @@ fun main(args: Array<String>) {
         quit(0)
     }
 
-    var extClassPath = "${jarFile}${CP_SEPARATOR_CHAR}${KOTLIN_HOME}${File.separatorChar}lib${File.separatorChar}kotlin-script-runtime.jar"
-    if (classpath.isNotEmpty())
-        extClassPath += kscript.app.CP_SEPARATOR_CHAR + classpath
+    //  Optionally enter interactive mode
+    if (docopt.getBoolean("interactive")) {
+        System.err.println("Creating REPL from ${scriptFile}")
+        kotlinRunner.interactiveShell(jarFile, classpath, compilerOpts)
+        exitProcess(0)
+    }
 
-    println("kotlin ${kotlinOpts} -classpath \"${extClassPath}\" ${execClassName} ${joinedUserArgs} ")
+    val scriptClassPath = listOf(jarFile, joinToPathString(KOTLIN_HOME, "lib", "kotlin-script-runtime.jar"), classpath).joinToString(CP_SEPARATOR_CHAR)
+
+    exitProcess(kotlinRunner.runScript(scriptClassPath, execClassName, userArgs))
 }
 
 

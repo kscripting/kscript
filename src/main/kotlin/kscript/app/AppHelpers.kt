@@ -9,6 +9,11 @@ import java.security.MessageDigest
 import java.util.function.Consumer
 import kotlin.system.exitProcess
 
+val IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows")
+
+fun joinToPathString(vararg parts: String) = parts.joinToString("${File.separatorChar}")
+
+fun argsToList(args: String): List<String> = if (args.isEmpty()) listOf() else args.split("\\s+".toRegex())
 
 data class ProcessResult(val command: String, val exitCode: Int, val stdout: String, val stderr: String) {
 
@@ -116,7 +121,6 @@ fun errorIf(value: Boolean, lazyMessage: () -> Any) {
 }
 
 fun quit(status: Int): Nothing {
-    print(if (status == 0) "true" else "false")
     exitProcess(status)
 }
 
@@ -282,7 +286,7 @@ private fun createSymLink(link: File, target: File) {
  * Create and use a temporary gradle project to package the compiled script using capsule.
  * See https://github.com/puniverse/capsule
  */
-fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List<String>, customRepos: List<MavenRepo>, runtimeOptions: String, appName: String) {
+fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List<String>, customRepos: List<MavenRepo>, runtimeOptions: List<String>, appName: String) {
     requireInPath("gradle", "gradle is required to package kscripts")
 
     infoMsg("Packaging script '$appName' into standalone executable...")
@@ -295,7 +299,7 @@ fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List
     val stringifiedDeps = dependencies.map { "    compile \"$it\"" }.joinToString("\n")
     val stringifiedRepos = customRepos.map { "    maven {\n        url '${it.url}'\n    }\n" }.joinToString("\n")
 
-    val jvmOptions = runtimeOptions.split(" ")
+    val jvmOptions = runtimeOptions
         .filter { it.startsWith("-J") }
         .map { it.removePrefix("-J") }
         .map { '"' + it + '"' }

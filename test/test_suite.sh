@@ -133,10 +133,10 @@ export -f resolve_deps
 assert_stderr "resolve_deps log4j:log4j:1.2.14" "${HOME}/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar"
 
 ## impossible version
-assert "resolve_deps log4j:log4j:9.8.76" "false"
+assert_raises "resolve_deps log4j:log4j:9.8.76" 1
 
 ## wrong format should exit with 1
-assert "resolve_deps log4j:1.0" "false"
+assert_raises "resolve_deps log4j:1.0" 1
 
 assert_stderr "resolve_deps log4j:1.0" "[ERROR] Invalid dependency locator: 'log4j:1.0'.  Expected format is groupId:artifactId:version[:classifier][@type]"
 
@@ -267,14 +267,17 @@ assert "kscript ${KSCRIPT_HOME}/test/resources/kotlin_opts_test.kts" "mem_477259
 assert_raises 'kscript "println(org.docopt.Docopt::class)"' 1
 
 
-kscript_nocall() { kotlin -classpath ${KSCRIPT_HOME}/build/libs/kscript.jar kscript.app.KscriptKt "$@";}
-export -f kscript_nocall
+##
+## --idea tests were commented out as they do not make sense anymore
 
-## temp projects with include symlinks
-assert_raises 'tmpDir=$(kscript_nocall --idea test/resources/includes/include_variations.kts | cut -f2 -d" " | xargs echo); cd $tmpDir && gradle build' 0
+# kscript_nocall() { kotlin -classpath ${KSCRIPT_HOME}/build/libs/kscript.jar kscript.app.KscriptKt "$@";}
+# export -f kscript_nocall
 
-## support diamond-shaped include schemes (see #133)
-assert_raises 'tmpDir=$(kscript_nocall --idea test/resources/includes/diamond.kts | cut -f2 -d" " | xargs echo); cd $tmpDir && gradle build' 0
+# ## temp projects with include symlinks
+# assert_raises 'tmpDir=$(kscript_nocall --idea test/resources/includes/include_variations.kts | cut -f2 -d" " | xargs echo); cd $tmpDir && gradle build' 0
+
+# ## support diamond-shaped include schemes (see #133)
+# assert_raises 'tmpDir=$(kscript_nocall --idea test/resources/includes/diamond.kts | cut -f2 -d" " | xargs echo); cd $tmpDir && gradle build' 0
 
 ## todo reenable interactive mode tests using kscript_nocall
 
