@@ -35,6 +35,7 @@ fun resolveIncludes(template: File, includeContext: URI = template.parentFile.to
                 val includeURL = when {
                     isUrl(include) -> URL(include)
                     include.startsWith("/") -> File(include).toURI().toURL()
+                    include.startsWith("~/") -> File(System.getenv("HOME")!! + include.substring(1)).toURI().toURL()
                     else -> includeContext.resolve(URI(include.removePrefix("./"))).toURL()
                 }
 
