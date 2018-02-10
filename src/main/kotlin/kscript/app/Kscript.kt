@@ -168,8 +168,8 @@ fun main(args: Array<String>) {
     val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled) ?: ""
 
     // Extract kotlin arguments
-    val kotlinOpts = script.collectRuntimeOptions()
-    val compilerOpts = script.collectCompilerOptions()
+    val kotlinOpts = argsToList(script.collectRuntimeOptions())
+    val compilerOpts = argsToList(script.collectCompilerOptions())
 
     val scriptFileExt = scriptFile.extension
     val scriptCheckSum = md5(scriptFile)
@@ -248,14 +248,8 @@ fun main(args: Array<String>) {
             """.trimIndent())
             mainKotlin
         } else null
-        kotlinRunner.compile(jarFile, scriptFile, wrapperFile, classpath, compilerOpts)
-    }
-
-    //  Optionally enter interactive mode
-    if (docopt.getBoolean("interactive")) {
-        System.err.println("Creating REPL from ${scriptFile}")
-        kotlinRunner.interactiveShell(jarFile, classpath, compilerOpts, kotlinOpts)
-        exitProcess(0)
+        val sourceFiles = listOfNotNull(scriptFile, wrapperFile)
+        kotlinRunner.compile(compilerOpts, jarFile, sourceFiles, classpath)
     }
 
     //if requested try to package the into a standalone binary
@@ -271,9 +265,16 @@ fun main(args: Array<String>) {
         quit(0)
     }
 
+    //  Optionally enter interactive mode
+    if (docopt.getBoolean("interactive")) {
+        System.err.println("Creating REPL from ${scriptFile}")
+        kotlinRunner.interactiveShell(jarFile, classpath, compilerOpts, kotlinOpts)
+        exitProcess(0)
+    }
+
     val scriptClassPath = listOf(jarFile, joinToPathString(KOTLIN_HOME, "lib", "kotlin-script-runtime.jar"), classpath).joinToString(CP_SEPARATOR_CHAR)
 
-    kotlinRunner.runScriptAndExit(scriptClassPath, execClassName, userArgs, kotlinOpts)
+    exitProcess(kotlinRunner.runScript(scriptClassPath, execClassName, userArgs, kotlinOpts))
 }
 
 private fun selfUpdate() {

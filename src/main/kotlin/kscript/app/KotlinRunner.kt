@@ -1,49 +1,51 @@
 package kscript.app
 
 import java.io.File
-import kotlin.system.exitProcess
 
-class KotlinRunner(val kotlinHome: String) {
+class KotlinRunner(private val kotlinHome: String) {
     companion object {
-        const val PRELOADER_CLASS = "org.jetbrains.kotlin.preloading.Preloader"
-        const val RUNNER_MAIN_CLASS = "org.jetbrains.kotlin.runner.Main"
+        private const val PRELOADER_CLASS = "org.jetbrains.kotlin.preloading.Preloader"
+        private const val RUNNER_MAIN_CLASS = "org.jetbrains.kotlin.runner.Main"
     }
+
     private val jarFileLoader by lazy { JarFileLoader() }
 
     private val compilerBaseArgs = listOf("-cp", joinToPathString(kotlinHome, "lib", "kotlin-compiler.jar"),
             "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler")
 
-    private val preloaderJar = File(joinToPathString(kotlinHome, "lib", "kotlin-preloader.jar"))
 
     private val preloaderMainMethod by lazy {
+        val preloaderJar = File(joinToPathString(kotlinHome, "lib", "kotlin-preloader.jar"))
         jarFileLoader.addFile(preloaderJar)
         jarFileLoader.loadClass(PRELOADER_CLASS).getDeclaredMethod("main", Array<String>::class.java)
     }
-
-    fun compile(jarFile: File, scriptFile: File, wrapperFile: File?, classpath: String?, compilerOpts: String) {
-        val compilerArgs = if (compilerOpts.isNotEmpty()) compilerOpts.split("\\s+".toRegex()) else listOf()
-        val baseArgs = listOf<String>("-Xskip-runtime-version-check") +
-                compilerArgs +
-                listOf("-d", jarFile.absolutePath, scriptFile.absolutePath)
-        val wrapperArgs =  listOfNotNull(wrapperFile?.absolutePath)
-        val cpArgs = classPathArgs(classpath)
-        runKotlinc(baseArgs + wrapperArgs + cpArgs)
+    private val runnerMainMethod by lazy {
+        System.getProperties().setProperty("kotlin.home", kotlinHome)
+        jarFileLoader.addFile(File(joinToPathString(kotlinHome, "lib", "kotlin-runner.jar")))
+        jarFileLoader.loadClass(RUNNER_MAIN_CLASS).getDeclaredMethod("main", Array<String>::class.java)
     }
 
-    fun runScriptAndExit(scriptClassPath: String, execClassName: String, userArgs: List<String>, kotlinOpts: String) {
+    fun compile(compilerOpts: List<String>, targetJarFile: File, sourceFiles: List<File>, classpath: String?) {
+        val baseArgs = listOf("-Xskip-runtime-version-check") +
+                compilerOpts + listOf("-d", targetJarFile.absolutePath)
+        val cpArgs = classPathArgs(classpath)
+        runKotlinc(baseArgs + sourceFiles.map { it.absolutePath } + cpArgs)
+    }
+
+    fun runScript(scriptClassPath: String, execClassName: String, userArgs: List<String>, kotlinOpts: List<String>): Int {
         val runnerArgs = listOf("-cp", scriptClassPath, execClassName) + userArgs
-        if (kotlinOpts.isNotEmpty()) {
-            exitProcess(execKotlin(kotlinOpts, runnerArgs))
+        return if (kotlinOpts.isNotEmpty()) {
+            execKotlin(kotlinOpts, runnerArgs)
         } else {
             runKotlin(runnerArgs)
-            exitProcess(0)
+            // it would be unreachable if the script calls exitProcess()
+            0
         }
     }
 
-    fun interactiveShell(jarFile: File, classpath: String?, compilerOpts: String, kotlinOpts: String) {
-        val compilerArgs = if (compilerOpts.isNotEmpty()) compilerOpts.split("\\s+".toRegex()) else listOf()
+    fun interactiveShell(jarFile: File, classpath: String?, compilerOpts: List<String>, kotlinOpts: List<String>) {
         val jarPath = if (jarFile.isFile) jarFile.absolutePath else null
-        val args = compilerArgs + classPathArgs(classpath, jarPath)
+        val args = compilerOpts + classPathArgs(classpath, jarPath)
         if (kotlinOpts.isNotEmpty()) {
             execKotlinc(kotlinOpts, args)
         } else {
@@ -62,36 +64,33 @@ class KotlinRunner(val kotlinHome: String) {
         preloaderMainMethod.invoke(jarFileLoader, (compilerBaseArgs + args).toTypedArray())
     }
 
-    private fun execKotlinc(kotlinOpts: String, args: List<String>): Int {
-        val kotlinOptsList = kotlinOpts.split("\\s+".toRegex())
+    private fun execKotlinc(kotlinOpts: List<String>, args: List<String>): Int {
         return if (IS_WINDOWS) {
-            val (javaOpts, pureKotlinOpts) = kotlinOptsList.partition { it.startsWith("-J") || it.startsWith("-D") }
-            val pureJavaOpts = javaOpts.map { if (it.startsWith("-J")) it.substring(2) else it }
-            val javaCmd = System.getenv("JAVACMD") ?: "java"
-            exec(listOf(javaCmd) + pureJavaOpts + compilerBaseArgs + pureKotlinOpts + args)
+            execJava(kotlinOpts, compilerBaseArgs, args)
         } else {
-            exec(listOf("kotlinc") + kotlinOptsList + args)
+            exec(listOf("kotlinc") + kotlinOpts + args)
         }
     }
-
 
     private fun runKotlin(args: Collection<String>) {
-        val runnerMain = jarFileLoader.loadClass(RUNNER_MAIN_CLASS).getDeclaredMethod("main", Array<String>::class.java)
-        runnerMain.invoke(jarFileLoader, args.toTypedArray())
+        runnerMainMethod.invoke(jarFileLoader, args.toTypedArray())
     }
 
-    private fun execKotlin(kotlinOpts: String, args: List<String>): Int {
-        val kotlinOptsList = kotlinOpts.split("\\s+".toRegex())
+    private fun execKotlin(kotlinOpts: List<String>, args: List<String>): Int {
         return if (IS_WINDOWS) {
             val runnerJar = joinToPathString(kotlinHome, "lib", "kotlin-runner.jar")
-            val (javaOpts, pureKotlinOpts) = kotlinOptsList.partition { it.startsWith("-J") || it.startsWith("-D") }
-            val pureJavaOpts = javaOpts.map { if (it.startsWith("-J")) it.substring(2) else it }
-            val javaCmd = System.getenv("JAVACMD") ?: "java"
-            exec(listOf(javaCmd) + pureJavaOpts + listOf("-Dkotlin.home=${kotlinHome}", "-cp", runnerJar, RUNNER_MAIN_CLASS)
-                    + pureKotlinOpts + args)
+            val kotlinAppArgs = listOf("-Dkotlin.home=$kotlinHome", "-cp", runnerJar, RUNNER_MAIN_CLASS)
+            execJava(kotlinOpts, kotlinAppArgs, args)
         } else {
-            exec(listOf("kotlin") + kotlinOptsList + args)
+            exec(listOf("kotlin") + kotlinOpts + args)
         }
+    }
+
+    private fun execJava(kotlinOpts: List<String>, kotlinAppArgs: List<String>, args: List<String>): Int {
+        val (javaOpts, pureKotlinOpts) = kotlinOpts.partition { it.startsWith("-J") || it.startsWith("-D") }
+        val pureJavaOpts = javaOpts.map { if (it.startsWith("-J")) it.substring(2) else it }
+        val javaCmd = System.getenv("JAVACMD") ?: "java"
+        return exec(listOf(javaCmd) + pureJavaOpts + kotlinAppArgs + pureKotlinOpts + args)
     }
 
     private fun exec(commandList: List<String>) =
@@ -101,3 +100,4 @@ class KotlinRunner(val kotlinHome: String) {
                     .start()
                     .waitFor()
 }
+
