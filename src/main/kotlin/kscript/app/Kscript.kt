@@ -237,8 +237,8 @@ fun main(args: Array<String>) {
     }
 
 
-    // print the final command to be run by exec
-    val joinedUserArgs = userArgs.joinToString(" ")
+    // print the final command to be run by eval+exec
+    val joinedUserArgs = userArgs.map { "\"${it.replace("\"", "\\\"")}\"" }.joinToString(" ")
 
     //if requested try to package the into a standalone binary
     if (docopt.getBoolean("package")) {

@@ -25,4 +25,4 @@ jarPath=$(dirname $abs_kscript_path)/kscript.jar
 if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
 
 ## run it using command substitution to have just the user process once kscript is done
-exec $(kotlin -classpath ${jarPath} kscript.app.KscriptKt "$@")
+eval "exec $(kotlin -classpath ${jarPath} kscript.app.KscriptKt "$@")"
