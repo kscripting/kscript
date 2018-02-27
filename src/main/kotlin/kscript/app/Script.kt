@@ -2,15 +2,56 @@ package kscript.app
 
 import java.io.File
 import java.lang.IllegalArgumentException
+import java.net.URL
 
 /* Immutable script class */
-data class Script(val lines: List<String>, val extension: String = "kts") : Iterable<String> {
+data class Script(
+        val lines: List<String>,
+        val extension: String = "kts",
+        val file: File = createTmpScript(lines.joinToString("\n"), extension),
+        private var originUrl: URL? = null) : Iterable<String> {
 
-    constructor(scriptFile: File) : this(scriptFile.readLines(), scriptFile.extension)
+    constructor(scriptFile: File) : this(scriptFile.readLines(), scriptFile.extension, scriptFile)
+    constructor(url: URL) : this(fetchFromURL(url.toString())) {
+        originUrl = url
+    }
 
     /** Returns a the namespace/package of the script (if declared). */
     val pckg by lazy {
         lines.find { it.startsWith("package ") }?.split("[ ]+".toRegex())?.get(1)?.run { this + "." }
+    }
+
+    val includes by lazy {
+        lines.mapNotNull {
+            if (isIncludeDirective(it)) extractIncludeTarget(it) else null
+        }.map {
+            when {
+                // absolute file/url
+                isUrl(it) -> Script(URL(it))
+                it.startsWith("/") -> Script(File(it))
+
+                // relative file/url
+                originUrl != null -> Script(originUrl!!.toURI().resolve(it).normalize().toURL())
+                else -> Script(file.parentFile.resolve(it).normalize())
+            }
+        }.toMutableList()
+    }
+
+    val deps by lazy {
+        lines.flatMap {
+            if (isDependDeclare(it)) extractDependencies(it) else emptyList()
+        } + if (lines.any { isKscriptAnnotation(it) }) listOf("com.github.holgerbrandl:kscript-annotations:1.2") else emptyList()
+    }
+
+    val repos: List<MavenRepo> by lazy { collectRepos() }
+
+    fun <T> recursive(property: Script.() -> Iterable<T>): Set<T> {
+        return linkedSetOf<T>().also { recursivelyCollectTo(it, property) }
+    }
+
+    private fun <T> recursivelyCollectTo(out: MutableSet<T>, property: Script.() -> Iterable<T>) {
+        out.addAll(property())
+        includes.forEach { it.recursivelyCollectTo(out, property) }
     }
 
     override fun toString(): String = lines.joinToString("\n")
@@ -19,13 +60,13 @@ data class Script(val lines: List<String>, val extension: String = "kts") : Iter
     override fun iterator(): Iterator<String> = lines.iterator()
 
 
-    fun stripShebang(): Script = lines.filterNot { it.startsWith("#!/") }.let { copy(it) }
+    fun stripShebang(): Script = lines.filterNot { it.startsWith("#!/") }.let { Script(it, extension) }
 
 
     fun createTmpScript() = createTmpScript(toString(), extension)
 
 
-    fun prependWith(preamble: String): Script = copy(lines = preamble.lines() + lines).consolidateStructure()
+    fun prependWith(preamble: String): Script = Script(preamble.lines() + lines, extension).consolidateStructure()
 
 
     fun consolidateStructure(): Script {
@@ -66,7 +107,7 @@ data class Script(val lines: List<String>, val extension: String = "kts") : Iter
             codeBits.forEach { appendln(it) }
         }
 
-        return copy(lines = consolidated.lines())
+        return Script(consolidated.lines(), extension)
     }
 }
 

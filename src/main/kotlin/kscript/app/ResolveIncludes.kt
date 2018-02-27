@@ -29,8 +29,7 @@ fun resolveIncludes(template: File, includeContext: URI = template.parentFile.to
                 val include = extractIncludeTarget(it)
 
                 val includeURL = when {
-                    include.startsWith("http://") -> URL(include)
-                    include.startsWith("https://") -> URL(include)
+                    isUrl(include) -> URL(include)
                     include.startsWith("/") -> File(include).toURI().toURL()
                     else -> includeContext.resolve(URI(include.removePrefix("./"))).toURL()
                 }
@@ -51,13 +50,14 @@ fun resolveIncludes(template: File, includeContext: URI = template.parentFile.to
     return script.consolidateStructure().createTmpScript()
 }
 
+internal fun isUrl(s: String) = s.startsWith("http://") || s.startsWith("https://")
 
 private const val INCLUDE_ANNOT_PREFIX = "@file:Include("
 
-private fun isIncludeDirective(line: String) = line.startsWith("//INCLUDE") || line.startsWith(INCLUDE_ANNOT_PREFIX)
+internal fun isIncludeDirective(line: String) = line.startsWith("//INCLUDE") || line.startsWith(INCLUDE_ANNOT_PREFIX)
 
 
-private fun extractIncludeTarget(incDirective: String) = when {
+internal fun extractIncludeTarget(incDirective: String) = when {
     incDirective.startsWith(INCLUDE_ANNOT_PREFIX) -> incDirective
         .replaceFirst(INCLUDE_ANNOT_PREFIX, "")
         .split(")")[0].trim(' ', '"')

@@ -99,6 +99,9 @@ object ShellUtils {
 fun infoMsg(msg: String) = System.err.println("[kscript] " + msg)
 
 
+fun warnMsg(msg: String) = System.err.println("[kscript] [WARN] " + msg)
+
+
 fun errorMsg(msg: String) = System.err.println("[kscript] [ERROR] " + msg)
 
 
@@ -133,9 +136,10 @@ fun createTmpScript(scriptText: String, extension: String = "kts"): File {
 fun String.stripShebang(): String = lines().dropWhile { it.startsWith("#!/") }.joinToString("\n")
 
 
-fun fetchFromURL(scriptURL: String): File? {
+fun fetchFromURL(scriptURL: String): File {
     val urlHash = md5(scriptURL)
-    val urlCache = File(KSCRIPT_CACHE_DIR, "/url_cache_${urlHash}.kts")
+    val urlExtension = if (scriptURL.endsWith(".kt")) "kt" else "kts"
+    val urlCache = File(KSCRIPT_CACHE_DIR, "/url_cache_${urlHash}.$urlExtension")
 
     if (!urlCache.isFile) {
         urlCache.writeText(URL(scriptURL).readText())
@@ -190,10 +194,10 @@ fun numLines(str: String) = str.split("\r\n|\r|\n".toRegex()).dropLastWhile { it
 fun info(msg: String) = System.err.println(msg)
 
 
-fun launchIdeaWithKscriptlet(scriptFile: File, dependencies: List<String>, customRepos: List<MavenRepo>): String {
+fun launchIdeaWithKscriptlet(script: Script): String {
     requireInPath("idea", "Could not find 'idea' in your PATH. It can be created in IntelliJ under `Tools -> Create Command-line Launcher`")
 
-    System.err.println("Setting up idea project from ${scriptFile}")
+    System.err.println("Setting up idea project from ${script.file}")
 
     //    val tmpProjectDir = createTempDir("edit_kscript", suffix="")
     //            .run { File(this, "kscript_tmp_project") }
@@ -202,14 +206,20 @@ fun launchIdeaWithKscriptlet(scriptFile: File, dependencies: List<String>, custo
 
     //  fixme use tmp instead of cachdir. Fails for now because idea gradle import does not seem to like tmp
     val tmpProjectDir = KSCRIPT_CACHE_DIR
-        .run { File(this, "kscript_tmp_project__${scriptFile.name}_${System.currentTimeMillis()}") }
+        .run { File(this, "kscript_tmp_project__${script.file.name}_${System.currentTimeMillis()}") }
         .apply { mkdir() }
     //    val tmpProjectDir = File("/Users/brandl/Desktop/")
     //            .run { File(this, "kscript_tmp_project") }
     //            .apply { mkdir() }
 
-    val stringifiedDeps = dependencies.map { "    compile \"$it\"" }.joinToString("\n")
-    val stringifiedRepos = customRepos.map { "    maven {\n        url '${it.url}'\n    }\n" }.joinToString("\n")
+    val stringifiedDeps = script
+            .recursive { deps }
+            .map { "    compile \"$it\"" }
+            .joinToString("\n")
+    val stringifiedRepos = script
+            .recursive { repos }
+            .map { "    maven {\n        url '${it.url}'\n    }\n" }
+            .joinToString("\n")
 
     val gradleScript = """
 plugins {
@@ -236,14 +246,19 @@ sourceSets.main.java.srcDirs 'src'
     File(tmpProjectDir, "src").run {
         mkdir()
 
-        val tmpProjectScript = File(this, scriptFile.name)
+        (setOf(script) + script.recursive { includes }).forEach { includedScript ->
+            if (includedScript != script && includedScript.extension == "kts") {
+                warnMsg("$includedScript: terms in .kts may not be resolved in idea. Use .kt for library scripts")
+            }
+            val tmpProjectScript = File(this, includedScript.file.name)
 
-        // https://stackoverflow.com/questions/17926459/creating-a-symbolic-link-with-java
-        try {
-            Files.createSymbolicLink(tmpProjectScript.toPath(), scriptFile.absoluteFile.toPath());
-        } catch (e: IOException) {
-            errorMsg("Failed to create symbolic link to script. Copying instead...")
-            scriptFile.copyTo(tmpProjectScript)
+            // https://stackoverflow.com/questions/17926459/creating-a-symbolic-link-with-java
+            try {
+                Files.createSymbolicLink(tmpProjectScript.toPath(), includedScript.file.absoluteFile.toPath());
+            } catch (e: IOException) {
+                errorMsg("Failed to create symbolic link to script. Copying instead...")
+                includedScript.file.copyTo(tmpProjectScript)
+            }
         }
     }
 

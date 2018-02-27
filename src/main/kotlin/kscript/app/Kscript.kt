@@ -54,6 +54,14 @@ Website   : https://github.com/holgerbrandl/kscript
 val KSCRIPT_CACHE_DIR = File(System.getenv("HOME")!!, ".kscript")
 val SCRIPT_TEMP_DIR = createTempDir()
 
+const val SUPPORT_API_PREAMBLE = """
+//DEPS com.github.holgerbrandl:kscript-support:1.2.4
+
+import kscript.text.*
+val lines = resolveArgFile(args)
+
+"""
+
 fun main(args: Array<String>) {
     // skip org.docopt for version and help to allow for lazy version-check
     if (args.size == 1 && listOf("--help", "-h", "--version", "-v").contains(args[0])) {
@@ -85,7 +93,7 @@ fun main(args: Array<String>) {
 
     // optionally self-update kscript ot the newest version
     // (if not local copy is not being maintained by sdkman)
-    if (docopt.getBoolean(("self-update"))) {
+    if (docopt.getBoolean("self-update")) {
         if (true || evalBash("which kscript | grep .sdkman").stdout.isNotBlank()) {
             info("Installing latest version of kscript...")
             //            println("sdkman_auto_answer=true && sdk install kscript")
@@ -114,24 +122,39 @@ fun main(args: Array<String>) {
 
     // Resolve the script resource argument into an actual file
     val scriptResource = docopt.getString("script")
-    val scriptFile = prepareScript(scriptResource, enableSupportApi = docopt.getBoolean("text"))
+    var script = Script(prepareScript(scriptResource))
 
-    val script = Script(scriptFile)
-
-
-    // Find all //DEPS directives and concatenate their values
-    val dependencies = script.collectDependencies()
-    val customRepos = script.collectRepos()
-
+    val customPreamble = System.getenv("CUSTOM_KSCRIPT_PREAMBLE")
+    val enableSupportApi = docopt.getBoolean("text")
 
     //  Create temporary dev environment
     if (docopt.getBoolean("idea")) {
-        println(launchIdeaWithKscriptlet(scriptFile, dependencies, customRepos))
+
+        // Treat preambles as anonymous included scripts
+        customPreamble?.let { interpPreamble ->
+            script.includes.add(0, Script(interpPreamble.lines(), extension = "kt"))
+        }
+        if (enableSupportApi) {
+            script.includes.add(0, Script(SUPPORT_API_PREAMBLE.lines(), extension = "kt"))
+        }
+
+        println(launchIdeaWithKscriptlet(script))
         exitProcess(0)
     }
 
+    // include preamble for custom interpreters (see https://github.com/holgerbrandl/kscript/issues/67)
+    customPreamble?.let { interpPreamble ->
+        script = Script(script.prependWith(interpPreamble).createTmpScript())
+    }
 
-    val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled) ?: ""
+    // prefix with text-processing preamble if kscript-support api is enabled
+    if (enableSupportApi) {
+        script = Script(script.prependWith(SUPPORT_API_PREAMBLE).createTmpScript())
+    }
+
+    script = Script(resolveIncludes(script.file))
+
+    val classpath = resolveDependencies(script.deps, script.repos, loggingEnabled) ?: ""
     val optionalCpArg = if (classpath.isNotEmpty()) "-classpath '${classpath}'" else ""
 
     // Extract kotlin arguments
@@ -141,7 +164,7 @@ fun main(args: Array<String>) {
 
     //  Optionally enter interactive mode
     if (docopt.getBoolean("interactive")) {
-        infoMsg("Creating REPL from ${scriptFile}")
+        infoMsg("Creating REPL from ${script.file}")
         //        System.err.println("kotlinc ${kotlinOpts} -classpath '${classpath}'")
 
         println("kotlinc ${compilerOpts} ${kotlinOpts} ${optionalCpArg}")
@@ -149,8 +172,8 @@ fun main(args: Array<String>) {
         exitProcess(0)
     }
 
-    val scriptFileExt = scriptFile.extension
-    val scriptCheckSum = md5(scriptFile)
+    val scriptFileExt = script.file.extension
+    val scriptCheckSum = md5(script.file)
 
 
     // Even if we just need and support the //ENTRY directive in case of kt-class
@@ -162,14 +185,14 @@ fun main(args: Array<String>) {
     }
 
 
-    val jarFile = if (scriptFile.nameWithoutExtension.endsWith(scriptCheckSum)) {
-        File(KSCRIPT_CACHE_DIR, scriptFile.nameWithoutExtension + ".jar")
+    val jarFile = if (script.file.nameWithoutExtension.endsWith(scriptCheckSum)) {
+        File(KSCRIPT_CACHE_DIR, script.file.nameWithoutExtension + ".jar")
     } else {
-        File(KSCRIPT_CACHE_DIR, scriptFile.nameWithoutExtension + "." + scriptCheckSum + ".jar")
+        File(KSCRIPT_CACHE_DIR, script.file.nameWithoutExtension + "." + scriptCheckSum + ".jar")
     }
 
     // Capitalize first letter and get rid of dashes (since this is what kotlin compiler is doing for the wrapper to create a valid java class name)
-    val className = scriptFile.nameWithoutExtension
+    val className = script.file.nameWithoutExtension
         .replace("[.-]".toRegex(), "_")
         .capitalize()
 
@@ -230,7 +253,7 @@ fun main(args: Array<String>) {
             ""
         }
 
-        val scriptCompileResult = evalBash("kotlinc ${compilerOpts} ${optionalCpArg} -d '${jarFile.absolutePath}' '${scriptFile.absolutePath}' ${wrapperSrcArg}")
+        val scriptCompileResult = evalBash("kotlinc ${compilerOpts} ${optionalCpArg} -d '${jarFile.absolutePath}' '${script.file.absolutePath}' ${wrapperSrcArg}")
         with(scriptCompileResult) {
             errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
         }
@@ -245,10 +268,10 @@ fun main(args: Array<String>) {
         val binaryName = if (File(scriptResource).run { canRead() && listOf("kts", "kt").contains(extension) }) {
             File(scriptResource).nameWithoutExtension
         } else {
-            "k" + scriptFile.nameWithoutExtension
+            "k" + script.file.nameWithoutExtension
         }
 
-        packageKscript(jarFile, execClassName, dependencies, customRepos, kotlinOpts, binaryName)
+        packageKscript(jarFile, execClassName, script.deps, script.repos, kotlinOpts, binaryName)
 
         quit(0)
     }
@@ -286,7 +309,7 @@ private fun versionCheck() {
 
 
 
-fun prepareScript(scriptResource: String, enableSupportApi: Boolean): File {
+fun prepareScript(scriptResource: String): File {
     var scriptFile: File?
 
     // we need to keep track of the scripts dir or the working dir in case of stdin script to correctly resolve includes
@@ -326,7 +349,7 @@ fun prepareScript(scriptResource: String, enableSupportApi: Boolean): File {
     }
 
 
-    // Support for support process substitution and direct script arguments
+    // Support for process substitution and direct script arguments
     if (scriptFile == null && !scriptResource.endsWith(".kts") && !scriptResource.endsWith(".kt")) {
         val scriptText = if (File(scriptResource).canRead()) {
             File(scriptResource).readText().trim()
@@ -344,30 +367,5 @@ fun prepareScript(scriptResource: String, enableSupportApi: Boolean): File {
     }
 
     // note script file must be not null at this point
-
-    // include preamble for custom interpreters (see https://github.com/holgerbrandl/kscript/issues/67)
-    System.getenv("CUSTOM_KSCRIPT_PREAMBLE")?.let { interpPreamble ->
-        scriptFile = Script(scriptFile!!).prependWith(interpPreamble).createTmpScript()
-    }
-
-    // prefix with text-processing preamble if kscript-support api is enabled
-    if (enableSupportApi) {
-        val textProcPreamble = """
-            //DEPS com.github.holgerbrandl:kscript-support:1.2.4
-
-            import kscript.text.*
-            val lines = resolveArgFile(args)
-
-            """.trimIndent()
-
-        scriptFile = Script(scriptFile!!).prependWith(textProcPreamble).createTmpScript()
-    }
-
-    //    System.err.println("[kscript] temp script file is ${scriptFile}")
-    //    System.err.println("[kscript] temp script file is \n${Script(scriptFile!!)}")
-
-    // resolve all includes (see https://github.com/holgerbrandl/kscript/issues/34)
-    scriptFile = resolveIncludes(scriptFile!!, includeContext)
-
     return scriptFile!!
 }
