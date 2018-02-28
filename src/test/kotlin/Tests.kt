@@ -160,4 +160,10 @@ class Tests {
 
         result.readText() shouldBe (expected.readText())
     }
+
+    @Test
+    fun test_include_detection() {
+        val script = Script(File("test/resources/includes/include_variations.kts"))
+        script.includes.map { it.file.name } shouldBe List(4) { "include_${it+1}.kt" }
+    }
 }
