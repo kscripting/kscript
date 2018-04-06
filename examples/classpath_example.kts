@@ -1,4 +1,5 @@
 #!/usr/bin/env kscript
+
 //DEPS com.offbytwo:docopt:0.6.0.20150202,log4j:log4j:1.2.14
 
 //#!/usr/bin/env kotlinc -script -classpath /Users/brandl/.m2/repository/org/docopt/docopt/0.6.0-SNAPSHOT/docopt-0.6.0-SNAPSHOT.jar
@@ -11,34 +12,34 @@ import java.util.*
 // woraround for https://youtrack.jetbrains.com/issue/KT-13347
 //val args = listOf("foo", "bar")
 
+val usage ="""
+kscript is a wrapper to "interpret" the Kotlin source file in the way similar to SHELL script or "kotlinc -script"
 
-var test = File("sdf")
-val usage = """
-Usage: jl <command> [options] [<joblist_file>]
+Usage:
+    kscript ( -t | --text ) <text>
+    kscript [ --interactive | --idea | --package ] [--] [ - | <file or URL> ]...
+    kscript (-h | --help)
+    kscript --self-update
 
-Supported commands are
-  submit    Submits a job to the underlying queuing system and adds it to the list
-  add       Extracts job-ids from stdin and adds them to the list
-  wait      Wait for a list of jobs to finish
-  status    Prints various statistics and allows to create an html report for the list
-  kill      Removes all  jobs of this list from the scheduler queue
-  up        Moves a list of jobs to the top of a queue (if supported by the underlying scheduler)
-  reset     Removes all information related to this joblist.
-
-If no <joblist_file> is provided, jl will use '.jobs' as default
+Options:
+    -t, --text      text processing mode
+    --package       deploy scripts as standalone binaries
+    --idea          boostrap IDEA from a kscript
+    --interactive   treat yourself a REPL
+    -               to read script from the STDIN
+    -h, --help      this screen
+    --self-update   kscript updates itself
 """
 
-val doArgs = Docopt(usage).
-        parse(args.toList()).
-        map { it ->
-            it.key.removePrefix("--").replace("[<>]", "") to {
-                if (it.value == null) null else Objects.toString(it.value)
-            }
-        }
+val doArgs = Docopt(usage).parse(args.toList())
 
-println("parsed args are: \n" + doArgs)
+println("parsed args are: \n$doArgs (${doArgs.javaClass.simpleName})\n")
 
-println("Hello from Kotlin!")
+doArgs.forEach { (key: Any, value: Any) ->
+    println("$key:\t$value\t(${value?.javaClass?.canonicalName})")
+}
+
+println("\nHello from Kotlin!")
 for (arg in args) {
     println("arg: $arg")
 }
