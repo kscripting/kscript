@@ -39,7 +39,7 @@ Use '--self-update' to update kscript to the latest version
 
 Options:
  -i --interactive        Create interactive shell with dependencies as declared in script
- -t --text               Enable stdin support API for more streamlined text processing
+ -t --text <version>              Enable stdin support API for more streamlined text processing  [default: latest]
  --idea                  Open script in temporary Intellij session
  -s --silent             Suppress status logging to stderr
  --package               Package script and dependencies into self-dependent binary
