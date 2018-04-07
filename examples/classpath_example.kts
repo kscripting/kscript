@@ -13,22 +13,23 @@ import java.util.*
 //val args = listOf("foo", "bar")
 
 val usage ="""
-kscript is a wrapper to "interpret" the Kotlin source file in the way similar to SHELL script or "kotlinc -script"
+kscript  - Enhanced scripting support for Kotlin on *nix-based systems.
 
 Usage:
-    kscript ( -t | --text ) <text>
-    kscript [ --interactive | --idea | --package ] [--] [ - | <file or URL> ]...
+    kscript ( -t | --text ) <version>
+    kscript [ --interactive | --idea | --package ] [--] ( - | <file or URL> ) [<args>]...
     kscript (-h | --help)
-    kscript --self-update
+    kscript ( --self-update | --clear-cache )
 
 Options:
-    -t, --text      text processing mode
-    --package       deploy scripts as standalone binaries
-    --idea          boostrap IDEA from a kscript
-    --interactive   treat yourself a REPL
-    -               to read script from the STDIN
-    -h, --help      this screen
-    --self-update   kscript updates itself
+    -t, --text         Enable stdin support API for more streamlined text processing  [default: latest]
+    --package          Package script and dependencies into self-dependent binary
+    --idea             boostrap IDEA from a kscript
+    -i, --interactive  Create interactive shell with dependencies as declared in script
+    -                  Read script from the STDIN
+    -h, --help         Print this text
+    --self-update      Update kscript to the latest version
+    --clear-cache      Wipe cached script jars and urls
 """
 
 val doArgs = Docopt(usage).parse(args.toList())
