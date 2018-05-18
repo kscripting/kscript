@@ -23,9 +23,6 @@ abs_kscript_path=$(resolve_symlink $(absolute_path $0))
 ## resolve application jar path from script location and convert to windows path when using cygwin
 jarPath=$(dirname $abs_kscript_path)/kscript.jar
 
-## prefer KOTLIN_HOME instead of PATH to resolve `kotlin` location (see #145)
-if [[ -z "$KOTLIN_HOME" ]]; then KOTLIN_EXEC="kotlin"; else KOTLIN_EXEC="$KOTLIN_HOME/bin/kotlin"; fi
-
 ## expose the name of the script being run to the script itself
 export KSCRIPT_FILE="$1"
 
@@ -48,7 +45,7 @@ while [ $# -gt 0 ]; do
       shift
       ;;
     -J*)
-      java_args=("${java_args[@]}" "$1")
+      java_args=("${java_args[@]}" "${1:2}")
       shift
       ;;
     *)
@@ -59,4 +56,4 @@ while [ $# -gt 0 ]; do
 done
 
 ## run it
-exec ${KOTLIN_EXEC} "${java_args[@]}" -classpath ${jarPath} kscript.app.KscriptKt "${kscript_args[@]}"
+exec ${JAVACMD:=java} "${java_args[@]}" -jar ${jarPath} "${kscript_args[@]}"
