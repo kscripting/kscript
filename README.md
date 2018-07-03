@@ -41,7 +41,7 @@ Taken all these features together, `kscript` provides an easy-to-use, very flexi
 Installation
 ------------
 
-To use `kscript` just Kotlin and Maven are required. To [install Kotlin](https://kotlinlang.org/docs/tutorials/command-line.html) we recommend [sdkman](http://sdkman.io/install.html):
+To use `kscript` just Kotlin and Maven are required. To [install Kotlin](https://kotlinlang.org/docs/tutorials/command-line.html) we recommend [sdkman](http://sdkman.io/install):
 ```
 curl -s "https://get.sdkman.io" | bash  # install sdkman
 source ~/.bash_profile                  # add sdkman to PATH
