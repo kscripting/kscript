@@ -214,7 +214,7 @@ fun launchIdeaWithKscriptlet(scriptFile: File, dependencies: List<String>, custo
 
     val gradleScript = """
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.2.41"
+    id "org.jetbrains.kotlin.jvm" version "${KotlinVersion.CURRENT}"
 }
 
 repositories {
@@ -296,7 +296,7 @@ fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List
 
     val gradleScript = """
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.2.41"
+    id "org.jetbrains.kotlin.jvm" version "${KotlinVersion.CURRENT}"
     id "us.kirchmeier.capsule" version "1.0.2"
 }
 
@@ -310,7 +310,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib"
 $stringifiedDeps
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '1.2.41'
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '${KotlinVersion.CURRENT}'
 
     // https://stackoverflow.com/questions/20700053/how-to-add-local-jar-file-dependency-to-build-gradle-file
     compile files('${scriptJar}')
