@@ -168,4 +168,24 @@ class Tests {
         result.includes.filter { it.protocol == "file" }.map { File(it.toURI()).name } shouldBe List(4) { "include_${it + 1}.kt" }
         result.includes.filter { it.protocol != "file" }.size shouldBe 1
     }
+
+    @Test
+    fun test_include_dir() {
+        val file = File("test/resources/include_dir/input.kts")
+        val expected = File("test/resources/include_dir/expected.kts")
+
+        val result = resolveIncludes(file)
+
+        result.scriptFile.readText() shouldBe (expected.readText())
+    }
+
+    @Test
+    fun test_include_dirs() {
+        val file = File("test/resources/include_dirs/input.kts")
+        val expected = File("test/resources/include_dirs/expected.kts")
+
+        val result = resolveIncludes(file)
+
+        result.scriptFile.readText() shouldBe (expected.readText())
+    }
 }
