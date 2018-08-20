@@ -1,0 +1,1 @@
+fun comment_dot_include_2() = println("comment_dot_include_2")

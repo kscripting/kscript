@@ -1,0 +1,1 @@
+fun annotation_dot_include_3() = println("annotation_dot_include_3")

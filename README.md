@@ -187,6 +187,8 @@ The following directives supported by `kscript` to configure scripts:
 * `//DEPS` to declare dependencies with gradle-style locators
 * `//KOTLIN_OPTS`  to configure the kotlin/java runtime environment
 * `//INCLUDE` to source kotlin files into the script
+* `//INCLUDE_DIR` to source all kotlin files in a directory into the script
+* `//INCLUDE_DIRS` to recursively source all kotlin files in a directory into the script
 * `//ENTRY` to declare the application entrypoint for kotlin `*.kt` applications
 
 
@@ -255,7 +257,9 @@ println(robustMean)
 ```
 The argument can be an URL, absolute or relative file path. Note that URLs used in include directives are cached locally to speed up processing, that is `kscript` won't fetch URLs again unless the user actively clears the cache with `kscript --clear-cache`.
 
-For more examples see [here](test/resources/includes/include_variations.kts).
+Similarly, you can use `//INCLUDE_DIR` to directly include all files in a single directory, or `//INCLUDE_DIRS` to recursively include all files in a directory and its subdirectories.
+
+For more examples see [INCLUDE here](test/resources/includes/include_variations.kts), [INCLUDE_DIR here](test/resources/include_dir/input.kts), or [INCLUDE_DIRS here](test/resources/include_dirs/input.kts)
 
 
 ### Use `//ENTRY` to run applications with `main` method
@@ -317,6 +321,8 @@ Using annotations instead of comment directives to configure scripts is cleaner 
 
 // Include helper scripts without deployment or prior compilation
 @file:Include("util.kt")
+@file:IncludeDir("utils")
+@file:IncludeDirs("utils")
 
 
 // Define kotlin options
