@@ -2,19 +2,21 @@ package kscript.app
 
 fun buildPom(depIds: List<String>, customRepos: List<MavenRepo>): String {
     val depTags = depIds.map {
-        val splitDepId = it.split(":")
+        val regex = Regex("^([^:]*):([^:]*):([^:@]*)(:(.*))?(@(.*))?\$")
+        val matchResult = regex.find(it)
 
-        if (!listOf(3, 4).contains(splitDepId.size)) {
-            System.err.println("[ERROR] Invalid dependency locator: '${it}'.  Expected format is groupId:artifactId:version[:classifier]")
+        if (matchResult == null) {
+            System.err.println("[ERROR] Invalid dependency locator: '${it}'.  Expected format is groupId:artifactId:version[:classifier][@type]")
             quit(1)
         }
 
         """
     <dependency>
-            <groupId>${splitDepId[0]}</groupId>
-            <artifactId>${splitDepId[1]}</artifactId>
-            <version>${splitDepId[2]}</version>
-            ${if (splitDepId.size == 4) "<classifier>" + splitDepId[3] + "<classifier>" else ""}
+            <groupId>${matchResult.groupValues[1]}</groupId>
+            <artifactId>${matchResult.groupValues[2]}</artifactId>
+            <version>${matchResult.groupValues[3]}</version>
+            ${matchResult.groups[5]?.let { "<classifier>" + it.value + "</classifier>"} ?: ""}
+            ${matchResult.groups[7]?.let { "<type>" + it.value + "</type>"} ?: ""}
     </dependency>
     """
     }

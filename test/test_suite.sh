@@ -78,6 +78,9 @@ assert "kscript i_do_not_exist.kts 2>&1" "[kscript] [ERROR] Could not read scrip
 ## make sure that it runs with remote URLs
 assert "kscript https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/url_test.kts" "I came from the internet"
 
+## there are some dependencies which are not jar, but maybe pom, aar, ..
+## make sure they work, too
+assert "kscript ${KSCRIPT_HOME}/test/resources/depends_on_with_type.kts" "getBigDecimal(1L): 1"
 
 # repeated compilation of buggy same script should end up in error again
 assert_raises "kscript '1-'; kscript '1-'" 1
@@ -130,7 +133,7 @@ assert "resolve_deps log4j:log4j:9.8.76" "false"
 ## wrong format should exit with 1
 assert "resolve_deps log4j:1.0" "false"
 
-assert_stderr "resolve_deps log4j:1.0" "[ERROR] Invalid dependency locator: 'log4j:1.0'.  Expected format is groupId:artifactId:version[:classifier]"
+assert_stderr "resolve_deps log4j:1.0" "[ERROR] Invalid dependency locator: 'log4j:1.0'.  Expected format is groupId:artifactId:version[:classifier][@type]"
 
 ## other version of wrong format should die with useful error.
 assert_raises "resolve_deps log4j:::1.0" 1
