@@ -21,9 +21,7 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
 
     // Use cached classpath from previous run if present
     if (DEP_LOOKUP_CACHE_FILE.isFile()) {
-        val cache = DEP_LOOKUP_CACHE_FILE.
-                readLines().filter { it.isNotBlank() }.
-                associateBy({ it.split(" ")[0] }, { it.split(" ")[1] })
+        val cache = DEP_LOOKUP_CACHE_FILE.readLines().filter { it.isNotBlank() }.associateBy({ it.split(" ")[0] }, { it.split(" ")[1] })
 
         if (cache.containsKey(depsHash)) {
             return cache.get(depsHash)
@@ -33,62 +31,6 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
 
     if (loggingEnabled) System.err.print("[kscript] Resolving dependencies...")
     var hasLoggedDownload = false
-
-    val depTags = depIds.map {
-        val splitDepId = it.split(":")
-
-        if (!listOf(3, 4).contains(splitDepId.size)) {
-            System.err.println("[ERROR] Invalid dependency locator: '${it}'.  Expected format is groupId:artifactId:version[:classifier]")
-            quit(1)
-        }
-
-        """
-    <dependency>
-            <groupId>${splitDepId[0]}</groupId>
-            <artifactId>${splitDepId[1]}</artifactId>
-            <version>${splitDepId[2]}</version>
-            ${if (splitDepId.size == 4) "<classifier>" + splitDepId[3] + "<classifier>" else ""}
-    </dependency>
-    """
-    }
-
-    // see https://github.com/holgerbrandl/kscript/issues/22
-    val repoTags = customRepos.map {
-        """
-    <repository>
-            <id>${it.id}</id>
-            <url>${it.url}</url>
-    </repository>
-    """
-
-    }
-
-    val pom = """
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
-
-    <groupId>kscript</groupId>
-    <artifactId>maven_template</artifactId>
-    <version>1.0</version>
-
-     <repositories>
-        <repository>
-            <id>jcenter</id>
-            <url>http://jcenter.bintray.com/</url>
-        </repository>
-        ${repoTags.joinToString("\n")}
-    </repositories>
-
-    <dependencies>
-    ${depTags.joinToString("\n")}
-    </dependencies>
-</project>
-"""
-
 
     fun runMaven(pom: String, goal: String): Iterable<String> {
         val temp = File.createTempFile("__resdeps__temp__", "_pom.xml")
@@ -119,6 +61,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         }).stdout.lines()
     }
 
+    val pom = buildPom(depIds, customRepos)
     val mavenResult = runMaven(pom, "dependency:build-classpath")
 
 
@@ -143,8 +86,8 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 
         System.err.println("[kscript] Generated pom file was:")
         pom.lines()
-            //            .map{it.prependIndent("[kscript] [pom] ")}
-            .forEach { System.err.println(it) }
+                //            .map{it.prependIndent("[kscript] [pom] ")}
+                .forEach { System.err.println(it) }
         quit(1)
     }
 
