@@ -1,5 +1,7 @@
 # kscript - Having fun with Kotlin scripting
 
+
+[![GitHub release](https://img.shields.io/github/release/holgerbrandl/kscript.svg)](https://github.com/holgerbrandl/kscript/releases)
 [![Build Status](https://travis-ci.org/holgerbrandl/kscript.svg?branch=master)](https://travis-ci.org/holgerbrandl/kscript)
 [![Gitter](https://badges.gitter.im/holgerbrandl/kscript.svg)](https://gitter.im/holgerbrandl/kscript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
