@@ -492,7 +492,7 @@ Help to spread the word. Great community articles about `kscript` include
 * [Type-safety in the shell with kscript](https://medium.com/@OhadShai/type-safety-in-the-shell-with-kscript-7dd40d022537)
 * [Using Kotlin kscript for Preprocessing Data](https://medium.com/@kenkyee/using-kotlin-kscript-for-preprocessing-data-1dbff4eae292)
 * [kscript as substitute for awk](https://holgerbrandl.github.io/kotlin/2017/05/08/kscript_as_awk_substitute.html)
-
+* [A complete backend with Kotlin and your favourite text-editor](https://hackernoon.com/a-complete-backend-only-with-kotlin-and-your-favourite-text-editor-582b4528688) -using kscript
 
 You could also show your support by upvoting `kscript` here on github, or by voting for issues in Intellij IDEA which impact `kscript`ing. Here are our top 2 tickets/annoyances that we would love to see fixed:
 
@@ -518,4 +518,3 @@ Special thanks to [Ilan Pillemer](https://github.com/ilanpillemer), [Andrey Misc
 Thanks also to the [Scionics Computer Innovation GmbH](https://www.scionics.com/) and the [MPI-CBG](http://www.mpi-cbg.de) for supporting this project.
 
 `kscript` was inspired by [kotlin-script](https://github.com/andrewoma/kotlin-script) which is another great way (now deprecated) to do scripting in Kotlin.
-
