@@ -167,7 +167,7 @@ internal fun extractDependencies(line: String) = when {
         .substringBeforeLast(")").trim(' ', '"').let { listOf(it) }
 
     line.startsWith(DEPS_COMMENT_PREFIX) ->
-        line.split("[ ;]+".toRegex()).drop(1).map(String::trim)
+        line.split("[ ;,]+".toRegex()).drop(1).map(String::trim)
 
     else ->
         throw IllegalArgumentException("can not extract entry point from non-directive")
