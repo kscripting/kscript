@@ -117,11 +117,20 @@ internal fun buildPom(depIds: List<String>, customRepos: List<MavenRepo>): Strin
             quit(1)
         }
 
+        // replace + with open version range for maven
+        val version = matchResult.groupValues[3].let {
+            if(it.endsWith("+")) {
+                "[${it.dropLast(1)},)"
+            } else {
+                it
+            }
+        }
+
         """
     <dependency>
             <groupId>${matchResult.groupValues[1]}</groupId>
             <artifactId>${matchResult.groupValues[2]}</artifactId>
-            <version>${matchResult.groupValues[3]}</version>
+            <version>$version</version>
             ${matchResult.groups[5]?.let { "<classifier>" + it.value + "</classifier>" } ?: ""}
             ${matchResult.groups[7]?.let { "<type>" + it.value + "</type>" } ?: ""}
     </dependency>
