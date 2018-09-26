@@ -15,7 +15,7 @@ class Tests {
     @Test
     fun directiveDependencyCollect() {
         val lines = listOf(
-            "//DEPS de.mpicbg.scicomp.joblist:joblist-kotlin:1.1, de.mpicbg.scicomp:kutils:0.7",
+            "//DEPS de.mpicbg.scicomp.joblist:joblist-kotlin:1.1; de.mpicbg.scicomp:kutils:0.7",
             "//DEPS  log4j:log4j:1.2.14"
         )
 
@@ -30,7 +30,7 @@ class Tests {
 
     @Test
     fun parseAnnotDependencies() {
-        val lines = listOf("""@file:DependsOn("something:dev-1.1.0-alpha3(T2):1.2.14", "de.mpicbg.scicomp:kutils:0.7")""")
+        val lines = listOf("""@file:DependsOn("something:dev-1.1.0-alpha3(T2):1.2.14"; "de.mpicbg.scicomp:kutils:0.7")""")
 
         val expected = listOf(
             "something:dev-1.1.0-alpha3(T2):1.2.14",
@@ -83,7 +83,7 @@ class Tests {
     @Test
     fun mixedDependencyCollect() {
         val lines = listOf(
-            "//DEPS de.mpicbg.scicomp.joblist:joblist-kotlin:1.1, de.mpicbg.scicomp:kutils:0.7",
+            "//DEPS de.mpicbg.scicomp.joblist:joblist-kotlin:1.1; de.mpicbg.scicomp:kutils:0.7",
             """@file:DependsOn("log4j:log4j:1.2.14")"""
         )
 

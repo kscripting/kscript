@@ -97,7 +97,7 @@ private fun extractEntryPoint(line: String) = when {
     line.contains(ENTRY_ANNOT_PREFIX) ->
         line
             .replaceFirst(ENTRY_ANNOT_PREFIX, "")
-            .split(")")[0].trim(' ', '"')
+            .substringBeforeLast(")").trim(' ', '"')
     line.startsWith(ENTRY_COMMENT_PREFIX) ->
         line.split("[ ]+".toRegex()).last()
     else ->
@@ -158,16 +158,16 @@ internal fun extractDependencies(line: String) = when {
     line.contains(DEPS_ANNOT_PREFIX) -> line
         .replaceFirst(DEPS_ANNOT_PREFIX, "")
         .extractAnnotParams()
-//        .split(")")[0].split(",")
+//        ..substringBeforeLast(")").split(",")
 //        .map { it.trim(' ', '"') }
 
 
     line.contains(DEPSMAVEN_ANNOT_PREFIX) -> line
         .replaceFirst(DEPSMAVEN_ANNOT_PREFIX, "")
-        .split(")")[0].trim(' ', '"').let { listOf(it) }
+        .substringBeforeLast(")").trim(' ', '"').let { listOf(it) }
 
     line.startsWith(DEPS_COMMENT_PREFIX) ->
-        line.split("[ ;,]+".toRegex()).drop(1).map(String::trim)
+        line.split("[ ;]+".toRegex()).drop(1).map(String::trim)
 
     else ->
         throw IllegalArgumentException("can not extract entry point from non-directive")
@@ -195,7 +195,7 @@ fun Script.collectRepos(): List<MavenRepo> {
     // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/")
     return lines
         .filter { it.contains(dependsOnMavenPrefix) }
-        .map { it.replaceFirst(dependsOnMavenPrefix, "").split(")")[0] }
+        .map { it.replaceFirst(dependsOnMavenPrefix, "").substringBeforeLast(")") }
         .map { it.split(",").map { it.trim(' ', '"', '(') }.let { MavenRepo(it[0], it[1]) } }
 
     // todo add credential support https://stackoverflow.com/questions/36282168/how-to-add-custom-maven-repository-to-gradle
