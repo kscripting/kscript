@@ -152,6 +152,9 @@ assert "kscript ${KSCRIPT_HOME}/test/resources/depends_on_annot.kts" "kscript wi
 # make sure that @file:DependsOnMaven is parsed correctly
 assert "kscript ${KSCRIPT_HOME}/test/resources/depends_on_maven_annot.kts" "kscript with annotations rocks!"
 
+# make sure that dynamic versions are matched properly
+assert "kscript ${KSCRIPT_HOME}/test/resources/depends_on_dynamic.kts" "dynamic kscript rocks!"
+
 # make sure that @file:MavenRepository is parsed correctly
 assert "kscript ${KSCRIPT_HOME}/test/resources/custom_mvn_repo_annot.kts" "kscript with annotations rocks!"
 

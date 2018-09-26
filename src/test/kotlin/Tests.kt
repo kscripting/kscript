@@ -49,7 +49,7 @@ class Tests {
 
     @Test
     fun parseAnnotWithTypeAndClassifier() {
-        val pom = buildPom(listOf("org.javamoney:moneta:1.3", "org.javamoney:moneta:1.3:pom", "org.javamoney:moneta:1.3@pom"), emptyList())
+        val pom = buildPom(listOf("org.javamoney:moneta:1.3", "org.javamoney:moneta:1.3:pom", "org.javamoney:moneta:1.3@pom", "org.javamoney:moneta:1.3+"), emptyList())
 
         val expected = "" +
                 "    <dependency>\n" +
@@ -77,6 +77,15 @@ class Tests {
                 "            \n" +
                 "            <type>pom</type>\n" +
                 "    </dependency>"
+                "    \n" +
+                "\n" +
+                "    <dependency>\n" +
+                "            <groupId>org.javamoney</groupId>\n" +
+                "            <artifactId>moneta</artifactId>\n" +
+                "            <version>[1.3,)</version>\n" +
+                "            \n" +
+                "            \n" +
+                "    </dependency>\n" +
         assertTrue(pom.contains(expected))
     }
 
