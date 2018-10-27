@@ -77,6 +77,7 @@ assert "kscript i_do_not_exist.kts 2>&1" "[kscript] [ERROR] Could not read scrip
 
 ## make sure that it runs with remote URLs
 assert "kscript https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/url_test.kts" "I came from the internet"
+assert "kscript https://git.io/fxHBv" "main was called"
 
 ## there are some dependencies which are not jar, but maybe pom, aar, ..
 ## make sure they work, too
