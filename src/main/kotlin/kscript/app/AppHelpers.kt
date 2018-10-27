@@ -20,6 +20,19 @@ data class ProcessResult(val command: String, val exitCode: Int, val stdout: Str
     }
 }
 
+fun isWindows (): Boolean {
+    return System.getProperty("os.name").toLowerCase().startsWith("windows")
+}
+
+fun evalCommand(cmd: String, wd: File? = null,
+             stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
+             stderrConsumer: Consumer<String> = StringBuilderConsumer()): ProcessResult {
+
+    val (shell, shellArg0) = if (isWindows()) Pair("cmd", "/C") else Pair("bash", "-c")
+    return runProcess(shell, shellArg0, cmd,
+            wd = wd, stderrConsumer = stderrConsumer, stdoutConsumer = stdoutConsumer)
+}
+
 fun evalBash(cmd: String, wd: File? = null,
              stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
              stderrConsumer: Consumer<String> = StringBuilderConsumer()): ProcessResult {
@@ -89,7 +102,7 @@ internal open class StringBuilderConsumer : Consumer<String> {
 
 object ShellUtils {
 
-    fun isInPath(tool: String) = evalBash("which $tool").stdout.trim().isNotBlank()
+    fun isInPath(tool: String) = evalCommand( (if (isWindows()) "where" else "which") + " $tool").stdout.trim().isNotBlank()
 
     fun requireInPath(tool: String, msg: String = "$tool is not in PATH") = errorIf(!isInPath(tool)) { msg }
 
@@ -122,9 +135,14 @@ fun quit(status: Int): Nothing {
 
 /** see discussion on https://github.com/holgerbrandl/kscript/issues/15*/
 fun guessKotlinHome(): String? {
-    return evalBash("KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
-        "kotlin.home=([^\\s]*)".toRegex()
-            .find(this)?.groups?.get(1)?.value
+    if (isWindows()) {
+        return File(evalCommand("where kotlinc").stdout.split("\n")[0].trim())
+                .parentFile.parent
+    } else {
+        return evalBash("KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
+            "kotlin.home=([^\\s]*)".toRegex()
+                    .find(this)?.groups?.get(1)?.value
+        }
     }
 }
 

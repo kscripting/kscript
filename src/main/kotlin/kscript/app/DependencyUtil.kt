@@ -34,7 +34,6 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
         if (cache.containsKey(depsHash)) {
             val cachedCP = cache.get(depsHash)!!
 
-
             // Make sure that local dependencies have not been wiped since resolving them (like by deleting .m2) (see #146)
             if (cachedCP.split(":").all { File(it).exists() }) {
                 return cachedCP

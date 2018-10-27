@@ -1,9 +1,13 @@
+import io.kotlintest.matchers.beGreaterThan
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import kscript.app.*
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.io.File
+import java.util.function.Consumer
 
 /**
  * @author Holger Brandl
@@ -177,4 +181,42 @@ class Tests {
             "dup_include_2.kt"
         )
     }
+
+    @Test
+    fun `should run process in Windows shell`() {
+        // run only in windows
+        assumeTrue(isWindows())
+
+        val sout = StringBuilder()
+        val runProcess = runProcess(
+                cmd = *arrayOf("cmd", "/C", "dir", "."),
+                wd = File(".").absoluteFile,
+                stdoutConsumer = Consumer {
+                    sout.append("$it\n")
+                })
+
+        runProcess.exitCode shouldBe 0
+        sout.split("\n").size should beGreaterThan(1)
+    }
+
+    @Test
+    fun `should resolve if command is in path`() {
+        val cmd = if (isWindows()) "cmd" else "ls"
+        val isInPath = ShellUtils.isInPath(cmd)
+
+        isInPath shouldBe true
+    }
+
+    @Test
+    fun `should resolve dependencies`() {
+        val resolvedDependencies = resolveDependencies(depIds = listOf("junit:junit:4.12"), customRepos = emptyList(), loggingEnabled = true)
+
+        resolvedDependencies!!.split(File.pathSeparator).size shouldBe 2
+    }
+
+    @Test
+    fun `should run a script with only println`() {
+        main(arrayOf("test/resources/dot.Test.kts"))
+    }
+
 }

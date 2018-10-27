@@ -242,12 +242,12 @@ fun main(args: Array<String>) {
             }
             """.trimIndent())
 
-            "'${mainKotlin.absolutePath}'"
+            "${mainKotlin.absolutePath}"
         } else {
             ""
         }
 
-        val scriptCompileResult = evalBash("kotlinc ${compilerOpts} ${optionalCpArg} -d '${jarFile.absolutePath}' '${scriptFile.absolutePath}' ${wrapperSrcArg}")
+        val scriptCompileResult = evalCommand("kotlinc ${compilerOpts} ${optionalCpArg} -d \"${jarFile.absolutePath}\" \"${scriptFile.absolutePath}\" \"${wrapperSrcArg}\"")
         with(scriptCompileResult) {
             errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
         }
