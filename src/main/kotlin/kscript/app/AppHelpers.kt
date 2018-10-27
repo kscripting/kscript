@@ -142,11 +142,20 @@ fun createTmpScript(scriptText: String, extension: String = "kts"): File {
 
 fun fetchFromURL(scriptURL: String): File {
     val urlHash = md5(scriptURL)
-    val urlExtension = if (scriptURL.endsWith(".kt")) "kt" else "kts"
+    val scriptText = URL(scriptURL).readText()
+    val urlExtension = when {
+        scriptURL.endsWith(".kt") -> "kt"
+        scriptURL.endsWith(".kts") -> "kts"
+        else -> if (scriptText.contains("fun main")) {
+            "kt"
+        } else {
+            "kts"
+        }
+    }
     val urlCache = File(KSCRIPT_CACHE_DIR, "/url_cache_${urlHash}.$urlExtension")
 
     if (!urlCache.isFile) {
-        urlCache.writeText(URL(scriptURL).readText())
+        urlCache.writeText(scriptText)
     }
 
     return urlCache
