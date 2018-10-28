@@ -209,14 +209,9 @@ class Tests {
 
     @Test
     fun `should resolve dependencies`() {
-        val resolvedDependencies = resolveDependencies(depIds = listOf("junit:junit:4.12"), customRepos = emptyList(), loggingEnabled = true)
+        val resolvedDependencies = resolveDependencies(depIds = listOf("junit:junit:4.12", "org.jetbrains.kotlin:kotlin-stdlib-common:1.2.71"), customRepos = emptyList(), loggingEnabled = true)
 
-        resolvedDependencies!!.split(File.pathSeparator).size shouldBe 2
-    }
-
-    @Test
-    fun `should run a script with only println`() {
-        main(arrayOf("test/resources/dot.Test.kts"))
+        resolvedDependencies!!.split(File.pathSeparator).size shouldBe 3
     }
 
 }

@@ -24,6 +24,12 @@ fun isWindows (): Boolean {
     return System.getProperty("os.name").toLowerCase().startsWith("windows")
 }
 
+fun isCygwinOrMingw() : Boolean {
+    val result = evalCommand("uname")
+    // `uname` will fail on Windows cmd returning 1 as exitCode
+    return result.exitCode == 0 && (result.stdout.startsWith("CYGWIN") || result.stdout.startsWith("MINGW"))
+}
+
 fun evalCommand(cmd: String, wd: File? = null,
              stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
              stderrConsumer: Consumer<String> = StringBuilderConsumer()): ProcessResult {

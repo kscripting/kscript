@@ -11,7 +11,7 @@ import java.io.File
 
 val DEP_LOOKUP_CACHE_FILE = File(KSCRIPT_CACHE_DIR, "dependency_cache.txt")
 
-val CP_SEPARATOR_CHAR = if (System.getProperty("os.name").toLowerCase().contains("windows")) ";" else ":"
+val CP_SEPARATOR_CHAR = if (isWindows()) ";" else ":"
 
 
 fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emptyList(), loggingEnabled: Boolean): String? {

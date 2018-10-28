@@ -146,7 +146,7 @@ fun main(args: Array<String>) {
 
 
     val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled) ?: ""
-    val optionalCpArg = if (classpath.isNotEmpty()) "-classpath '${classpath}'" else ""
+    val optionalCpArg = if (classpath.isNotEmpty()) """-classpath "${classpath}"""" else ""
 
     // Extract kotlin arguments
     val kotlinOpts = script.collectRuntimeOptions()
