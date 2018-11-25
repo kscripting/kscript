@@ -142,8 +142,13 @@ fun quit(status: Int): Nothing {
 /** see discussion on https://github.com/holgerbrandl/kscript/issues/15*/
 fun guessKotlinHome(): String? {
     if (isWindows()) {
-        return File(evalCommand("where kotlinc").stdout.split("\n")[0].trim())
-                .parentFile.parent
+        return evalCommand("where kotlinc").run {
+            if (exitCode == 1)
+                null
+            else
+                File(stdout.split("\n")[0].trim())
+                        .parentFile.parent
+        }
     } else {
         return evalBash("KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
             "kotlin.home=([^\\s]*)".toRegex()
@@ -376,7 +381,8 @@ exec java -jar ${'$'}0 "${'$'}@"
 
     File(tmpProjectDir, "build.gradle").writeText(gradleScript)
 
-    val pckgResult = evalBash("cd '${tmpProjectDir}' && gradle simpleCapsule")
+    // wrap chained commands (&&) with additional " for Windows
+    val pckgResult = evalCommand("gradle --no-daemon -p \"${tmpProjectDir}\" simpleCapsule")
 
     with(pckgResult) {
         kscript.app.errorIf(exitCode != 0) { "packaging of '$appName' failed:\n$pckgResult" }

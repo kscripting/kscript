@@ -54,7 +54,7 @@ Website   : https://github.com/holgerbrandl/kscript
 // see https://stackoverflow.com/questions/585534/what-is-the-best-way-to-find-the-users-home-directory-in-java
 // See #146 "allow kscript cache dir to be configurable" for details
 val KSCRIPT_CACHE_DIR = System.getenv("KSCRIPT_CACHE_DIR")?.let { File(it) }
-    ?: File(System.getProperty("user.home")!!, ".kscript")
+        ?: File(System.getProperty("user.home")!!, ".kscript")
 
 // use lazy here prevent empty dirs for regular scripts https://github.com/holgerbrandl/kscript/issues/130
 val SCRIPT_TEMP_DIR by lazy { createTempDir() }
@@ -83,9 +83,7 @@ fun main(args: Array<String>) {
 
     // optionally clear up the jar cache
     if (docopt.getBoolean("clear-cache")) {
-        info("Cleaning up cache...")
-        KSCRIPT_CACHE_DIR.listFiles().forEach { it.delete() }
-        //        evalBash("rm -f ${KSCRIPT_CACHE_DIR}/*")
+        clearCache()
         quit(0)
     }
 
@@ -247,7 +245,14 @@ fun main(args: Array<String>) {
             ""
         }
 
-        val scriptCompileResult = evalCommand("kotlinc ${compilerOpts} ${optionalCpArg} -d \"${jarFile.absolutePath}\" \"${scriptFile.absolutePath}\" \"${wrapperSrcArg}\"")
+        val cmd= StringBuilder()
+                .append("kotlinc ${compilerOpts} ${optionalCpArg} -d \"${jarFile.absolutePath}\" \"${scriptFile.absolutePath}\"")
+                .apply {
+                    if (wrapperSrcArg.isNotEmpty())
+                        this.append(" \"${wrapperSrcArg}\"")
+                }
+                .toString()
+        val scriptCompileResult = evalCommand(cmd)
         with(scriptCompileResult) {
             errorIf(exitCode != 0) { "compilation of '$scriptResource' failed\n$stderr" }
         }
@@ -274,9 +279,14 @@ fun main(args: Array<String>) {
     if (classpath.isNotEmpty())
         extClassPath += kscript.app.CP_SEPARATOR_CHAR + classpath
 
-    println("kotlin ${kotlinOpts} -classpath \"${extClassPath}\" ${execClassName} ${joinedUserArgs} ")
+    println("kotlin ${kotlinOpts} -classpath \"${extClassPath}\" ${execClassName} ${joinedUserArgs}")
 }
 
+fun clearCache() {
+    info("Cleaning up cache...")
+    KSCRIPT_CACHE_DIR.listFiles().forEach { it.delete() }
+    // evalBash("rm -f ${KSCRIPT_CACHE_DIR}/*")
+}
 
 /** Determine the latest version by checking github repo and print info if newer version is available. */
 private fun versionCheck() {

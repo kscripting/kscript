@@ -157,7 +157,7 @@ class Tests {
     @Test
     fun test_include_annotations() {
         val file = File("test/resources/includes/include_variations.kts")
-        val expected = File("test/resources/includes/expexcted_variations.kts")
+        val expected = File("test/resources/includes/expected_variations.kts")
 
         val result = resolveIncludes(file)
 

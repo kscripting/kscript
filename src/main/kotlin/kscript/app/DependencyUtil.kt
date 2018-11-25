@@ -35,10 +35,10 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
             val cachedCP = cache.get(depsHash)!!
 
             // Make sure that local dependencies have not been wiped since resolving them (like by deleting .m2) (see #146)
-            if (cachedCP.split(":").all { File(it).exists() }) {
+            if (cachedCP.split(CP_SEPARATOR_CHAR).all { File(it).exists() }) {
                 return cachedCP
             } else {
-                System.err.println("[kscript] Detected missing dependencies in cache.")
+                System.err.println("[kscript] Detected missing dependencies in cache")
             }
         }
     }

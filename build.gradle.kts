@@ -25,6 +25,7 @@ dependencies {
 
     testCompile("junit:junit:4.12")
     testCompile( "io.kotlintest:kotlintest:2.0.7")
+    testImplementation("io.mockk:mockk:1.8.13")
     testCompile(kotlin("script-runtime"))
 }
 

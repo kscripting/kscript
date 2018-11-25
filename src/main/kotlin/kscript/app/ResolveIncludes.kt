@@ -36,7 +36,11 @@ fun resolveIncludes(template: File, includeContext: URI = template.parentFile.to
                     isUrl(include) -> URL(include)
                     include.startsWith("/") -> File(include).toURI().toURL()
                     include.startsWith("~/") -> File(System.getenv("HOME")!! + include.substring(1)).toURI().toURL()
-                    else -> includeContext.resolve(URI(include.removePrefix("./"))).toURL()
+                    else -> {
+                        val includeFile = if (File(include).isAbsolute) { File(include) } else File(template.parent, include)
+                        // TODO is `resolve` really necessary?
+                        includeContext.resolve(includeFile.toURI()).toURL()
+                    }
                 }
 
                 // test if include was processed already (aka include duplication, see #151)

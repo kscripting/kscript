@@ -230,7 +230,7 @@ export PATH=${PATH}:${KSCRIPT_HOME}/test/resources/custom_dsl
 
 assert 'mydsl "println(foo)"' "bar"
 
-assert '${KSCRIPT_HOME}/test/resources/custom_dsl/mydsl_test_with_deps.kts' "foobar"
+assert "${KSCRIPT_HOME}/test/resources/custom_dsl/mydsl_test_with_deps.kts" "foobar"
 
 assert_end custom_interpreters
 
