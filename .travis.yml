@@ -42,7 +42,7 @@ install:
 #  - bash -c 'source "/home/travis/.sdkman/bin/sdkman-init.sh"; yes | sdk install java 8u144-zulu'
 #  - sudo apt-get install -y openjdk-8-jdk
   - sdk install kotlin
-  - sdk install gradle
+  - sdk install gradle 4.10.2
 
   - export KSCRIPT_HOME=${TRAVIS_BUILD_DIR}
   - export PATH=${KSCRIPT_HOME}/build/libs:$PATH
