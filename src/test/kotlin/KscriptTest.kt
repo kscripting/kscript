@@ -46,7 +46,11 @@ class KscriptTest {
         assumeTrue(kotlinIsAvailableInPath())
         assumeTrue(gradleIsAvailableInPath())
 
-        main(arrayOf("--package", """println("kotlin rocks")"""))
+        val result: Int = exitStatus {
+            main(arrayOf("--package", """println("kotlin rocks")"""))
+        }
+
+        result shouldBe 0
     }
 
     @Test
@@ -141,20 +145,11 @@ class KscriptTest {
     fun `should exit if kotlinc is not in PATH`() {
         assumeFalse(kotlinIsAvailableInPath())
 
-        mockkStatic("kscript.app.AppHelpersKt")
-        val controlMessage = "exit mocked"
-        every {
-            quit(1)
-        } answers {
-            // workaround for `Nothing` methods: https://github.com/mockk/mockk/issues/187
-            throw RuntimeException(controlMessage)
+        val result = exitStatus {
+            main(arrayOf("println(\"kotlin rocks\")"))
         }
 
-        try {
-            main(arrayOf("println(\"kotlin rocks\")"))
-        } catch (e: Exception) {
-            e.message shouldBe controlMessage
-        }
+        result shouldBe 1
     }
 
     private fun kotlinIsAvailableInPath() = guessKotlinHome() != null
@@ -172,4 +167,25 @@ class KscriptTest {
         System.setErr(originalErr)
     }
 
+    private fun exitStatus(arg: () -> Unit): Int {
+        mockkStatic("kscript.app.AppHelpersKt")
+        // workaround for `Nothing` methods: https://github.com/mockk/mockk/issues/187
+        every {
+            quit(1)
+        } answers {
+            throw RuntimeException("1")
+        }
+        every {
+            quit(0)
+        } answers {
+            throw RuntimeException("0")
+        }
+
+        try {
+            arg.invoke()
+        } catch (e: RuntimeException) {
+            return e.message?.toInt() ?: 0
+        }
+        return 0
+    }
 }
