@@ -34,6 +34,7 @@ Taken all these features together, `kscript` provides an easy-to-use, very flexi
 - [Treat yourself a REPL with `--interactive`](#treat-yourself-a-repl-with---interactive)
 - [Boostrap IDEA from a `kscript`let](#boostrap-idea-from-a-kscriptlet)
 - [Deploy scripts as standalone binaries](#deploy-scripts-as-standalone-binaries)
+- [Embed kscript installer within a script](#embed-kscript-installer-within-a-script)
 - [FAQ](#faq)
 - [Support](#support)
 - [How to contribute?](#how-to-contribute)
@@ -426,6 +427,22 @@ The created binary will contain a compiled copy of the script, as well as all de
 
 
 Just `java` is required to run these binaries.
+
+
+Embed kscript installer within your script
+--------------------------------------
+
+ To make a script automatically [install kscript](#installation) and its dependencies on first run if necessary, run:
+
+ ```bash
+kscript --add-bootstrap-header some_script.kts
+```
+
+Now `some_script.kts` can be shared and run directly on any other machine that has `bash`, without having to go through the [Installation](#installation) steps first.
+
+Note that unlike the [`--package` option](#deploy-scripts-as-standalone-binaries) this doesn't produce a separate file, allowing the distributed script to be read and modified(including with [`kscript --idea`](#boostrap-idea-from-a-kscriptlet)) similar to what you might expect with bash/python/ruby scripts.
+On the other hand this doesn't embed dependencies within the script("fat jar"), so internet connection may be required on its first run.
+
 
 FAQ
 ---

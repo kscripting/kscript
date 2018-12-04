@@ -2,6 +2,7 @@ package kscript.app
 
 import kscript.app.ShellUtils.requireInPath
 import org.docopt.DocOptWrapper
+import org.intellij.lang.annotations.Language
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -43,6 +44,7 @@ Options:
  --idea                  Open script in temporary Intellij session
  -s --silent             Suppress status logging to stderr
  --package               Package script and dependencies into self-dependent binary
+ --add-bootstrap-header  Prepend bash header that installs kscript if necessary
 
 
 Copyright : 2017 Holger Brandl
@@ -58,6 +60,18 @@ val KSCRIPT_CACHE_DIR = System.getenv("KSCRIPT_CACHE_DIR")?.let { File(it) }
 
 // use lazy here prevent empty dirs for regular scripts https://github.com/holgerbrandl/kscript/issues/130
 val SCRIPT_TEMP_DIR by lazy { createTempDir() }
+
+@Language("sh")
+private val BOOTSTRAP_HEADER = """
+    #!/bin/bash
+
+    //usr/bin/env echo '
+    /**** BOOTSTRAP kscript ****\'>/dev/null
+    command -v kscript >/dev/null 2>&1 || curl -L "https://git.io/fpVLG" | bash 1>&2
+    exec kscript $0 "$@"
+    \*** IMPORTANT: Any code including imports and annotations must come after this line ***/
+
+    """.trimIndent().lines()
 
 
 fun main(args: Array<String>) {
@@ -124,6 +138,33 @@ fun main(args: Array<String>) {
     val enableSupportApi = docopt.getBoolean("text")
     val (rawScript, includeContext) = prepareScript(scriptResource)
 
+    if (docopt.getBoolean("add-bootstrap-header")) {
+        errorIf(!rawScript.canWrite()) {
+            "Script file not writable: $rawScript"
+        }
+        errorIf(rawScript.parentFile == SCRIPT_TEMP_DIR) {
+            "Temporary script file detected: $rawScript, created from $scriptResource"
+        }
+        val scriptLines = rawScript.readLines().dropWhile {
+            it.startsWith("#!/") && it != "#!/bin/bash"
+        }
+
+        errorIf(scriptLines.getOrNull(0) == BOOTSTRAP_HEADER[0]
+                && scriptLines.any { "command -v kscript >/dev/null 2>&1 || " in it }) {
+            val lastHeaderLine = BOOTSTRAP_HEADER.findLast { it.isNotBlank() }!!
+            val preexistingHeader =
+                    scriptLines.dropLastWhile { it != lastHeaderLine }.joinToString("\n")
+            "Bootstrap header already detected:\n\n$preexistingHeader\n\n" +
+                    "You can remove it to force the re-generation"
+        }
+
+        rawScript.writeText((BOOTSTRAP_HEADER + scriptLines).joinToString("\n"))
+
+        if (loggingEnabled) {
+            info("$rawScript updated")
+        }
+        quit(0)
+    }
 
     // post process script (text-processing mode, custom dsl preamble, resolve includes)
     // and finally resolve all includes (see https://github.com/holgerbrandl/kscript/issues/34)
