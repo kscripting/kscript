@@ -27,5 +27,8 @@ if [[ $(uname) == CYGWIN* ]]; then jarPath=$(cygpath -w ${jarPath}); fi
 ## prefer KOTLIN_HOME instead of PATH to resolve `kotlin` location (see #145)
 if [[ -z "$KOTLIN_HOME" ]]; then KOTLIN_EXEC="kotlin"; else KOTLIN_EXEC="$KOTLIN_HOME/bin/kotlin"; fi
 
+## expose the name of the script being run to the script itself
+export KSCRIPT_FILE="$1"
+
 ## run it using command substitution to have just the user process once kscript is done
 eval "exec $(${KOTLIN_EXEC} -classpath ${jarPath} kscript.app.KscriptKt "$@")"
