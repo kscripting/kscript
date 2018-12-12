@@ -1,0 +1,12 @@
+//INCLUDE ./extensionlessLib.kt
+
+//ENTRY Foo
+
+class Foo {
+	companion object {
+		@kotlin.jvm.JvmStatic fun main(args: Array<String>) {
+			useLib()
+			println(" world")
+		} 
+	}
+}

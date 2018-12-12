@@ -252,14 +252,23 @@ sourceSets.main.java.srcDirs 'src'
 
         // also symlink all includes
         includeURLs.distinctBy { it.fileName() }
-          .forEach {
+            .forEach {
 
-            val includeFile = when {
-                it.protocol == "file" -> File(it.toURI())
-                else -> fetchFromURL(it.toString())
-            }
+                val includeFile = when {
+                    it.protocol == "file" -> File(it.toURI())
+                    else -> fetchFromURL(it.toString())
+                }
 
-            createSymLink(File(this, it.fileName()), includeFile)
+                val fileName = it.fileName()
+                var symlink = File(this, fileName)
+                if (symlink.isFile) {
+                    // Name collision - append hash as a fallback
+                    symlink = File(this,
+                            "${fileName.substringBeforeLast(".")}_" +
+                                    "${md5(includeFile.absolutePath)}." +
+                                    fileName.substringAfterLast("."))
+                }
+                createSymLink(symlink, includeFile)
         }
     }
 
@@ -268,7 +277,7 @@ sourceSets.main.java.srcDirs 'src'
 
 private fun URL.fileName() = this.toURI().path.split("/").last()
 
-private fun createSymLink(link: File, target: File) {
+internal fun createSymLink(link: File, target: File) {
     try {
         Files.createSymbolicLink(link.toPath(), target.absoluteFile.toPath());
     } catch (e: IOException) {

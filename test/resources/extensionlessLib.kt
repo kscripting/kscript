@@ -1,0 +1,3 @@
+fun useLib() {
+	print("Hello")
+}

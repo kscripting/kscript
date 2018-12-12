@@ -1,0 +1,6 @@
+//INCLUDE ./extensionlessLib.kt
+
+fun main(args: Array<String>) {
+	useLib()
+	println(" world")
+}

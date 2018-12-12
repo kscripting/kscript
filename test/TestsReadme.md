@@ -17,30 +17,20 @@ To run the tests, just run the [`test_suite.sh`](test_suite.sh)
 ```bash
 # scp /Users/brandl/projects/kotlin/kscript/kscript bioinfo:/home/brandl/bin/test/kscript/kscript
 
-#git clone https://github.com/holgerbrandl/kscript ; export KSCRIPT_HOME=$(pwd)/kscript
-
-export KSCRIPT_HOME="/Users/brandl/projects/kotlin/kscript"
-#export KSCRIPT_HOME="/cygdrive/z/kscript"
-## change into this/test directory
+#git clone https://github.com/holgerbrandl/kscript && cd kscript
 
 ## make sure assert.h is in PATH
 which assert.sh || exit 1
-
-cd ${KSCRIPT_HOME}
 
 ## build it
 ./gradlew assemble
 
 
-## make sure to use devel-version from build/libs
-export PATH=${KSCRIPT_HOME}/build/libs:${PATH}
-which kscript
-
 ## clean up the environment
 #sdk use kotlin 1.1-RC
 kscript --clear-cache
 
-${KSCRIPT_HOME}/test/test_suite.sh
+./test/test_suite.sh
 
 # # run again with kotlin 1.0.X
 # sdk use kotlin 1.0.6

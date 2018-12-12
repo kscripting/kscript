@@ -1,0 +1,4 @@
+//INCLUDE ./extensionlessLib.kt
+
+useLib()
+println(" world")

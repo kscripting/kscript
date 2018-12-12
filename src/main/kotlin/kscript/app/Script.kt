@@ -92,6 +92,11 @@ fun Script.findEntryPoint(): String? {
     return lines.find { isEntryPointDirective(it) }?.let { extractEntryPoint(it) }
 }
 
+fun Script.hasMainMethod() = lines.any {
+    ("fun main(" in it && ": Array<String>)" in it)
+            || "fun main() {" in it
+}
+
 private fun extractEntryPoint(line: String) = when {
     line.contains(ENTRY_ANNOT_PREFIX) ->
         line

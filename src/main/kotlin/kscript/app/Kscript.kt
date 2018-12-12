@@ -354,12 +354,35 @@ fun prepareScript(scriptResource: String): Pair<File, URI> {
         if (!canRead()) {
             // not a file so let's keep the script-file undefined here
             null
-        } else if (listOf("kts", "kt").contains(extension)) {
+        } else if (isFile) {
             // update include context
             includeContext = this.absoluteFile.parentFile.toURI()
 
-            // script input is a regular script or clas file
-            this
+            if (listOf("kts", "kt").contains(extension)) {
+                // script input is a regular script or class file
+                this
+            } else {
+                // script is a file with a non-kotlin extension
+                // symlink it to a .kt or .kts for compiler and idea to understand
+                val newExtenstion = with(Script(this)) {
+                    if (hasMainMethod() || findEntryPoint() != null) ".kt" else ".kts"
+                }
+
+                KSCRIPT_CACHE_DIR
+                    .resolve("with_extension_symlinks")
+                    .resolve(scriptResource.hashCode().toString())
+                    .apply { mkdirs() }
+                    .resolve(nameWithoutExtension + newExtenstion)
+                    .also { symlink ->
+                        if (symlink.exists()
+                                && symlink.canonicalPath != this.absolutePath) {
+                            symlink.delete()
+                        }
+                        if (!symlink.exists()) {
+                            createSymLink(symlink, this)
+                        }
+                    }
+            }
         } else {
             // if we can "just" read from script resource create tmp file
             // i.e. script input is process substitution file handle

@@ -2,6 +2,9 @@
 #/bin/bash -x
 
 export DEBUG="--verbose"
+cd "$(dirname $0)/.."
+export KSCRIPT_HOME="$PWD"
+export PATH="${KSCRIPT_HOME}/build/libs:${PATH}"
 
 . assert.sh
 
@@ -24,6 +27,9 @@ assert_stderr(){
 #http://stackoverflow.com/questions/3005963/how-can-i-have-a-newline-in-a-string-in-sh
 #http://stackoverflow.com/questions/3005963/how-can-i-have-a-newline-in-a-string-in-sh
 export NL=$'\n'
+
+## Set up mocks for tools required in PATH such as `idea`
+export PATH="${KSCRIPT_HOME}/test/resources/mock:$PATH"
 
 
 ########################################################################################################################
@@ -309,3 +315,22 @@ assert 'echo stdin | kscript '$f' --foo bar' "stdin | script --foo bar"
 rm $f
 
 assert_end bootstrap_header
+
+
+########################################################################################################################
+##  scripts without extension support
+
+## run scripts without extrension and ensure entry point is resolved correctly for each type
+assert 'kscript ${KSCRIPT_HOME}/test/resources/extensionlessKt' 'Hello world'
+assert 'kscript ${KSCRIPT_HOME}/test/resources/extensionlessKts' 'Hello world'
+assert 'kscript ${KSCRIPT_HOME}/test/resources/extensionlessCustomEntryPointKt' 'Hello world'
+
+## `kscript --idea` scripts without extension and ensure files in ./src have extensions that Idea would support
+assert 'ls $(kscript --silent --idea ${KSCRIPT_HOME}/test/resources/extensionlessKt)/src' 'extensionlessKt.kt
+extensionlessLib.kt'
+assert 'ls $(kscript --silent --idea ${KSCRIPT_HOME}/test/resources/extensionlessKts)/src' 'extensionlessKts.kts
+extensionlessLib.kt'
+assert 'ls $(kscript --silent --idea ${KSCRIPT_HOME}/test/resources/extensionlessCustomEntryPointKt)/src' 'extensionlessCustomEntryPointKt.kt
+extensionlessLib.kt'
+
+assert_end extensionless_script_support

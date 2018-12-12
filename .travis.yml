@@ -62,9 +62,6 @@ install:
   - kscript --help
   - java -version
 
-  ## create mock `idea` to allow for idea environment bootstrapping tests (see kscript_nocall)
-  - touch idea && chmod +x idea
-
   - kscript 'println("kotlin rocks")'
 ##  - kscript ${KSCRIPT_HOME}/test/resources/multi_line_deps.kts
 #  - export tmpDir=$(kotlin -classpath ${KSCRIPT_HOME}/build/libs/kscript.jar kscript.app.KscriptKt --idea test/resources/includes/include_variations.kts | cut -f2 -d" ")
