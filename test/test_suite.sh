@@ -263,6 +263,10 @@ assert "source ${KSCRIPT_HOME}/test/resources/compiler_opts_with_includes.sh" "h
 ## KOTLIN_OPTS
 assert "kscript ${KSCRIPT_HOME}/test/resources/kotlin_opts_test.kts" "mem_4772593664_1_foo_bar"
 
+## kscript.jar class access test
+assert_raises 'kscript "println(org.docopt.Docopt::class)"' 1
+
+
 kscript_nocall() { kotlin -classpath ${KSCRIPT_HOME}/build/libs/kscript.jar kscript.app.KscriptKt "$@";}
 export -f kscript_nocall
 
