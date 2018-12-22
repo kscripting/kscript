@@ -260,6 +260,8 @@ assert "source ${KSCRIPT_HOME}/test/resources/home_dir_include.sh" "42"
 ## prevent regression of #173
 assert "source ${KSCRIPT_HOME}/test/resources/compiler_opts_with_includes.sh" "hello42"
 
+## KOTLIN_OPTS
+assert "kscript ${KSCRIPT_HOME}/test/resources/kotlin_opts_test.kts" "mem_4772593664_1_foo_bar"
 
 kscript_nocall() { kotlin -classpath ${KSCRIPT_HOME}/build/libs/kscript.jar kscript.app.KscriptKt "$@";}
 export -f kscript_nocall
