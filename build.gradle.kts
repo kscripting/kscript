@@ -3,12 +3,23 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     kotlin("jvm") version "1.2.70"
     id("com.github.johnrengelman.shadow") version "2.0.4"
+    id("com.palantir.graal") version "0.2.0-17-g543ec9e"
+}
+
+graal {
+    graalVersion("1.0.0-rc10")
+    mainClass("kscript.app.KscriptKt")
+    outputName("kscript-native")
+    option("--report-unsupported-elements-at-runtime")
+    // Avoids a nasty nondeterministic error in graal: https://github.com/oracle/graal/issues/908
+    option("-H:-UseServiceLoaderFeature")
 }
 
 group = "com.github.holgerbrandl.kscript.launcher"
 
 dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+    compile("org.jetbrains.kotlin:kotlin-reflect")
 
     compile("com.offbytwo:docopt:0.6.0.20150202")
 
