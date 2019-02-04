@@ -306,7 +306,7 @@ fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List
     val gradleScript = """
 plugins {
     id "org.jetbrains.kotlin.jvm" version "${KotlinVersion.CURRENT}"
-    id "us.kirchmeier.capsule" version "1.0.2"
+    id "it.gianluz.capsule" version "1.0.3"
 }
 
 repositories {
