@@ -35,7 +35,7 @@ class Tests {
         val expected = listOf(
             "something:dev-1.1.0-alpha3(T2):1.2.14",
             "de.mpicbg.scicomp:kutils:0.7",
-            "com.github.holgerbrandl:kscript-annotations:1.2"
+            "com.github.holgerbrandl:kscript-annotations:1.4"
         )
 
         Script(lines).collectDependencies() shouldBe expected
@@ -58,7 +58,7 @@ class Tests {
             "de.mpicbg.scicomp.joblist:joblist-kotlin:1.1",
             "de.mpicbg.scicomp:kutils:0.7",
             "log4j:log4j:1.2.14",
-            "com.github.holgerbrandl:kscript-annotations:1.2"
+            "com.github.holgerbrandl:kscript-annotations:1.4"
         )
 
         Script(lines).collectDependencies() shouldBe expected
@@ -83,11 +83,38 @@ class Tests {
             collectDependencies() shouldBe listOf(
                 "net.clearvolume:cleargl:2.0.1",
                 "log4j:log4j:1.2.14",
-                "com.github.holgerbrandl:kscript-annotations:1.2"
+                "com.github.holgerbrandl:kscript-annotations:1.4"
             )
         }
 
     }
+
+    @Test
+    fun customRepoWithCreds() {
+        val lines = listOf(
+                """@file:MavenRepository("imagej-releases", "http://maven.imagej.net/content/repositories/releases", user="user", password="pass") """,
+                """@file:MavenRepository("imagej-snapshots", "http://maven.imagej.net/content/repositories/snapshots", password="pass", user="user") """,
+                """@file:DependsOnMaven("net.clearvolume:cleargl:2.0.1")""",
+                """@file:DependsOn("log4j:log4j:1.2.14")""",
+                """println("foo")"""
+        )
+
+        with(Script(lines)) {
+
+            collectRepos() shouldBe listOf(
+                    MavenRepo("imagej-releases", "http://maven.imagej.net/content/repositories/releases", "user", "pass"),
+                    MavenRepo("imagej-snapshots", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass") //Provided with name in non-typical order
+            )
+
+            collectDependencies() shouldBe listOf(
+                    "net.clearvolume:cleargl:2.0.1",
+                    "log4j:log4j:1.2.14",
+                    "com.github.holgerbrandl:kscript-annotations:1.4"
+            )
+        }
+
+    }
+
 
 
     // combine kotlin opts spread over multiple lines

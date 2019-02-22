@@ -129,7 +129,7 @@ fun Script.collectDependencies(): List<String> {
 
     // if annotations are used add dependency on kscript-annotations
     if (lines.any { isKscriptAnnotation(it) }) {
-        dependencies += "com.github.holgerbrandl:kscript-annotations:1.2"
+        dependencies += "com.github.holgerbrandl:kscript-annotations:1.4"
     }
 
     return dependencies.distinct()
@@ -182,7 +182,7 @@ private fun isDependDeclare(line: String) =
 //
 
 
-data class MavenRepo(val id: String, val url: String)
+data class MavenRepo(val id: String, val url: String, val user: String = "", val password: String = "")
 
 /**
  * Collect custom artifact repos declared with @file:MavenRepository
@@ -192,12 +192,16 @@ fun Script.collectRepos(): List<MavenRepo> {
     // only supported annotation format for now
 
     // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/")
+    // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/", user="user", password="pass")
     return lines
         .filter { it.contains(dependsOnMavenPrefix) }
         .map { it.replaceFirst(dependsOnMavenPrefix, "").substringBeforeLast(")") }
-        .map { it.split(",").map { it.trim(' ', '"', '(') }.let { MavenRepo(it[0], it[1]) } }
-
-    // todo add credential support https://stackoverflow.com/questions/36282168/how-to-add-custom-maven-repository-to-gradle
+        .map {
+            it.split(",").map { it.trim(' ', '"', '(') }.let { annotationParams ->
+                val namedArgs = annotationParams.filter { it.contains("=") }.map { item: String -> item.let { item.substringBefore("=") to item.substringAfter("=\"") } }.toMap()
+                MavenRepo(annotationParams[0], annotationParams[1], namedArgs.getOrDefault("user", ""), namedArgs.getOrDefault("password", ""))
+            }
+        }
 }
 
 

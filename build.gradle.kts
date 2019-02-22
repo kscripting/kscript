@@ -20,6 +20,7 @@ dependencies {
         exclude("cglib", "cglib")
         exclude("org.kuali.maven.wagons", "maven-s3-wagon")
     }
+    // compile("com.jcabi:jcabi-aether:0.10.1:sources") //can be used for debugging, but somehow adds logging to dependency resolvement?
     compile("org.apache.maven:maven-core:3.0.3")
     compile("org.slf4j:slf4j-nop:1.7.25")
 

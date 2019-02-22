@@ -3,6 +3,7 @@ package kscript.app
 import com.jcabi.aether.Aether
 import org.sonatype.aether.RepositoryException
 import org.sonatype.aether.artifact.Artifact
+import org.sonatype.aether.repository.Authentication
 import org.sonatype.aether.repository.RemoteRepository
 import org.sonatype.aether.util.artifact.DefaultArtifact
 import org.sonatype.aether.util.artifact.JavaScopes.COMPILE
@@ -59,7 +60,8 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
         // Print the classpath
         return classPath
     } catch (e: RepositoryException) {
-        errorMsg("Failed to lookup dependencies. Check dependency locators or file a bug on https://github.com/holgerbrandl/kscript")
+        // Probably a wrapped Nullpointer from 'DefaultRepositorySystem.resolveDependencies()', this however is probably a connection problem.
+        errorMsg("Failed while connecting to the server. Check the connection (http/https, port, proxy, credentials, etc.) of your maven dependency locators. If you suspect this is a bug, you can create an issue on https://github.com/holgerbrandl/kscript")
         errorMsg("Exception: $e")
         quit(1)
     }
@@ -67,7 +69,13 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
 
 fun resolveDependenciesViaAether(depIds: List<String>, customRepos: List<MavenRepo>, loggingEnabled: Boolean): List<Artifact> {
     val jcenter = RemoteRepository("jcenter", "default", "http://jcenter.bintray.com/")
-    val customRemoteRepos = customRepos.map { it -> RemoteRepository(it.id, "default", it.url) }
+    val customRemoteRepos = customRepos.map { mavenRepo ->
+        RemoteRepository(mavenRepo.id, "default", mavenRepo.url).apply {
+            if (!mavenRepo.user.isNullOrEmpty() && !mavenRepo.password.isNullOrEmpty()) {
+                authentication = Authentication(mavenRepo.user, mavenRepo.password)
+            }
+        }
+    }
     val remoteRepos = customRemoteRepos + jcenter
 
     val aether = Aether(remoteRepos, File(System.getProperty("user.home") + "/.m2/repository"))
