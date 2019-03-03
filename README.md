@@ -81,6 +81,14 @@ To upgrade to latest version
 brew update
 brew upgrade holgerbrandl/tap/kscript
 ```
+
+#### Installation on Arch Linux
+
+On Arch Linux, `kscript` is available through the [Arch Linux User repository (AUR)](https://aur.archlinux.org/packages/kscript/). Use your favorite [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers) to install, e.g. `yay`:
+```shell
+yay -S kscript
+```
+
 #### Build it yourself
 
 To build `kscript` yourself, simply clone the repo and do
