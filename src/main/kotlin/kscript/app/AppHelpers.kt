@@ -283,7 +283,13 @@ private fun createSymLink(link: File, target: File) {
  * See https://github.com/puniverse/capsule
  */
 fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List<String>, customRepos: List<MavenRepo>, runtimeOptions: String, appName: String) {
-    requireInPath("gradle", "gradle is required to package kscripts")
+    val gradleName = System.getenv("KSCRIPT_CUSTOM_GRADLE_NAME") ?: "gradle"
+    requireInPath(
+            gradleName,
+            "Could not find $gradleName. gradle is required to package kscripts. If gradle is not in your PATH, " +
+                    "you can set the ENV variable KSCRIPT_CUSTOM_GRADLE_NAME to use a " +
+                    "local gradle wrapper (ie ./gradlew) or other Gradle executable of your preference."
+    )
 
     infoMsg("Packaging script '$appName' into standalone executable...")
 
@@ -352,7 +358,7 @@ exec java -jar ${'$'}0 "${'$'}@"
 
     File(tmpProjectDir, "build.gradle").writeText(gradleScript)
 
-    val pckgResult = evalBash("cd '${tmpProjectDir}' && gradle simpleCapsule")
+    val pckgResult = evalBash("cd '${tmpProjectDir}' && $gradleName simpleCapsule")
 
     with(pckgResult) {
         kscript.app.errorIf(exitCode != 0) { "packaging of '$appName' failed:\n$pckgResult" }
