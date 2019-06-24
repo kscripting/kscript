@@ -76,7 +76,8 @@ internal fun extractIncludeTarget(incDirective: String): Pair<String, String?> {
     return when {
         incDirective.startsWith(INCLUDE_ANNOT_PREFIX) -> {
             with(incDirective.replaceFirst(INCLUDE_ANNOT_PREFIX, "").split(")", ");", limit = 2)) {
-                Pair(this[0].trim(' ', '"'), this.getOrNull(1))
+                // TODO: Once on Kotlin 1.3, the following conditional can become `this[1].ifBlank { null }`
+                Pair(this[0].trim(' ', '"'), if (this[1].isNotBlank()) this[1] else null)
             }
         }
         // Comment directives cannot have trailing logic (as it would still be within a comment)
