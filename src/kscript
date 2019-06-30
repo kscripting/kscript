@@ -3,7 +3,7 @@
 
 
 absolute_path() {
-    # if the given path to the kscript launcher is abosulte (i.e. it is either starting with / or a
+    # if the given path to the kscript launcher is absolute (i.e. it is either starting with / or a
     # 'letter:/' when using gitbash on windows) it is returned unchanged, otherwise we construct an absolute path
     [[ $1 = /* ]] || [[ $1 =~ ^[A-z]:/ ]] && echo "$1" || echo "$PWD/${1#./}"
 }
