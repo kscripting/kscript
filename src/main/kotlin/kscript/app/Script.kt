@@ -205,15 +205,28 @@ fun Script.collectRepos(): List<MavenRepo> {
                         .map { keyVal -> keyVal.split(keyValSep).map { it.trim(' ', '\"') }.let{ it.first() to it.last()}}
                         .toMap()
 
-                MavenRepo(annotationParams[0], annotationParams[1], namedArgs.getOrDefault("user", ""), namedArgs.getOrDefault("password", ""))
+                MavenRepo(annotationParams[0], annotationParams[1], resolveOptionalVariableInString(namedArgs.getOrDefault("user", "")), resolveOptionalVariableInString(namedArgs.getOrDefault("password", "")))
             }
         }
+
 }
 
+/** If the provided string contains {{something}}, the string will be treated as an environment variable.
+ * When the variable exists, the string will be replaced with the value of the environment variable. */
+private fun resolveOptionalVariableInString(stringWithOptionalVar: String): String {
+    val varRegex = "\\{\\{(.*)\\}\\}".toRegex()
+    val usrFind = varRegex.find(stringWithOptionalVar)
+    if (usrFind != null && usrFind.groupValues.size > 1) {
+        val varString = usrFind.groupValues[1]
+        if (System.getenv().containsKey(varString)) {
+            return System.getenv(varString)
+        } else {
+            throw RuntimeException("The specified environment variable '{{$varString}}' is not found.")
+        }
+    }
+    return stringWithOptionalVar // No match, so input string is returned
+}
 
-//
-// Runtime Configuration
-//
 
 
 /**

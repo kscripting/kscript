@@ -1,15 +1,20 @@
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldThrow
 import kscript.app.*
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import java.io.File
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 /**
  * @author Holger Brandl
  */
-
 class Tests {
+
+    @JvmField @Rule
+    val environmentVariables = EnvironmentVariables()
 
     // "comma separated dependencies should be parsed correctly"
     @Test
@@ -120,6 +125,27 @@ class Tests {
                     "log4j:log4j:1.2.14",
                     "com.github.holgerbrandl:kscript-annotations:1.4"
             )
+        }
+
+    }
+
+    @Test
+    fun customRepoWithCredsFromEnvironment() {
+        environmentVariables.set("MY_USER_ENV", "my_user")
+        environmentVariables.set("MY_PASS_ENV", "my_pass")
+
+        val validLines = listOf("""@file:MavenRepository("imagej-releases", "http://maven.imagej.net/content/repositories/releases", user="{{MY_USER_ENV}}", password="{{MY_PASS_ENV}}") """)
+
+        with(Script(validLines)) {
+            collectRepos() shouldBe listOf(MavenRepo("imagej-releases", "http://maven.imagej.net/content/repositories/releases", "my_user", "my_pass"))
+        }
+
+        val invalidLines = listOf("""@file:MavenRepository("imagej-releases", "http://maven.imagej.net/content/repositories/releases", user="{{MY_USER_ENV}}", password="{{MY_PASS_EN}}") """)
+
+        with(Script(invalidLines)) {
+            shouldThrow<RuntimeException> {
+                collectRepos()
+            }
         }
 
     }

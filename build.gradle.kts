@@ -24,6 +24,7 @@ dependencies {
     compile("org.apache.maven:maven-core:3.0.3")
     compile("org.slf4j:slf4j-nop:1.7.25")
 
+    testCompile("com.github.stefanbirkner:system-rules:1.19.0")
     testCompile("junit:junit:4.12")
     testCompile( "io.kotlintest:kotlintest:2.0.7")
     testCompile(kotlin("script-runtime"))
