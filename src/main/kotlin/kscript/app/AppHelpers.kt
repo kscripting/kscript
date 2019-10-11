@@ -200,7 +200,7 @@ private fun bytesToHex(buffer: ByteArray): String {
 fun numLines(str: String) = str.split("\r\n|\r|\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray().size
 
 
-fun launchIdeaWithKscriptlet(scriptFile: File, dependencies: List<String>, customRepos: List<MavenRepo>, includeURLs: List<URL>): String {
+fun launchIdeaWithKscriptlet(scriptFile: File, userArgs: List<String>, dependencies: List<String>, customRepos: List<MavenRepo>, includeURLs: List<URL>): String {
     requireInPath("idea", "Could not find 'idea' in your PATH. It can be created in IntelliJ under `Tools -> Create Command-line Launcher`")
 
     infoMsg("Setting up idea project from ${scriptFile}")
@@ -217,6 +217,28 @@ fun launchIdeaWithKscriptlet(scriptFile: File, dependencies: List<String>, custo
     //    val tmpProjectDir = File("/Users/brandl/Desktop/")
     //            .run { File(this, "kscript_tmp_project") }
     //            .apply { mkdir() }
+
+    File(tmpProjectDir, ".idea/runConfigurations/")
+        .run {
+            mkdirs()
+        }
+    File(tmpProjectDir, ".idea/runConfigurations/Main.xml").writeText(
+        """
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Main" type="BashConfigurationType" factoryName="Bash">
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="INTERPRETER_PATH" value="kscript" />
+    <option name="PROJECT_INTERPRETER" value="false" />
+    <option name="WORKING_DIRECTORY" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <option name="SCRIPT_NAME" value="${'$'}PROJECT_DIR${'$'}/src/${scriptFile.name}" />
+    <option name="PARAMETERS" value="${userArgs.joinToString(" ")}" />
+    <module name="" />
+    <method v="2" />
+  </configuration>
+</component>
+        """.trimIndent()
+    )
 
     val stringifiedDeps = dependencies.map { "    compile \"$it\"" }.joinToString("\n")
     val stringifiedRepos = customRepos.map { "    maven {\n        url '${it.url}'\n    }\n" }.joinToString("\n")
@@ -270,7 +292,7 @@ private fun URL.fileName() = this.toURI().path.split("/").last()
 
 private fun createSymLink(link: File, target: File) {
     try {
-        Files.createSymbolicLink(link.toPath(), target.absoluteFile.toPath());
+        Files.createSymbolicLink(link.toPath(), target.absoluteFile.toPath())
     } catch (e: IOException) {
         errorMsg("Failed to create symbolic link to script. Copying instead...")
         target.copyTo(link)

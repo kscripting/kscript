@@ -150,7 +150,7 @@ fun main(args: Array<String>) {
 
     //  Create temporary dev environment
     if (docopt.getBoolean("idea")) {
-        println(launchIdeaWithKscriptlet(rawScript, dependencies, customRepos, includeURLs))
+        println(launchIdeaWithKscriptlet(rawScript, userArgs, dependencies, customRepos, includeURLs))
         exitProcess(0)
     }
 
