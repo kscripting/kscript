@@ -152,6 +152,15 @@ touch idea && chmod +x idea
 
 The `--idea` command outputs the directory that the project was created in, which you can use to determine where to run your tests.
 
+For example, you could do something like this to generate the project and test it in one command.
+```bash
+project_path=$(kscript --idea YourScript.kts 2>&1 | grep --line-buffered  "Project set up at" | cut -d'/' -f2-)
+cd "/$project_path"
+gradle test
+```
+
+Note that the Gradlew wrapper is not automatically created by `kscript --idea` so `./gradlew` will not be available. This uses a gradle instance from the PATH instead.
+
 ## Text Processing
 
 `kscript` allows to perform `sed`/`awk` text streaming/processing.
