@@ -17,6 +17,7 @@ Feel welcome to submit a [ticket](https://github.com/holgerbrandl/kscript/issues
 - [Create interpreters for custom DSLs](#create-interpreters-for-custom-dsls)
 - [Tips and tricks](#tips-and-tricks)
     - [Display images inline and open other files](#display-images-inline-and-open-other-files)
+- [Testing](#testing)
 - [Text Processing](#text-processing)
 - [Examples](#examples)
     - [Bioinformatics](#bioinformatics)
@@ -114,7 +115,42 @@ When using iterm2 it is possible to print inlined image output directly into the
 
 Suggested by [@yschimke](https://github.com/yschimke) in  [#51](https://github.com/holgerbrandl/kscript/issues/51)
 
+## Testing
+When an IDEA project is generated with the `--idea` command it is configured to consider all project files as test sources.
 
+This means that you can include unit test code, such as with JUnit, in your script files and run the tests with Gradle.
+
+For example, to run JUnit tests you would include the junit dependency at the top of your Kotlin file:
+```kotlin
+@file:DependsOn("junit:junit:4.12")
+```
+
+and then include a class with your tests somewhere in that file:
+```kotlin
+class MyTests {
+    @Test
+    fun myTest() {
+        check(1 + 1 == 2)
+    }
+}
+```
+
+You can run this test like usual, either from the IDE (by right clicking on the function or class and selecting "run") or from the command line (with `./gradlew test`).
+
+### Caveats
+- These tests can go in either .kts files or the .kt files that your script depend on via `@file:Include`. However, tests in a `.kts` file can only be run from the command line
+- If you encounter any Gradle build errors such as "Duplicate JVM class name" then try cleaning the project first - `./gradlew clean test`
+- Kscript does not differentiate test dependencies, so any test code or test imports in your script will be included when creating a packaged binary with `--package`
+
+### Testing on CI
+If you have script tests that you would like to run in automated environments, like CI, then you likely don't want to open up an Intellij IDEA instance to do so.
+
+However, to setup the gradle project to run the tests we still need to use the `--idea` command. To prevent this command from failing, you can create a mock `idea`:
+```
+touch idea && chmod +x idea
+```
+
+The `--idea` command outputs the directory that the project was created in, which you can use to determine where to run your tests.
 
 ## Text Processing
 

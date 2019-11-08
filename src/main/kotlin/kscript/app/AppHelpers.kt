@@ -261,6 +261,7 @@ $stringifiedDeps
 }
 
 sourceSets.main.java.srcDirs 'src'
+sourceSets.test.java.srcDirs 'src'
     """.trimIndent()
 
     File(tmpProjectDir, "build.gradle").writeText(gradleScript)
@@ -285,7 +286,10 @@ sourceSets.main.java.srcDirs 'src'
         }
     }
 
-    return "idea \"${tmpProjectDir.absolutePath}\""
+    val projectPath = tmpProjectDir.absolutePath
+    infoMsg("Project set up at $projectPath")
+
+    return "idea \"$projectPath\""
 }
 
 private fun URL.fileName() = this.toURI().path.split("/").last()
