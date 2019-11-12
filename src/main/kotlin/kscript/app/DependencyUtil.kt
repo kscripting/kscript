@@ -68,12 +68,20 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
     }
 }
 
+fun decodeEnv(value: String): String {
+    if (value.startsWith("@")) {
+        return System.getenv(value.substring(1))
+    } else {
+        return value
+    }
+}
+
 fun resolveDependenciesViaAether(depIds: List<String>, customRepos: List<MavenRepo>, loggingEnabled: Boolean): List<Artifact> {
     val jcenter = RemoteRepository("jcenter", "default", "http://jcenter.bintray.com/")
     val customRemoteRepos = customRepos.map { mavenRepo ->
         RemoteRepository(mavenRepo.id, "default", mavenRepo.url).apply {
             if (!mavenRepo.user.isNullOrEmpty() && !mavenRepo.password.isNullOrEmpty()) {
-                authentication = Authentication(mavenRepo.user, mavenRepo.password)
+                authentication = Authentication(decodeEnv(mavenRepo.user), decodeEnv(mavenRepo.password))
             }
         }
     }
