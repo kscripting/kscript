@@ -72,7 +72,8 @@ fun decodeEnv(value: String): String {
         val envKey = value.substring(2, value.length - 2)
         val envValue = System.getenv()[envKey]
         if (null == envValue) {
-            throw RuntimeException("environment variable '$envKey' doesn't found")
+            errorMsg("Could not resolve environment variable {{$envKey}} in maven repository credentials")
+            quit(1)
         }
         envValue
     } else {
