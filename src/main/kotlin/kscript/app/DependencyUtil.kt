@@ -68,15 +68,15 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
 }
 
 fun decodeEnv(value: String): String {
-    if (value.startsWith("{{") && value.endsWith("}}")) {
+    return if (value.startsWith("{{") && value.endsWith("}}")) {
         val envKey = value.substring(2, value.length - 2)
         try {
-            return System.getenv(envKey)
+            System.getenv(envKey)
         } catch (e: RuntimeException) {
             throw RuntimeException("environment variable '$envKey' doesn't found")
         }
     } else {
-        return value
+        value
     }
 }
 
