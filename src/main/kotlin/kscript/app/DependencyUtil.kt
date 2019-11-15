@@ -6,7 +6,6 @@ import org.sonatype.aether.artifact.Artifact
 import org.sonatype.aether.repository.Authentication
 import org.sonatype.aether.repository.RemoteRepository
 import org.sonatype.aether.util.artifact.DefaultArtifact
-import org.sonatype.aether.util.artifact.JavaScopes.COMPILE
 import org.sonatype.aether.util.artifact.JavaScopes.RUNTIME
 import java.io.File
 
@@ -69,8 +68,9 @@ fun resolveDependencies(depIds: List<String>, customRepos: List<MavenRepo> = emp
 }
 
 fun decodeEnv(value: String): String {
-    if (value.startsWith("@")) {
-        return System.getenv(value.substring(1))
+    if (value.startsWith("{{") && value.endsWith("}}")) {
+        val envKey = value.substring(2, value.length - 2)
+        return System.getenv(envKey)
     } else {
         return value
     }
