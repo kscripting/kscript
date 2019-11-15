@@ -317,8 +317,8 @@ Using annotations instead of comment directives to configure scripts is cleaner 
 // also protected artifact repositories are supported, see <https://github.com/holgerbrandl/kscript/blob/master/test/TestsReadme.md#manual-testing>
 // @file:MavenRepository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
 // You can use environment variables for user and password when string surrounded by double {} brackets 
-// @file:MavenRepository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{artifactory_user}}", password="{{artifactory_password}}")
-// will be use 'artifactory_user' and 'artifactory_password' environment variables
+// @file:MavenRepository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{ARTIFACTORY_USER}}", password="{{ARTIFACTORY_PASSWORD}}")
+// will be use 'ARTIFACTORY_USER' and 'ARTIFACTORY_PASSWORD' environment variables
 // if the value doesn't found in the script environment  will fail
 
 // Include helper scripts without deployment or prior compilation
