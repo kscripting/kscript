@@ -259,15 +259,15 @@ EOF
 #update the PKGBUILD file/pkgver variable
 cat - <<EOF > .SRCINFO
 pkgbase = kscript
-	pkgdesc = Enhanced scripting support for Kotlin on *nix-based systems
-	pkgver = ${kscript_version}
-	pkgrel = 1
-	url = https://github.com/holgerbrandl/kscript
-	arch = any
-	license = MIT
-	depends = kotlin
-	source = kscript-${kscript_version}.bin.zip::https://github.com/holgerbrandl/kscript/releases/download/v${kscript_version}/kscript-${kscript_version}-bin.zip
-	sha256sums = ${archiveMd5}
+pkgdesc = Enhanced scripting support for Kotlin on *nix-based systems
+pkgver = ${kscript_version}
+pkgrel = 1
+url = https://github.com/holgerbrandl/kscript
+arch = any
+license = MIT
+depends = kotlin
+source = kscript-${kscript_version}.bin.zip::https://github.com/holgerbrandl/kscript/releases/download/v${kscript_version}/kscript-${kscript_version}-bin.zip
+sha256sums = ${archiveMd5}
 
 pkgname = kscript
 
