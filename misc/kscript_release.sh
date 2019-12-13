@@ -244,7 +244,7 @@ arch=('any')
 url='https://github.com/holgerbrandl/kscript'
 license=('MIT')
 depends=('kotlin')
-source=("\${pkgname}-\${pkgver}.bin.zip::https://github.com/holgerbrandl/\${pkgname}/releases/download/v\${pkgver}/\${pkgname}-\${pkgver}-bin.zip")
+source=("\${pkgname}-\${pkgver}-bin.zip::https://github.com/holgerbrandl/\${pkgname}/releases/download/v\${pkgver}/\${pkgname}-\${pkgver}-bin.zip")
 sha256sums=('${archiveMd5}')
 
 package() {
