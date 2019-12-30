@@ -52,3 +52,7 @@ val jar by tasks.getting {
 val assemble by tasks.getting {
     dependsOn(shadowJar)
 }
+
+val test by tasks.getting {
+    inputs.dir("${project.projectDir}/test/resources")
+}
