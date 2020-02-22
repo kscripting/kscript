@@ -200,7 +200,12 @@ private fun bytesToHex(buffer: ByteArray): String {
 fun numLines(str: String) = str.split("\r\n|\r|\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray().size
 
 
-fun launchIdeaWithKscriptlet(scriptFile: File, userArgs: List<String>, dependencies: List<String>, customRepos: List<MavenRepo>, includeURLs: List<URL>): String {
+fun launchIdeaWithKscriptlet(scriptFile: File,
+                             userArgs: List<String>,
+                             dependencies: List<String>,
+                             customRepos: List<MavenRepo>,
+                             includeURLs: List<URL>,
+                             compilerOpts: String): String {
     requireInPath("idea", "Could not find 'idea' in your PATH. It can be created in IntelliJ under `Tools -> Create Command-line Launcher`")
 
     infoMsg("Setting up idea project from ${scriptFile}")
@@ -240,15 +245,44 @@ fun launchIdeaWithKscriptlet(scriptFile: File, userArgs: List<String>, dependenc
         """.trimIndent()
     )
 
-    val stringifiedDeps = dependencies.map { """
-|    compile("$it")
-""".trimMargin() }.joinToString("\n")
+    val stringifiedDeps = dependencies.map {
+        """
+|    implementation("$it")
+""".trimMargin()
+    }.joinToString("\n")
 
-    val stringifiedRepos = customRepos.map { """
+    val stringifiedRepos = customRepos.map {
+        """
 |    maven {
 |        url = uri("${it.url}")
 |    }
-    """.trimMargin() }.joinToString("\n")
+    """.trimMargin()
+    }.joinToString("\n")
+
+    // We split on space after having joined by space so we have lost some information on how
+    // the options where passed. It might cause some issues if some compiler options contain spaces
+    // but it's not the case of jvmTarget so we should be fine.
+    val opts = compilerOpts.split(" ")
+        .filter { it.isNotBlank() }
+
+    var jvmTargetOption: String? = null
+    for (i in opts.indices) {
+        if (i > 0 && opts[i - 1] == "-jvm-target") {
+            jvmTargetOption = opts[i]
+        }
+    }
+
+    val kotlinOptions = if (jvmTargetOption != null) {
+        """
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions { 
+        jvmTarget = "$jvmTargetOption"
+    }
+}
+""".trimIndent()
+    } else {
+        ""
+    }
 
     val gradleScript = """
 plugins {
@@ -262,13 +296,15 @@ $stringifiedRepos
 }
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib")
-    compile("org.jetbrains.kotlin:kotlin-script-runtime")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime")
 $stringifiedDeps
 }
 
 sourceSets.getByName("main").java.srcDirs("src")
 sourceSets.getByName("test").java.srcDirs("src")
+
+$kotlinOptions
     """.trimIndent()
 
     File(tmpProjectDir, "build.gradle.kts").writeText(gradleScript)
@@ -282,15 +318,15 @@ sourceSets.getByName("test").java.srcDirs("src")
 
         // also symlink all includes
         includeURLs.distinctBy { it.fileName() }
-          .forEach {
+            .forEach {
 
-            val includeFile = when {
-                it.protocol == "file" -> File(it.toURI())
-                else -> fetchFromURL(it.toString())
+                val includeFile = when {
+                    it.protocol == "file" -> File(it.toURI())
+                    else -> fetchFromURL(it.toString())
+                }
+
+                createSymLink(File(this, it.fileName()), includeFile)
             }
-
-            createSymLink(File(this, it.fileName()), includeFile)
-        }
     }
 
     val projectPath = tmpProjectDir.absolutePath

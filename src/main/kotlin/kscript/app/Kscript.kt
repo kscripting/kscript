@@ -147,21 +147,18 @@ fun main(args: Array<String>) {
     val dependencies = (script.collectDependencies() + Script(rawScript).collectDependencies()).distinct()
     val customRepos = (script.collectRepos() + Script(rawScript).collectRepos()).distinct()
 
-
-    //  Create temporary dev environment
-    if (docopt.getBoolean("idea")) {
-        println(launchIdeaWithKscriptlet(rawScript, userArgs, dependencies, customRepos, includeURLs))
-        exitProcess(0)
-    }
-
-
-    val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled) ?: ""
-    val optionalCpArg = if (classpath.isNotEmpty()) "-classpath '${classpath}'" else ""
-
     // Extract kotlin arguments
     val kotlinOpts = script.collectRuntimeOptions()
     val compilerOpts = script.collectCompilerOptions()
 
+    //  Create temporary dev environment
+    if (docopt.getBoolean("idea")) {
+        println(launchIdeaWithKscriptlet(rawScript, userArgs, dependencies, customRepos, includeURLs, compilerOpts))
+        exitProcess(0)
+    }
+
+    val classpath = resolveDependencies(dependencies, customRepos, loggingEnabled) ?: ""
+    val optionalCpArg = if (classpath.isNotEmpty()) "-classpath '${classpath}'" else ""
 
     //  Optionally enter interactive mode
     if (docopt.getBoolean("interactive")) {
