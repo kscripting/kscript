@@ -240,12 +240,19 @@ fun launchIdeaWithKscriptlet(scriptFile: File, userArgs: List<String>, dependenc
         """.trimIndent()
     )
 
-    val stringifiedDeps = dependencies.map { "    compile \"$it\"" }.joinToString("\n")
-    val stringifiedRepos = customRepos.map { "    maven {\n        url '${it.url}'\n    }\n" }.joinToString("\n")
+    val stringifiedDeps = dependencies.map { """
+|    compile("$it")
+""".trimMargin() }.joinToString("\n")
+
+    val stringifiedRepos = customRepos.map { """
+|    maven {
+|        url = uri("${it.url}")
+|    }
+    """.trimMargin() }.joinToString("\n")
 
     val gradleScript = """
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "${KotlinVersion.CURRENT}"
+    id("org.jetbrains.kotlin.jvm") version "${KotlinVersion.CURRENT}"
 }
 
 repositories {
@@ -255,16 +262,16 @@ $stringifiedRepos
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib"
-    compile "org.jetbrains.kotlin:kotlin-script-runtime"
+    compile("org.jetbrains.kotlin:kotlin-stdlib")
+    compile("org.jetbrains.kotlin:kotlin-script-runtime")
 $stringifiedDeps
 }
 
-sourceSets.main.java.srcDirs 'src'
-sourceSets.test.java.srcDirs 'src'
+sourceSets.getByName("main").java.srcDirs("src")
+sourceSets.getByName("test").java.srcDirs("src")
     """.trimIndent()
 
-    File(tmpProjectDir, "build.gradle").writeText(gradleScript)
+    File(tmpProjectDir, "build.gradle.kts").writeText(gradleScript)
 
     // also copy/symlink script resource in
     File(tmpProjectDir, "src").run {
