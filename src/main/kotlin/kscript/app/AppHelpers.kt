@@ -251,10 +251,22 @@ fun launchIdeaWithKscriptlet(scriptFile: File,
 """.trimMargin()
     }.joinToString("\n")
 
+    fun MavenRepo.stringifiedRepoCredentials(): String{
+       return  takeIf { user.isNotBlank() || password.isNotBlank() }?.let {
+            """
+|        credentials {
+|            username = "${it.user}"
+|            password = "${it.password}"
+|        }
+        """
+        } ?: ""
+    }
+
     val stringifiedRepos = customRepos.map {
         """
 |    maven {
 |        url = uri("${it.url}")
+         ${it.stringifiedRepoCredentials()}
 |    }
     """.trimMargin()
     }.joinToString("\n")
