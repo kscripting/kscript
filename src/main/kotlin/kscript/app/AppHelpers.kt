@@ -206,7 +206,8 @@ fun launchIdeaWithKscriptlet(scriptFile: File,
                              customRepos: List<MavenRepo>,
                              includeURLs: List<URL>,
                              compilerOpts: String): String {
-    requireInPath("idea", "Could not find 'idea' in your PATH. It can be created in IntelliJ under `Tools -> Create Command-line Launcher`")
+    val intellijCommand = System.getenv("KSCRIPT_IDEA_COMMAND") ?: "idea"
+    requireInPath("$intellijCommand", "Could not find '$intellijCommand' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_IDEA_COMMAND' env property")
 
     infoMsg("Setting up idea project from ${scriptFile}")
 
@@ -344,7 +345,7 @@ $kotlinOptions
     val projectPath = tmpProjectDir.absolutePath
     infoMsg("Project set up at $projectPath")
 
-    return "idea \"$projectPath\""
+    return "$intellijCommand \"$projectPath\""
 }
 
 private fun URL.fileName() = this.toURI().path.split("/").last()
