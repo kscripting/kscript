@@ -328,18 +328,26 @@ $kotlinOptions
 
         // https://stackoverflow.com/questions/17926459/creating-a-symbolic-link-with-java
         createSymLink(File(this, scriptFile.name), scriptFile)
+        val scriptDir = Paths.get(scriptFile.path).parent
 
         // also symlink all includes
         includeURLs.distinctBy { it.fileName() }
-            .forEach {
+                .forEach {
+                    val includeFile = when {
+                        it.protocol == "file" -> {
+                            val includeFile = File(it.toURI())
+                            val includeDir = Paths.get(includeFile.path).parent
+                            val symlinkRelativePathToScript = File(this, scriptDir.relativize(includeDir).toFile().path)
+                            symlinkRelativePathToScript.mkdirs()
+                            Pair(symlinkRelativePathToScript, includeFile)
+                        }
 
-                val includeFile = when {
-                    it.protocol == "file" -> File(it.toURI())
-                    else -> fetchFromURL(it.toString())
+                        else -> {
+                            Pair(this, fetchFromURL(it.toString()))
+                        }
+                    }
+                    createSymLink(File(includeFile.first, it.fileName()), includeFile.second)
                 }
-
-                createSymLink(File(this, it.fileName()), includeFile)
-            }
     }
 
     val projectPath = tmpProjectDir.absolutePath
