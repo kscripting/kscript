@@ -333,7 +333,7 @@ $kotlinOptions
         // also symlink all includes
         includeURLs.distinctBy { it.fileName() }
                 .forEach {
-                    val includeFile = when {
+                    val symlinkSrcDirAndDestination = when {
                         it.protocol == "file" -> {
                             val includeFile = File(it.toURI())
                             val includeDir = Paths.get(includeFile.path).parent
@@ -346,7 +346,7 @@ $kotlinOptions
                             Pair(this, fetchFromURL(it.toString()))
                         }
                     }
-                    createSymLink(File(includeFile.first, it.fileName()), includeFile.second)
+                    createSymLink(File(symlinkSrcDirAndDestination.first, it.fileName()), symlinkSrcDirAndDestination.second)
                 }
     }
 
