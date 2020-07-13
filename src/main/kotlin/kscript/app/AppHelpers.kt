@@ -327,7 +327,7 @@ $kotlinOptions
         mkdir()
 
         // https://stackoverflow.com/questions/17926459/creating-a-symbolic-link-with-java
-        createSymLink(File(this, scriptFile.name), scriptFile)
+        createLink(File(this, scriptFile.name), scriptFile)
         val scriptDir = Paths.get(scriptFile.path).parent
 
         // also symlink all includes
@@ -346,7 +346,7 @@ $kotlinOptions
                             Pair(this, fetchFromURL(it.toString()))
                         }
                     }
-                    createSymLink(File(symlinkSrcDirAndDestination.first, it.fileName()), symlinkSrcDirAndDestination.second)
+                    createLink(File(symlinkSrcDirAndDestination.first, it.fileName()), symlinkSrcDirAndDestination.second)
                 }
     }
 
@@ -358,11 +358,11 @@ $kotlinOptions
 
 private fun URL.fileName() = this.toURI().path.split("/").last()
 
-private fun createSymLink(link: File, target: File) {
+private fun createLink(link: File, target: File) {
     try {
-        Files.createSymbolicLink(link.toPath(), target.absoluteFile.toPath())
+        Files.createLink(link.toPath(), target.absoluteFile.toPath())
     } catch (e: IOException) {
-        errorMsg("Failed to create symbolic link to script. Copying instead...")
+        errorMsg("Failed to create link to script. Copying instead...")
         target.copyTo(link)
     }
 }
