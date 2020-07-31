@@ -42,6 +42,7 @@ Options:
  --idea                  Open script in temporary Intellij session
  -s --silent             Suppress status logging to stderr
  --package               Package script and dependencies into self-dependent binary
+ --proguard              Works together with --package and will Proguard process the output
  --add-bootstrap-header  Prepend bash header that installs kscript if necessary
 
 
@@ -146,6 +147,13 @@ fun main(args: Array<String>) {
     // Find all //DEPS directives and concatenate their values
     val dependencies = (script.collectDependencies() + Script(rawScript).collectDependencies()).distinct()
     val customRepos = (script.collectRepos() + Script(rawScript).collectRepos()).distinct()
+
+    // Find all extra Proguard configuration
+    val progurdConfigurations: List<String>? by lazy {
+        if (docopt.getBoolean("proguard")) {
+            (script.collectProguardConfig() + Script(rawScript).collectProguardConfig()).distinct()
+        } else null
+    }
 
     // Extract kotlin arguments
     val kotlinOpts = script.collectRuntimeOptions()
@@ -272,7 +280,15 @@ fun main(args: Array<String>) {
             "k" + scriptFile.nameWithoutExtension
         }
 
-        packageKscript(jarFile, execClassName, dependencies, customRepos, kotlinOpts, binaryName)
+        packageKscript(
+                scriptJar = jarFile,
+                wrapperClassName = execClassName,
+                dependencies = dependencies,
+                customRepos = customRepos,
+                runtimeOptions = kotlinOpts,
+                appName = binaryName,
+                proguardConfig = progurdConfigurations
+        )
 
         quit(0)
     }

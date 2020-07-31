@@ -69,8 +69,7 @@ data class Script(val lines: List<String>, val extension: String = "kts") : Iter
     }
 }
 
-
-private val KSCRIPT_DIRECTIVE_ANNO: List<Regex> = listOf("DependsOn", "KotlinOpts", "Include", "EntryPoint", "MavenRepository", "DependsOnMaven", "CompilerOpts")
+private val KSCRIPT_DIRECTIVE_ANNO: List<Regex> = listOf("DependsOn", "KotlinOpts", "Include", "EntryPoint", "MavenRepository", "DependsOnMaven", "CompilerOpts" , "ProguardConfig")
     .map { "^@file:$it[(]".toRegex() }
 
 private fun isKscriptAnnotation(line: String) =
@@ -129,7 +128,7 @@ fun Script.collectDependencies(): List<String> {
 
     // if annotations are used add dependency on kscript-annotations
     if (lines.any { isKscriptAnnotation(it) }) {
-        dependencies += "com.github.holgerbrandl:kscript-annotations:1.4"
+        dependencies += "com.github.holgerbrandl:kscript-annotations:1.5"
     }
 
     return dependencies.distinct()
@@ -210,6 +209,16 @@ fun Script.collectRepos(): List<MavenRepo> {
         }
 }
 
+fun Script.collectProguardConfig(): List<String> {
+
+    // Supports parsing Proguard config configured like this:
+    //
+    // @file:ProguardConfig("-keepclassmembers class CliArgs { *;}")
+
+    val proguardConfigRegex = "(?<!\\/\\/)@file:ProguardConfig\\(\\\"(.*?)\\\"\\)\$".toRegex(RegexOption.MULTILINE)
+
+    return proguardConfigRegex.findAll(lines.joinToString(separator = "\n")).map { it.groupValues[1] }.toList()
+}
 
 //
 // Runtime Configuration
