@@ -136,9 +136,11 @@ To use `kscript` as interpreter for a script just point to it in the shebang lin
 ```kotlin
 #!/usr/bin/env kscript
 
-println("Hello from Kotlin!")
-for (arg in args) {
-    println("arg: $arg")
+fun main(args: Array<String>) {
+    println("Hello from Kotlin!")
+    for (arg in args) {
+        println("arg: $arg")
+    }
 }
 ```
 
