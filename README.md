@@ -64,7 +64,7 @@ To test your installation simply run
 kscript --help
 ```
 
-This will check and inform about udpates. To update `kscript` simply install it again as described above.
+This will check and inform about updates. To update `kscript` simply install it again as described above.
 
 #### Run with docker
 
