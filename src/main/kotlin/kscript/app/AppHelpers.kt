@@ -207,6 +207,8 @@ fun launchIdeaWithKscriptlet(scriptFile: File,
                              includeURLs: List<URL>,
                              compilerOpts: String): String {
     val intellijCommand = System.getenv("KSCRIPT_IDEA_COMMAND") ?: "idea"
+    val gradleCommand = System.getenv("KSCRIPT_GRADLE_COMMAND") ?: "gradle"
+
     requireInPath("$intellijCommand", "Could not find '$intellijCommand' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_IDEA_COMMAND' env property")
 
     infoMsg("Setting up idea project from ${scriptFile}")
@@ -229,20 +231,10 @@ fun launchIdeaWithKscriptlet(scriptFile: File,
             mkdirs()
         }
     File(tmpProjectDir, ".idea/runConfigurations/Main.xml").writeText(
-        """
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main" type="BashConfigurationType" factoryName="Bash">
-    <option name="INTERPRETER_OPTIONS" value="" />
-    <option name="INTERPRETER_PATH" value="kscript" />
-    <option name="PROJECT_INTERPRETER" value="false" />
-    <option name="WORKING_DIRECTORY" value="" />
-    <option name="PARENT_ENVS" value="true" />
-    <option name="SCRIPT_NAME" value="${'$'}PROJECT_DIR${'$'}/src/${scriptFile.name}" />
-    <option name="PARAMETERS" value="${userArgs.joinToString(" ")}" />
-    <module name="" />
-    <method v="2" />
-  </configuration>
-</component>
+            """
+        <component name="ProjectRunConfigurationManager">
+        ${runConfig(scriptFile, tmpProjectDir, userArgs)}
+        </component>
         """.trimIndent()
     )
 
@@ -351,9 +343,48 @@ $kotlinOptions
     }
 
     val projectPath = tmpProjectDir.absolutePath
+
+    // Create gradle wrapper
+    requireInPath("$gradleCommand", "Could not find '$gradleCommand' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_GRADLE_COMMAND' env property")
+    runProcess("$gradleCommand wrapper", wd = tmpProjectDir)
+
     infoMsg("Project set up at $projectPath")
 
     return "$intellijCommand \"$projectPath\""
+}
+
+private fun runConfig(scriptFile: File, tmpProjectDir: File, userArgs: List<String>): String {
+    return if (scriptFile.extension == "kt") {
+        """
+        <configuration name="${scriptFile.name.substringBeforeLast(".")}" type="JetRunConfigurationType">
+            <module name="${tmpProjectDir.name}.main" />
+            <option name="VM_PARAMETERS" value="" />
+            <option name="PROGRAM_PARAMETERS" value="" />
+            <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+            <option name="ALTERNATIVE_JRE_PATH" />
+            <option name="PASS_PARENT_ENVS" value="true" />
+            <option name="MAIN_CLASS_NAME" value="${scriptFile.name.substringBeforeLast(".").capitalize()}Kt" />
+            <option name="WORKING_DIRECTORY" value="" />
+            <method v="2">
+                <option name="Make" enabled="true" />
+            </method>
+            </configuration>
+            """.trimIndent()
+    } else {
+        """  
+        <configuration default="false" name="Main" type="BashConfigurationType" factoryName="Bash">
+            <option name="INTERPRETER_OPTIONS" value="" />
+            <option name="INTERPRETER_PATH" value="kscript" />
+            <option name="PROJECT_INTERPRETER" value="false" />
+            <option name="WORKING_DIRECTORY" value="" />
+            <option name="PARENT_ENVS" value="true" />
+            <option name="SCRIPT_NAME" value="${'$'}PROJECT_DIR${'$'}/src/${scriptFile.name}" />
+            <option name="PARAMETERS" value="${userArgs.joinToString(" ")}" />
+            <module name="" />
+            <method v="2" />
+         </configuration>
+         """.trimIndent()
+    }
 }
 
 private fun URL.fileName() = this.toURI().path.split("/").last()
