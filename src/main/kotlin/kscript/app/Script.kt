@@ -46,23 +46,23 @@ data class Script(val lines: List<String>, val extension: String = "kts") : Iter
         val consolidated = StringBuilder().apply {
             // file annotations have to be on top of everything, just switch places between your annotation and package
             with(annotations) {
-                sorted().map(String::trim).distinct().map { appendln(it) }
+                sorted().map(String::trim).distinct().map { appendLine(it) }
                 // kotlin seems buggy here, so maybe we need to recode annot-directives into comment directives
-                if (isNotEmpty()) appendln()
+                if (isNotEmpty()) appendLine()
             }
 
             // restablish the package statement if present
             lines.firstOrNull { it.startsWith(PACKAGE_STATEMENT_PREFIX) }?.let {
-                appendln(it)
+                appendLine(it)
             }
 
             with(imports) {
-                sorted().map(String::trim).distinct().map { appendln(it) }
-                if (isNotEmpty()) appendln()
+                sorted().map(String::trim).distinct().map { appendLine(it) }
+                if (isNotEmpty()) appendLine()
             }
 
             // append actual script
-            codeBits.forEach { appendln(it) }
+            codeBits.forEach { appendLine(it) }
         }
 
         return copy(lines = consolidated.lines())

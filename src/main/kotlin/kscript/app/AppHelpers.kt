@@ -30,7 +30,7 @@ fun evalBash(cmd: String, wd: File? = null,
 
 fun runProcess(cmd: String, wd: File? = null): ProcessResult {
     val parts = cmd.split("\\s".toRegex())
-    return runProcess(cmd = *parts.toTypedArray(), wd = wd)
+    return runProcess(cmd = parts.toTypedArray(), wd = wd)
 }
 
 fun runProcess(vararg cmd: String, wd: File? = null,
@@ -78,7 +78,7 @@ internal open class StringBuilderConsumer : Consumer<String> {
     val sb = StringBuilder()
 
     override fun accept(t: String) {
-        sb.appendln(t)
+        sb.appendLine(t)
     }
 
     override fun toString(): String {
@@ -430,7 +430,6 @@ task simpleCapsule(type: FatCapsule){
   }
 }
     """.trimIndent()
-
     val pckgedJar = File(Paths.get("").toAbsolutePath().toFile(), appName).absoluteFile
 
 

@@ -1,8 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    kotlin("jvm") version "1.3.72"
-    id("com.github.johnrengelman.shadow") version "2.0.4"
+    kotlin("jvm") version "1.4.10"
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 group = "com.github.holgerbrandl.kscript.launcher"
