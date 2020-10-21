@@ -372,7 +372,7 @@ private fun createSymLink(link: File, target: File) {
  * Create and use a temporary gradle project to package the compiled script using capsule.
  * See https://github.com/puniverse/capsule
  */
-fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List<String>, customRepos: List<MavenRepo>, runtimeOptions: String, appName: String) {
+fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List<String>, customRepos: List<MavenRepo>, runtimeOptions: String, appName: String, proguardConfig: List<String>?) {
     requireInPath("gradle", "gradle is required to package kscripts")
 
     infoMsg("Packaging script '$appName' into standalone executable...")
@@ -393,10 +393,46 @@ fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List
 
     // https://shekhargulati.com/2015/09/10/gradle-tip-using-gradle-plugin-from-local-maven-repository/
 
-    val gradleScript = """
+    createGradleFile(proguardConfig, stringifiedRepos, stringifiedDeps, scriptJar, wrapperClassName, tmpProjectDir, appName, jvmOptions)
+
+
+    val pckgedJar = File(Paths.get("").toAbsolutePath().toFile(), appName).absoluteFile
+
+    // create exec_header to allow for direction execution (see http://www.capsule.io/user-guide/#really-executable-capsules)
+    // from https://github.com/puniverse/capsule/blob/master/capsule-util/src/main/resources/capsule/execheader.sh
+    val execHeaderFile = File(tmpProjectDir, "exec_header.sh").also {
+        it.writeText("""#!/usr/bin/env bash
+exec java -jar ${'$'}0 "${'$'}@"
+""")
+    }
+
+    createProguardFile(tmpProjectDir, proguardConfig)
+
+    val pckgResult = evalBash("cd '${tmpProjectDir}' && gradle ${if (proguardConfig != null) "shadowJar proguard" else "simpleCapsule"}")
+
+    with(pckgResult) {
+        kscript.app.errorIf(exitCode != 0) { "packaging of '$appName' failed:\n$pckgResult" }
+    }
+
+    pckgedJar.delete()
+    if (proguardConfig != null) {
+        execHeaderFile.let {
+            it.appendBytes(File(tmpProjectDir, "build/libs/${tmpProjectDir.name}-proguarded.jar").readBytes())
+            it.copyTo(pckgedJar, true).setExecutable(true)
+        }
+    } else {
+        File(tmpProjectDir, "build/libs/${appName}").copyTo(pckgedJar, true).setExecutable(true)
+    }
+
+    infoMsg("Finished packaging into ${pckgedJar}")
+}
+
+private fun createGradleFile(proguardConfig: List<String>?, stringifiedRepos: String, stringifiedDeps: String, scriptJar: File, wrapperClassName: String, tmpProjectDir: File, appName: String, jvmOptions: String) {
+    File(tmpProjectDir, "build.gradle").writeText("""
+${proguardBuildScripts(proguardConfig)}
 plugins {
     id "org.jetbrains.kotlin.jvm" version "${KotlinVersion.CURRENT}"
-    id "it.gianluz.capsule" version "1.0.3"
+    ${if (proguardConfig != null) "id \"com.github.johnrengelman.shadow\" version \"6.0.0\"" else "id \"it.gianluz.capsule\" version \"1.0.3\""}
 }
 
 repositories {
@@ -415,6 +451,35 @@ $stringifiedDeps
     compile files('${scriptJar.invariantSeparatorsPath}')
 }
 
+${gradleTasks(proguardConfig, wrapperClassName, tmpProjectDir, appName, jvmOptions)}""".trimIndent()) }
+
+private fun gradleTasks(proguardConfig: List<String>?, wrapperClassName: String, tmpProjectDir: File, appName: String, jvmOptions: String): String {
+    return if (proguardConfig != null) """
+jar {
+    manifest {
+        attributes 'Main-Class': '$wrapperClassName'
+    }
+}
+
+task ('proguard', type: proguard.gradle.ProGuardTask) {
+
+  configuration("proguard.pro")
+
+  injars  'build/libs/${tmpProjectDir.name}-all.jar'
+  outjars 'build/libs/${tmpProjectDir.name}-proguarded.jar'
+
+  // Automatically handle the Java version of this build.
+  if (System.getProperty('java.version').startsWith('1.')) {
+    // Before Java 9, the runtime classes were packaged in a single jar file.
+    libraryjars "${"$"}{System.getProperty('java.home')}/lib/rt.jar"
+  } else {
+    // As of Java 9, the runtime classes are packaged in modular jmod files.
+    libraryjars "${"$"}{System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    //libraryjars ${"$"}{System.getProperty('java.home')}/jmods/....."
+  }
+}
+""" else """
+
 task simpleCapsule(type: FatCapsule){
   applicationClass '$wrapperClassName'
 
@@ -429,27 +494,101 @@ task simpleCapsule(type: FatCapsule){
     //systemProperties['java.awt.headless'] = true
   }
 }
-    """.trimIndent()
+"""
+}
 
-    val pckgedJar = File(Paths.get("").toAbsolutePath().toFile(), appName).absoluteFile
-
-
-    // create exec_header to allow for direction execution (see http://www.capsule.io/user-guide/#really-executable-capsules)
-    // from https://github.com/puniverse/capsule/blob/master/capsule-util/src/main/resources/capsule/execheader.sh
-    File(tmpProjectDir, "exec_header.sh").writeText("""#!/usr/bin/env bash
-exec java -jar ${'$'}0 "${'$'}@"
-""")
-
-    File(tmpProjectDir, "build.gradle").writeText(gradleScript)
-
-    val pckgResult = evalBash("cd '${tmpProjectDir}' && gradle simpleCapsule")
-
-    with(pckgResult) {
-        kscript.app.errorIf(exitCode != 0) { "packaging of '$appName' failed:\n$pckgResult" }
+private fun proguardBuildScripts(proguardConfig: List<String>?): String {
+    return if (proguardConfig != null) """
+buildscript { 
+    repositories {
+           google()
+           jcenter()
     }
+    dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.0.0'
+        classpath "com.github.jengelman.gradle.plugins:shadow:6.0.0"
+    }
+}
+""" else ""
+}
 
-    pckgedJar.delete()
-    File(tmpProjectDir, "build/libs/${appName}").copyTo(pckgedJar, true).setExecutable(true)
+private fun createProguardFile(tmpProjectDir: File, proguardConfig: List<String>?) {
+    proguardConfig?.let {
+        File(tmpProjectDir, "proguard.pro").writeText(
+                """
+### Custom project based configuration
 
-    infoMsg("Finished packaging into ${pckgedJar}")
+${proguardConfig?.joinToString(separator = "\n")}
+
+### Default app configuration
+#
+# This ProGuard configuration file illustrates how to process applications.
+# Usage:
+#     java -jar proguard.jar @applications.pro
+#
+
+-verbose
+
+-dontwarn
+
+# Save the obfuscation mapping to a file, so you can de-obfuscate any stack
+# traces later on. Keep a fixed source file attribute and all line number
+# tables to get line numbers in the stack traces.
+# You can comment this out if you're not interested in stack traces.
+
+-printmapping out.map
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
+# Preserve all annotations.
+
+-keepattributes *Annotation*
+
+# You can print out the seeds that are matching the keep options below.
+
+#-printseeds out.seeds
+
+# Preserve all public applications.
+
+-keepclasseswithmembers public class * {
+    public static void main(java.lang.String[]);
+}
+
+# Preserve all native method names and the names of their classes.
+
+-keepclasseswithmembernames,includedescriptorclasses class * {
+    native <methods>;
+}
+
+# Preserve the special static methods that are required in all enumeration
+# classes.
+
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# Explicitly preserve all serialization members. The Serializable interface
+# is only a marker interface, so it wouldn't save them.
+# You can comment this out if your application doesn't use serialization.
+# If your code contains serializable classes that have to be backward
+# compatible, please refer to the manual.
+
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+# Your application may contain more items that need to be preserved;
+# typically classes that are dynamically created using Class.forName:
+
+# -keep public class com.example.MyClass
+# -keep public interface com.example.MyInterface
+# -keep public class * implements com.example.MyInterface
+    """.trimIndent())
+    }
 }

@@ -8,7 +8,7 @@ plugins {
 group = "com.github.holgerbrandl.kscript.launcher"
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+    compile("org.jetbrains.kotlin:kotlin-stdlib")
 
     compile("com.offbytwo:docopt:0.6.0.20150202")
 
