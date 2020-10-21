@@ -8,8 +8,6 @@ plugins {
 group = "com.github.holgerbrandl.kscript.launcher"
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
-
     compile("com.offbytwo:docopt:0.6.0.20150202")
 
     compile("com.jcabi:jcabi-aether:0.10.1") {
