@@ -1,26 +1,33 @@
-# Base Image for kscript testing
-FROM ubuntu:18.04
+# Adopted from https://github.com/serandel/kscript-docker/blob/master/Dockerfile
 
-## update apt cache
-RUN  apt-get update
+# Alpine had problems with Java and SDKMAN!
+# lchmod (file attributes) error: Not supported
+# https://bugs.alpinelinux.org/issues/8089
 
-RUN apt-get install -y curl unzip zip wget git
+FROM ubuntu:focal
 
-## install java
-RUN  apt-get install -y default-jdk
+MAINTAINER holgerbrandl@gmail.com
 
-# Define commonly used JAVA_HOME variable
-#ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+SHELL ["/bin/bash", "-c"]
 
+RUN apt-get update && \
+	apt-get -y install curl zip unzip && \
+    rm -rf /var/lib/apt/lists/*
 
+# Install SDKMAN!
+RUN curl -s "https://get.sdkman.io" | bash
 
-# install sdkman (see http://sdkman.io/install.html)
-RUN bash -c "curl -s 'https://get.sdkman.io' | bash"
+RUN source /root/.sdkman/bin/sdkman-init.sh && \
+    sdk install java 8.0.265-zulu && \
+    sdk install kotlin 1.4.10
+#    sdk install maven 3.6.0 && \
 
-# install assert.h
-RUN bash -c "cd /bin && wget https://raw.githubusercontent.com/lehmannro/assert.sh/master/assert.sh && chmod u+x assert.sh"
+ARG KSCRIPT_VERSION
+ENV KSCRIPT_VERSION=$KSCRIPT_VERSION
 
+## run separately to better use docker build cache
+RUN source /root/.sdkman/bin/sdkman-init.sh && \
+    sdk install kscript $KSCRIPT_VERSION
 
-#tall kotlin and maven
-RUN /bin/bash -c 'source ~/.sdkman/bin/sdkman-init.sh && sdkman_auto_answer=true && sdk install kotlin && sdk install maven && sdk install gradle 4.10'
+ENTRYPOINT source /root/.sdkman/bin/sdkman-init.sh && /usr/bin/env kscript "$0" "$@"
+CMD [ "--help" ]

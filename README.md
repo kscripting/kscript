@@ -19,6 +19,7 @@ In particular this wrapper around `kotlinc` adds
 
 Taken all these features together, `kscript` provides an easy-to-use, very flexible, and almost zero-overhead solution to write self-contained mini-applications with Kotlin.
 
+**Good News**: Kotlin [v1.4](https://kotlinlang.org/docs/reference/whatsnew14.html#scripting-and-repl) finally ships with a much improved - and needed - scripting integration. See [here](https://github.com/Kotlin/kotlin-script-examples/blob/master/jvm/main-kts/MainKts.md) for examples and documentation. Still, we think that `kscript` has various benefits compared this new platform-bundled improved toolstack, so we'll plan to support `kscript` until the kotlin platform will ship with an even more rich and versatile kotlin scripting interpreter.
 
 ---
 **[`kscript` presentation from KotlinConf2017!](https://holgerbrandl.github.io/kscript_kotlinconf_2017/kscript_kotlinconf.html)**
@@ -63,7 +64,29 @@ To test your installation simply run
 kscript --help
 ```
 
-This will check and inform about udpates. To update `kscript` simply install it again as described above.
+This will check and inform about updates. To update `kscript` simply install it again as described above.
+
+#### Run with docker
+
+We provide an executable docker container to run `kscript`
+
+```bash
+# using the latest version of kscript
+docker run -i holgerbrandl/kscript 'println("Hello, world!")'
+
+# or using versioned container
+docker run -i holgerbrandl/kscript:2.9.3 'println("Hello, world!")'
+```
+
+To use a script file outside of the container as input, you could do
+
+```bash
+docker run -i holgerbrandl/kscript - < script.kts
+```
+
+This will make `kscript` read the code from stdin while piping the file. Beware that the -i flag is needed to have stdout redirected outside the container.
+
+Please note, that currently `@Include` are not supported when using a dockerized kscript. Also, any resource outside the container context may not be resolved correctly. To overcome this limitation, you could use for instance [bind mounts](https://docs.docker.com/storage/bind-mounts/).
 
 #### Installation without `sdkman`
 

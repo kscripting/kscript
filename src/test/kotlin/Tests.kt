@@ -99,6 +99,7 @@ class Tests {
                 """@file:MavenRepository("spaceAroundCredentials", "http://maven.imagej.net/content/repositories/snapshots", password= "pass" , user= "user" ) """,
                 // Different whitespaces around credentials see #228
                 """@file:MavenRepository("spaceAroundCredentials2", "http://maven.imagej.net/content/repositories/snapshots", password= "pass", user="user" ) """,
+                """@file:MavenRepository("unnamedCredentials", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass") """,
 
                 // some other script bits unrelated to the repo definition
                 """@file:DependsOnMaven("net.clearvolume:cleargl:2.0.1")""",
@@ -112,13 +113,29 @@ class Tests {
                     MavenRepo("imagej-releases", "http://maven.imagej.net/content/repositories/releases", "user", "pass"),
                     MavenRepo("imagej-snapshots", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass"),
                     MavenRepo("spaceAroundCredentials", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass"),
-                    MavenRepo("spaceAroundCredentials2", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass")
+                    MavenRepo("spaceAroundCredentials2", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass"),
+                    MavenRepo("unnamedCredentials", "http://maven.imagej.net/content/repositories/snapshots", "user", "pass")
             )
 
             collectDependencies() shouldBe listOf(
                     "net.clearvolume:cleargl:2.0.1",
                     "log4j:log4j:1.2.14",
                     "com.github.holgerbrandl:kscript-annotations:1.4"
+            )
+        }
+    }
+
+    @Test
+    fun `it should support named repo options`() {
+        val lines = listOf(
+                """@file:MavenRepository(id= "imagej-releases", url = "http://maven.imagej.net/content/repositories/releases", user="user", password="pass") """,
+                """@file:DependsOn("log4j:log4j:1.2.14")""",
+                """println("foo")"""
+        )
+
+        with(Script(lines)) {
+            collectRepos() shouldBe listOf(
+                    MavenRepo("imagej-releases", "http://maven.imagej.net/content/repositories/releases", "user", "pass")
             )
         }
 

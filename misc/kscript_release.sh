@@ -279,3 +279,24 @@ EOF
 git add PKGBUILD .SRCINFO
 git commit -m "updated to ${kscript_version}"
 git push
+
+
+########################################################################
+## update docker image on dockerhub
+
+cd $KSCRIPT_HOME
+
+docker rmi kscript
+
+docker build --build-arg KSCRIPT_VERSION=${kscript_version} -t kscript misc
+
+docker tag kscript holgerbrandl/kscript:${kscript_version}
+
+docker login
+
+#https://stackoverflow.com/questions/41984399/denied-requested-access-to-the-resource-is-denied-docker
+docker push holgerbrandl/kscript:${kscript_version}
+
+## create latest tag
+docker tag kscript holgerbrandl/kscript
+docker push holgerbrandl/kscript

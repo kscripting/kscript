@@ -1,16 +1,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 group = "com.github.holgerbrandl.kscript.launcher"
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-
-    implementation("com.offbytwo:docopt:0.6.0.20150202")
+    compile("com.offbytwo:docopt:0.6.0.20150202")
 
     implementation("com.jcabi:jcabi-aether:0.10.1") {
         exclude("org.hibernate", "hibernate-validator")
