@@ -47,10 +47,10 @@ Installation
 
 To use `kscript` just Kotlin and Maven are required. To [install Kotlin](https://kotlinlang.org/docs/tutorials/command-line.html) we recommend [sdkman](http://sdkman.io/install):
 ```
-curl -s "https://get.sdkman.io" | bash  # install sdkman
-source ~/.bash_profile                  # add sdkman to PATH
+curl -s "https://get.sdkman.io" | bash     # install sdkman
+source "$HOME/.sdkman/bin/sdkman-init.sh"  # add sdkman to PATH
 
-sdk install kotlin                      # install Kotlin
+sdk install kotlin                         # install Kotlin
 ```
 
 Once Kotlin is ready, you can install `kscript` with
