@@ -205,6 +205,9 @@ fun Script.collectRepos(): List<MavenRepo> {
                         .map { keyVal -> keyVal.split(keyValSep).map { it.trim(' ', '\"') }.let{ it.first() to it.last()}}
                         .toMap()
 
+                if (annotationParams.size < 2) {
+                    throw IllegalArgumentException("Missing ${2 - annotationParams.size} of the required arguments for @file:MavenRepository(id, url)")
+                }
                 MavenRepo(
                         namedArgs.getOrDefault("id", annotationParams[0]),
                         namedArgs.getOrDefault("url", annotationParams[1]),
