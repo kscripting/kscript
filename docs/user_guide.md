@@ -163,6 +163,30 @@ Note that the Gradlew wrapper is not automatically created by `kscript --idea` s
 
 To streamline testing there is also [helper script](https://gist.github.com/elihart/019bd116d3fa0d6214b7396eedc4b206) by [@elihart](https://gist.github.com/elihart) that runs `gradle clean test` on other scripts to easily build and test them (using kscript). This script takes the name of another kts script as an argument, builds that script with gradle, and runs its tests via gradle clean test.
 
+#### Github Action 
+
+If you want to run your unit tests on every pull request to your `main` branch in Github, there is a Github Action called [kscript-action](https://github.com/plusmobileapps/kscript-action) which will utilize the helper script mentioned above to run your unit tests in a docker container. To use the Github action, create a `.github/workflows` folder in your project and create a `your-name.yml` file. Then in this `.yml` file add the following if you would like the unit tests to be run on every pull request against your main branch. An example project that utilizes this action can be found [here](https://github.com/plusmobileapps/kotlin-scripting/blob/main/.github/workflows/main.yml)
+
+```yml
+on: 
+  pull_request:
+      branches:
+        - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run tests in kscript project
+    steps:
+    - name: Checkout the project into the container
+      uses: actions/checkout@v2.3.4
+    - name: Run testing script to generate mock IDEA project and run gradle test
+      id: hello
+      uses: plusmobileapps/kscript-action@v1
+      with:
+        kts-file: 'the-path-to-script-in-github-repository.kts'
+```
+
 ## Text Processing
 
 `kscript` allows to perform `sed`/`awk` text streaming/processing.
