@@ -34,7 +34,7 @@ Usage:
  $selfName [options] <script> [<script_args>]...
  $selfName --clear-cache
 
-The <script> can be a  script file (*kts), a script URL, - for stdin, a *.kt source file with a main method, or some kotlin code.
+The <script> can be a script file (*kts), a script URL, - for stdin, a *.kt source file with a main method, or some kotlin code.
 
 Use '--clear-cache' to wipe cached script jars and urls
 
