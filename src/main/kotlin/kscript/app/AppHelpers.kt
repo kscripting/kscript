@@ -23,8 +23,10 @@ data class ProcessResult(val command: String, val exitCode: Int, val stdout: Str
 fun evalBash(cmd: String, wd: File? = null,
              stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
              stderrConsumer: Consumer<String> = StringBuilderConsumer()): ProcessResult {
-    return runProcess("bash", "-c", cmd,
-        wd = wd, stderrConsumer = stderrConsumer, stdoutConsumer = stdoutConsumer)
+    return runProcess(
+        *getBashCommandsForCurrentOS(), cmd,
+        wd = wd, stderrConsumer = stderrConsumer, stdoutConsumer = stdoutConsumer
+    )
 }
 
 
