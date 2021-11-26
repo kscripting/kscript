@@ -1,7 +1,6 @@
 package kscript.app
 
 import kotlinx.coroutines.runBlocking
-import org.eclipse.aether.artifact.DefaultArtifact
 import java.io.File
 import kotlin.script.experimental.api.valueOrThrow
 import kotlin.script.experimental.dependencies.CompoundDependenciesResolver

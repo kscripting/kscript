@@ -44,6 +44,7 @@ Options:
  --idea                  Open script in temporary Intellij session
  -s --silent             Suppress status logging to stderr
  --package               Package script and dependencies into self-dependent binary
+ --native                As --package, but with a bundled JRE (Java 11+)
  --add-bootstrap-header  Prepend bash header that installs kscript if necessary
 
 
@@ -276,14 +277,27 @@ fun main(args: Array<String>) {
     val joinedUserArgs = userArgs.map { "\"${it.replace("\"", "\\\"")}\"" }.joinToString(" ")
 
     //if requested try to package the into a standalone binary
-    if (docopt.getBoolean("package")) {
+    if (docopt.getBoolean("package") || docopt.getBoolean("native")) {
         val binaryName = if (File(scriptResource).run { canRead() && listOf("kts", "kt").contains(extension) }) {
             File(scriptResource).nameWithoutExtension
         } else {
             "k" + scriptFile.nameWithoutExtension
         }
 
-        packageKscript(jarFile, execClassName, dependencies, customRepos, kotlinOpts, binaryName)
+        val jvmOpts = parseJvmOptions(kotlinOpts)
+        val packager = KScriptPackager(
+            scriptJar = jarFile,
+            wrapperClassName = execClassName,
+            dependencies = dependencies,
+            customRepos = customRepos,
+            runtimeOptions = jvmOpts,
+            appName = binaryName
+        )
+        if(docopt.getBoolean("package")){
+            packager.makeExecutableJar()
+        } else {
+            packager.makeSelfExtractingRuntime()
+        }
 
         quit(0)
     }

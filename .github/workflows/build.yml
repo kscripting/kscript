@@ -39,12 +39,12 @@ jobs:
       - name: Install kotlin
         run: |
           source "/home/runner/.sdkman/bin/sdkman-init.sh"
-          sdk install kotlin 1.4.31
+          sdk install kotlin 1.6.0
 
       - name: Install gradle
         run: |
           source "/home/runner/.sdkman/bin/sdkman-init.sh"
-          sdk install gradle 6.7
+          sdk install gradle 7.2
 
 
       # https://stackoverflow.com/questions/50104666/gradle-difference-between-test-and-check

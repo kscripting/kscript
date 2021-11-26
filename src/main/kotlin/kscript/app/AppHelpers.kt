@@ -422,88 +422,22 @@ private fun createSymLink(link: File, target: File) {
     }
 }
 
-
-/**
- * Create and use a temporary gradle project to package the compiled script using capsule.
- * See https://github.com/puniverse/capsule
- */
-fun packageKscript(scriptJar: File, wrapperClassName: String, dependencies: List<String>, customRepos: List<MavenRepo>, runtimeOptions: String, appName: String) {
-    requireInPath("gradle", "gradle is required to package kscripts")
-
-    infoMsg("Packaging script '$appName' into standalone executable...")
-
-
-    val tmpProjectDir = KSCRIPT_CACHE_DIR
-        .run { File(this, "kscript_tmp_project__${scriptJar.name}_${System.currentTimeMillis()}") }
-        .apply { mkdir() }
-
-    val stringifiedDeps = dependencies.map { "    compile \"$it\"" }.joinToString("\n")
-    val stringifiedRepos = customRepos.map { "    maven {\n        url '${it.url}'\n    }\n" }.joinToString("\n")
-
-    val jvmOptions = runtimeOptions.split(" ")
+fun parseJvmOptions(kotlinOpts : String) : List<String> {
+    return kotlinOpts.split(" ")
         .filter { it.startsWith("-J") }
         .map { it.removePrefix("-J") }
-        .map { '"' + it + '"' }
-        .joinToString(", ")
-
-    // https://shekhargulati.com/2015/09/10/gradle-tip-using-gradle-plugin-from-local-maven-repository/
-
-    val gradleScript = """
-plugins {
-    id "org.jetbrains.kotlin.jvm" version "${KotlinVersion.CURRENT}"
-    id "it.gianluz.capsule" version "1.0.3"
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-$stringifiedRepos
-}
-
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib"
-$stringifiedDeps
-
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '${KotlinVersion.CURRENT}'
-
-    // https://stackoverflow.com/questions/20700053/how-to-add-local-jar-file-dependency-to-build-gradle-file
-    compile files('${scriptJar.invariantSeparatorsPath}')
-}
-
-task simpleCapsule(type: FatCapsule){
-  applicationClass '$wrapperClassName'
-
-  archiveName '$appName'
-
-  // http://www.capsule.io/user-guide/#really-executable-capsules
-  reallyExecutable
-
-  capsuleManifest {
-    jvmArgs = [$jvmOptions]
-    //args = []
-    //systemProperties['java.awt.headless'] = true
-  }
-}
-    """.trimIndent()
-    val pckgedJar = File(Paths.get("").toAbsolutePath().toFile(), appName).absoluteFile
-
-
-    // create exec_header to allow for direction execution (see http://www.capsule.io/user-guide/#really-executable-capsules)
-    // from https://github.com/puniverse/capsule/blob/master/capsule-util/src/main/resources/capsule/execheader.sh
-    File(tmpProjectDir, "exec_header.sh").writeText("""#!/usr/bin/env bash
-exec java -jar ${'$'}0 "${'$'}@"
-""")
-
-    File(tmpProjectDir, "build.gradle").writeText(gradleScript)
-
-    val pckgResult = evalBash("cd '${tmpProjectDir}' && gradle simpleCapsule")
-
-    with(pckgResult) {
-        errorIf(exitCode != 0) { "packaging of '$appName' failed:\n$pckgResult" }
+//See https://stackoverflow.com/a/2591122
+fun getJavaVersion(): Int {
+    var version = System.getProperty("java.version")
+    if (version.startsWith("1.")) {
+        version = version.substring(2, 3)
+    } else {
+        val dot = version.indexOf(".")
+        if (dot != -1) {
+            version = version.substring(0, dot)
+        }
     }
-
-    pckgedJar.delete()
-    File(tmpProjectDir, "build/libs/${appName}").copyTo(pckgedJar, true).setExecutable(true)
-
-    infoMsg("Finished packaging into ${pckgedJar}")
+    return version.toInt()
 }
