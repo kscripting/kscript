@@ -127,13 +127,13 @@ class KScriptPackager(
             }
             
             dependencies {
-                compile "org.jetbrains.kotlin:kotlin-stdlib"
+                implementation "org.jetbrains.kotlin:kotlin-stdlib"
                 ${dependencies.joinToString("\n    ") { "implementation \"$it\"" }}
             
-                compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '${KotlinVersion.CURRENT}'
+                implementation group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '${KotlinVersion.CURRENT}'
             
                 // https://stackoverflow.com/questions/20700053/how-to-add-local-jar-file-dependency-to-build-gradle-file
-                compile files('${scriptJar.invariantSeparatorsPath}')
+                implementation files('${scriptJar.invariantSeparatorsPath}')
             }
             
             application {
