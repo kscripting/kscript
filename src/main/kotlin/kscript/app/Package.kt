@@ -31,7 +31,7 @@ class KScriptPackager(
         ).resolve("build/libs/shadow.jar")
         val resultFile = File(Paths.get("").toAbsolutePath().toFile(), appName).absoluteFile
         resultFile.outputStream().use { fos ->
-            fos.write("#!/usr/bin/java ${runtimeOptions.joinToString(" ")} -jar\n".toByteArray())
+            fos.write("#!/usr/bin/env -S java ${runtimeOptions.joinToString(" ")} -jar\n".toByteArray())
             fatJar.inputStream().use { fis ->
                 fis.copyTo(fos)
             }
@@ -71,8 +71,7 @@ class KScriptPackager(
                     mkdir "$scriptTempFolder"
                     sed -e '1,/^#EOF#${'$'}/d' "${'$'}0" | tar -C "$scriptTempFolder" -kzxf -
                 fi
-                cd $scriptTempFolder
-                exec "./bin/$appName" "$@"
+                exec "$scriptTempFolder/bin/$appName" "$@"
                 exit
                 #EOF#
             """.trimIndent().toByteArray())
