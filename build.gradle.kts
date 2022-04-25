@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     kotlin("jvm") version "1.4.32"
+    application
     id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
@@ -13,6 +14,7 @@ group = "com.github.holgerbrandl.kscript.launcher"
 
 //val kotlinVersion: String by rootProject.extra
 val kotlinVersion: String ="1.4.32"
+val launcherClassName: String ="kscript.app.KscriptKt"
 
 dependencies {
     compile("com.offbytwo:docopt:0.6.0.20150202")
@@ -39,6 +41,10 @@ val shadowJar by tasks.getting(ShadowJar::class) {
             into(archiveFile.get().asFile.parentFile)
         }
     }
+}
+
+application {
+    mainClassName = launcherClassName
 }
 
 // Disable standard jar task to avoid building non-shadow jars
