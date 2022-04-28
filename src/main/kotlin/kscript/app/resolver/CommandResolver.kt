@@ -28,11 +28,16 @@ class CommandResolver(private val config: Config, private val script: Script) {
         val scriptRuntime =
             Paths.get("${config.kotlinHome}${config.separatorChar}lib${config.separatorChar}kotlin-script-runtime.jar")
 
-        val dependenciesSet = buildSet<Path> {
-            addAll(dependencies)
-            add(jarArtifact.path)
-            add(scriptRuntime)
-        }
+//        val dependenciesSet = buildSet<Path> {
+//            addAll(dependencies)
+//            add(jarArtifact.path)
+//            add(scriptRuntime)
+//        }
+
+        val dependenciesSet = mutableSetOf<Path>()
+        dependenciesSet.addAll(dependencies)
+        dependenciesSet.add(jarArtifact.path)
+        dependenciesSet.add(scriptRuntime)
 
         val classpath = resolveClasspath(dependenciesSet)
 

@@ -32,13 +32,22 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
 
         val enableSupportApi = docopt.getBoolean("text")
 
-        val preambles = buildList {
-            if (enableSupportApi) {
-                add(Templates.textProcessingPreamble)
-            }
+//        val preambles = buildList {
+//            if (enableSupportApi) {
+//                add(Templates.textProcessingPreamble)
+//            }
+//
+//            add(config.customPreamble)
+//        }
 
-            add(config.customPreamble)
+        val preambles = mutableListOf<String>()
+
+        if (enableSupportApi) {
+            preambles.add(Templates.textProcessingPreamble)
         }
+
+        preambles.add(config.customPreamble)
+
 
         val contentResolver = ContentResolver(appDir.cache)
         // see https://github.com/holgerbrandl/kscript/issues/127

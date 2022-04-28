@@ -2,10 +2,10 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-val kotlinVersion: String = "1.6.20"
+val kotlinVersion: String = "1.5.32"
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.5.32"
     application
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
@@ -43,11 +43,11 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:1.4.32")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies:1.4.32")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:1.4.32")
 
     implementation("commons-io:commons-io:2.11.0")
     implementation("commons-codec:commons-codec:1.15")
