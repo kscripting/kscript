@@ -26,7 +26,7 @@ class Cache(private val path: Path) {
         val directory = path.resolve("jar_$digest")
         val cachedJarArtifact = directory.resolve("jarArtifact.descriptor")
 
-        return if (directory.exists()) {
+        return if (cachedJarArtifact.exists()) {
             val jarArtifactLines = cachedJarArtifact.readText().lines()
             JarArtifact(Paths.get(jarArtifactLines[0]), jarArtifactLines[1])
         } else {
