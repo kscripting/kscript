@@ -10,8 +10,13 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+          # macos-10.15
+          - windows-2022
+    runs-on: ${{ matrix.os }}
 #    defaults:
 #      run:
 #        shell: bash
@@ -26,30 +31,43 @@ jobs:
         with:
           java-version: 11
 
+      - name: Install dependencies for ${{ runner.os }}
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            choco install zip
+            # Overwrite the WSL bash.exe
+            cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
+          fi
+
 #      - name: Update system dependencies
 #        run: |
 #          sudo apt-get update
 #          sudo apt-get install -y curl unzip zip wget
 
       - name: Install sdkman
+        shell: bash
         run: |
           bash -c "curl -s "https://get.sdkman.io" | bash"
-          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
 
       - name: Install kotlin
+        shell: bash
         run: |
-          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
           sdk install kotlin 1.4.31
 
       - name: Install gradle
+        shell: bash
         run: |
-          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
           sdk install gradle 6.7
 
 
       # https://stackoverflow.com/questions/50104666/gradle-difference-between-test-and-check
       - name: Build and test with Gradle
 #        working-directory: $GITHUB_WORKSPACE
+        shell: bash
         run: |
           echo  $GITHUB_WORKSPACE
           chmod +x gradlew
@@ -60,29 +78,36 @@ jobs:
         run: ./gradlew assemble
 
       - name: Install assert.sh
+        shell: bash
         run: |
-          wget https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh
+          curl -sLO https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh
           chmod +x assert.sh
 
       # https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#adding-a-system-path
-      - name: Update PATH to include kscrript
+      - name: Update PATH to include kscript
+        shell: bash
         run: echo "${GITHUB_WORKSPACE}/build/libs" >> $GITHUB_PATH
 
       - run: which kscript
+        shell: bash
 
       - name: Print --version
+        shell: bash
         run: |
-          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
           kscript --version
 
       - name: Create mock idea executable
+        shell: bash
         run: |
           touch idea
           chmod +x idea
           echo "${PWD}" >> $GITHUB_PATH
 
       - name: Run tests
+        shell: bash
+        if: ${{ runner.os != 'Windows' }}
         run: |
-          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
           export KSCRIPT_HOME="$GITHUB_WORKSPACE"
           ./test/test_suite.sh
