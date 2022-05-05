@@ -48,7 +48,7 @@ class DependencyResolver(private val customRepos: Set<Repository>) {
             }
         }.map {
             it.valueOr {
-                throw IllegalStateException("Failed while connecting to the server. Check the connection (http/https, port, proxy, credentials, etc.) of your maven dependency locators. If you suspect this is a bug, you can create an issue on https://github.com/holgerbrandl/kscript" + it.reports.joinToString(
+                throw IllegalStateException("Failed while connecting to the server. Check the connection (http/https, port, proxy, credentials, etc.) of your maven dependency locators. If you suspect this is a bug, you can create an issue on https://github.com/holgerbrandl/kscript\n" + it.reports.joinToString(
                     "\n"
                 ) { it.exception?.toString() ?: it.message }, it.reports.find { it.exception != null }?.exception
                 )

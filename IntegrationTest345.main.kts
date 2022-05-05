@@ -14,9 +14,6 @@ import kotlin.script.experimental.dependencies.RepositoryCoordinates
 import kotlin.script.experimental.dependencies.maven.MavenDependenciesResolver
 import kotlinx.coroutines.runBlocking
 
-
-// clear .m2 cache
-//        val log4jCached = File(System.getProperty("user.home"), ".m2/repository/log4j/log4j/1.2.14/")
 val cachedM2 = File(System.getProperty("user.home"), ".m2/repository/com/beust")
 
 if (cachedM2.isDirectory) {
@@ -30,14 +27,12 @@ val mvnResolver = MavenDependenciesResolver().apply {
 
 val resolver = CompoundDependenciesResolver(FileSystemDependenciesResolver(), mvnResolver)
 
-//    val resolve = resolver.resolve("log4j:log4j:1.2.14")
 runBlocking {
-val resolve = resolver.resolve("com.beust:klaxon:5.5")
+    val resolve = resolver.resolve("com.beust:klaxon:5.5")
 
-println(resolve.valueOrNull())
+    println(resolve.valueOrNull())
 
-//    require(File(System.getProperty("user.home"), ".m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar").exists()){
-require(File(System.getProperty("user.home"), ".m2/repository/com/beust/klaxon/5.5/klaxon-5.5.jar").exists()){
-    "failed to resolve dependency"
-}
+    require(File(System.getProperty("user.home"), ".m2/repository/com/beust/klaxon/5.5/klaxon-5.5.jar").exists()) {
+        "failed to resolve dependency"
+    }
 }

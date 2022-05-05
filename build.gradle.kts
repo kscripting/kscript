@@ -2,16 +2,20 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-val kotlinVersion: String = "1.6.20"
+val kotlinVersion: String = "1.7.20-dev-853"
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.6.21"
     application
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
     mavenCentral()
+
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+    }
 }
 
 group = "com.github.holgerbrandl.kscript.launcher"
@@ -41,23 +45,46 @@ val launcherClassName: String ="kscript.app.KscriptKt"
 dependencies {
     implementation("com.offbytwo:docopt:0.6.0.20150202")
 
-    implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
 
+    implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies:$kotlinVersion")
+
+    //-- BEGIN: Fixing issue #345
+
     implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:$kotlinVersion")
+
+    //implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:$kotlinVersion") {
+        //exclude(group="org.eclipse.aether")
+    //}
+
+//    implementation("org.apache.maven.resolver:maven-resolver-connector-basic:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-transport-wagon:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-transport-file:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-transport-http:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-impl:1.8.0")
+
+//    //Most probably not required
+//    implementation("org.apache.maven.resolver:maven-resolver-spi:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-api:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-util:1.8.0")
+//    implementation("org.apache.maven.resolver:maven-resolver-named-locks:1.8.0")
+//    implementation("org.apache.maven:maven-resolver-provider:3.8.5")
+//    implementation("org.apache.httpcomponents:httpclient:4.5.13")
+    //-- END
 
     implementation("commons-io:commons-io:2.11.0")
     implementation("commons-codec:commons-codec:1.15")
 
-    implementation("org.slf4j:slf4j-nop:1.7.32")
+    implementation("org.slf4j:slf4j-nop:1.7.36")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
-    testImplementation("io.mockk:mockk:1.12.1")
+    testImplementation("io.mockk:mockk:1.12.3")
 
     testImplementation(kotlin("script-runtime"))
 }

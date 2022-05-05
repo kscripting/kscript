@@ -13,9 +13,10 @@ class ConfigBuilder internal constructor() {
     var intellijCommand: String = System.getenv("KSCRIPT_IDEA_COMMAND") ?: "idea"
     var gradleCommand: String = System.getenv("KSCRIPT_GRADLE_COMMAND") ?: "gradle"
     var kotlinHome: Path? = (System.getenv("KOTLIN_HOME") ?: guessKotlinHome())?.let { Paths.get(it).absolute() }
-    var classPathSeparator: String = if (System.getProperty("os.name").lowercase().contains("windows")) ";" else ":"
-    var separatorChar: Char = File.separatorChar
+    var osName: String = System.getProperty("os.name")
     var homeDir: Path = Paths.get(System.getProperty("user.home")!!)
+    var classPathSeparator: String = if (osName.lowercase().contains("windows")) ";" else ":"
+    var separatorChar: Char = File.separatorChar
     var kotlinOptsEnvVariable = System.getenv("KSCRIPT_KOTLIN_OPTS") ?: ""
     var repositoryUrlEnvVariable = System.getenv("KSCRIPT_REPOSITORY_URL") ?: ""
     var repositoryUserEnvVariable = System.getenv("KSCRIPT_REPOSITORY_USER") ?: ""
@@ -29,6 +30,7 @@ class ConfigBuilder internal constructor() {
             intellijCommand,
             gradleCommand,
             kotlinHome,
+            osName,
             classPathSeparator,
             separatorChar,
             homeDir,

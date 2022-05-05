@@ -1,9 +1,6 @@
 package kscript.app.code
 
-import kscript.app.model.Dependency
 import kscript.app.model.PackageName
-import kscript.app.model.Repository
-import kscript.app.model.Script
 import kscript.app.util.ScriptUtils.dropExtension
 import org.intellij.lang.annotations.Language
 
@@ -33,7 +30,7 @@ object Templates {
         exec java -jar ${'$'}0 "${'$'}@"
         """.trimIndent()
 
-    fun wrapperForScript(packageName: PackageName, className: String) : String  {
+    fun wrapperForScript(packageName: PackageName, className: String): String {
         val classReference = packageName.value + "." + className
 
         return """

@@ -14,7 +14,6 @@ import kscript.app.util.Logger.infoMsg
 import org.docopt.DocOptWrapper
 import java.net.URI
 
-
 class KscriptHandler(private val config: Config, private val docopt: DocOptWrapper) {
 
     fun handle(userArgs: List<String>) {
@@ -23,6 +22,11 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
 
         devMsg("KScript configuration:")
         devMsg(config.toString())
+
+        if (Logger.devMode) {
+            devMsg("Classpath:")
+            devMsg(System.getProperty("java.class.path"))
+        }
 
         // create kscript dir if it does not yet exist
         val appDir = AppDir(config.kscriptDir)

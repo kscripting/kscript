@@ -9,6 +9,7 @@ data class Config(
     val intellijCommand: String,
     val gradleCommand: String,
     val kotlinHome: Path?,
+    val osName: String,
     val classPathSeparator: String,
     val separatorChar: Char,
     val homeDir: Path,
