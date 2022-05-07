@@ -51,15 +51,26 @@ assert_stderr(){
     assert "( $1 ) 2>&1 >/dev/null" "$2"
 }
 
-# $1 - suite name; $2 - requested suites
+# $1 - suite name; $2... - requested suites
 start_suite() {
-  if [[ "${2}" =~ "${1}" ]] || [[ "${2}" == "ALL" ]]; then
+  PARAM_SUITE="$1"
+  PARAM_REQUESTED_SUITES="${@:2}"
+
+  if [[ "${PARAM_REQUESTED_SUITES}" =~ "${PARAM_SUITE}" ]] || [[ "${PARAM_REQUESTED_SUITES}" == "ALL" ]]; then
     echo
-    echo "Starting '$1' tests:"
+    echo "Starting '$PARAM_SUITE' tests:"
+
+    SUITE_FILE="${PROJECT_DIR}/test/suite/${PARAM_SUITE}.sh"
+    if [[ -f ${SUITE_FILE} ]]; then
+      source ${SUITE_FILE}
+
+      assert_end "$PARAM_SUITE"
+    fi
+
     return 0
   fi
 
-  echo "Skipping '$1' tests..."
+  echo "Skipping '$PARAM_SUITE' tests..."
   return 1
 }
 
