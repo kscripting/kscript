@@ -1,7 +1,5 @@
 name: build
 
-# https://docs.github.com/en/free-pro-team@latest/actions/managing-workflow-runs/adding-a-workflow-status-badge
-
 on:
   push:
     branches: [ master ]
@@ -28,9 +26,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v3
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
+          distribution: 'zulu'
           java-version: '11'
       - uses: fwilhe2/setup-kotlin@main
+        with:
+          version: 1.6.21
 
       - name: Install dependencies for ${{ runner.os }}
         shell: bash
@@ -40,11 +40,6 @@ jobs:
             # Overwrite the WSL bash.exe
             cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
           fi
-
-#      - name: Update system dependencies
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y curl unzip zip wget
 
       - name: Run tests
         timeout-minutes: 10
