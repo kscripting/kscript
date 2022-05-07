@@ -2,7 +2,7 @@
 
 
 [![GitHub release](https://img.shields.io/github/release/holgerbrandl/kscript.svg)](https://github.com/holgerbrandl/kscript/releases)
-[![Build Status](https://github.com/holgerbrandl/kscript/workflows/build/badge.svg)](https://github.com/holgerbrandl/kscript/actions?query=workflow%3Abuild) 
+[![Build Status](https://github.com/holgerbrandl/kscript/workflows/build/badge.svg)](https://github.com/holgerbrandl/kscript/actions) 
 [![Gitter](https://badges.gitter.im/holgerbrandl/kscript.svg)](https://gitter.im/holgerbrandl/kscript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Enhanced scripting support for [Kotlin](https://kotlinlang.org/) on *nix-based systems.
