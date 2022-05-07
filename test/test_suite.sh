@@ -98,10 +98,6 @@ if start_suite $SUITE $REQUESTED_SUITES; then
   assert "kscript https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/url_test.kts" "I came from the internet"
   assert "kscript https://git.io/fxHBv" "main was called"
 
-  ## there are some dependencies which are not jar, but maybe pom, aar, ..
-  ## make sure they work, too
-  assert "kscript ${PROJECT_DIR}/test/resources/depends_on_with_type.kts" "getBigDecimal(1L): 1"
-
   # repeated compilation of buggy same script should end up in error again
   assert_raises "kscript '1-'; kscript '1-'" 1
 
@@ -145,6 +141,9 @@ fi
 ########################################################################################################################
 SUITE="annotation_driven_configuration"
 if start_suite $SUITE $REQUESTED_SUITES; then
+  ## there are some dependencies which are not jar, but maybe pom, aar,... make sure they work, too
+  assert "kscript ${PROJECT_DIR}/test/resources/depends_on_with_type.kts" "getBigDecimal(1L): 1"
+
   # make sure that @file:DependsOn is parsed correctly
   assert "kscript ${PROJECT_DIR}/test/resources/depends_on_annot.kts" "kscript with annotations rocks!"
 
@@ -161,6 +160,9 @@ if start_suite $SUITE $REQUESTED_SUITES; then
   # make sure that @file:MavenRepository is parsed correctly
   assert "kscript ${PROJECT_DIR}/test/resources/script_with_compile_flags.kts" "hoo_ray"
 
+  ## Ensure dependencies are solved correctly #345
+    rm -rf ~/.m2/repository/com/beust
+    assert "kscript ${PROJECT_DIR}/test/resources/depends_on_klaxon.kts" "Successfully resolved klaxon"
 
   assert_end "$SUITE"
 fi

@@ -1,14 +1,16 @@
 package kscript.app.parser
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.containsExactly
+import assertk.assertions.containsExactlyInAnyOrder
+import assertk.assertions.isFailure
+import assertk.assertions.messageContains
 import kscript.app.model.*
 import kscript.app.parser.LineParser.parseDependency
 import kscript.app.parser.LineParser.parseEntry
 import kscript.app.parser.LineParser.parseImport
 import kscript.app.parser.LineParser.parseKotlinOpts
 import kscript.app.parser.LineParser.parseRepository
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -45,10 +47,10 @@ class LineParserTest {
             "    //DEPS $listWithoutQuotesStrangelyFormatted",
         )) {
             println("Case: '$line'")
-            assertThat(parseDependency(line)).containsExactlyInAnyOrder(*list.map { Dependency(it.trim()) }.toTypedArray())
+            assertThat(parseDependency(line)).containsExactlyInAnyOrder(*list.map { Dependency(it.trim()) }
+                .toTypedArray())
         }
     }
-
 
     @ParameterizedTest
     @MethodSource("dynamicDependencies")

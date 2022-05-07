@@ -46,12 +46,16 @@ class DependencyResolver(private val customRepos: Set<Repository>) {
                 devMsg("Resolved in: ${System.currentTimeMillis() - start}")
                 resolved
             }
-        }.map {
-            it.valueOr {
-                throw IllegalStateException("Failed while connecting to the server. Check the connection (http/https, port, proxy, credentials, etc.) of your maven dependency locators. If you suspect this is a bug, you can create an issue on https://github.com/holgerbrandl/kscript\n" + it.reports.joinToString(
-                    "\n"
-                ) { it.exception?.toString() ?: it.message }, it.reports.find { it.exception != null }?.exception
-                )
+        }.asSequence().map { result ->
+            result.valueOr { failure ->
+                val details = failure.reports.joinToString("\n") { scriptDiagnostic ->
+                    scriptDiagnostic.exception?.stackTraceToString() ?: scriptDiagnostic.message
+                }
+
+                val firstException =
+                    failure.reports.find { scriptDiagnostic -> scriptDiagnostic.exception != null }?.exception
+
+                throw IllegalStateException(exceptionMessage + "\n" + details, firstException)
             }
         }.flatten().map {
             it.toPath()
@@ -60,5 +64,14 @@ class DependencyResolver(private val customRepos: Set<Repository>) {
         }.toSet()
 
         return resolvedDependencies
+    }
+
+    companion object {
+        //@formatter:off
+        private const val exceptionMessage =
+         "Failed while connecting to the server. Check the connection (http/https, port, proxy, credentials, etc.)" +
+         "of your maven dependency locators. If you suspect this is a bug, " +
+         "you can create an issue on https://github.com/holgerbrandl/kscript"
+        //@formatter:on
     }
 }

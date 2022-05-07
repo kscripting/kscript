@@ -1,8 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-val kotlinVersion: String = "1.7.20-dev-853"
+val kotlinVersion: String = "1.6.21"
 
 plugins {
     kotlin("jvm") version "1.6.21"
@@ -12,10 +13,6 @@ plugins {
 
 repositories {
     mavenCentral()
-
-    maven {
-        url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
-    }
 }
 
 group = "com.github.holgerbrandl.kscript.launcher"
@@ -24,23 +21,27 @@ tasks.test {
     useJUnitPlatform()
 
     testLogging {
-        events(TestLogEvent.FAILED); exceptionFormat = TestExceptionFormat.FULL
+        events(TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
     }
 }
 
 tasks.withType<Test> {
     addTestListener(object : TestListener {
-        override fun beforeSuite(suite: TestDescriptor) { logger.quiet("\nTest class: ${suite.displayName}") }
+        override fun beforeSuite(suite: TestDescriptor) {
+            logger.quiet("\nTest class: ${suite.displayName}")
+        }
+
         override fun beforeTest(testDescriptor: TestDescriptor) {}
         override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
-            logger.quiet("${String.format( "%-60s - %-10s", testDescriptor.name, result.resultType )} ")
+            logger.quiet("${String.format("%-60s - %-10s", testDescriptor.name, result.resultType)} ")
         }
 
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {}
     })
 }
 
-val launcherClassName: String ="kscript.app.KscriptKt"
+val launcherClassName: String = "kscript.app.KscriptKt"
 
 dependencies {
     implementation("com.offbytwo:docopt:0.6.0.20150202")
@@ -51,30 +52,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies:$kotlinVersion")
-
-    //-- BEGIN: Fixing issue #345
-
-    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:$kotlinVersion")
-
-    //implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:$kotlinVersion") {
-        //exclude(group="org.eclipse.aether")
-    //}
-
-//    implementation("org.apache.maven.resolver:maven-resolver-connector-basic:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-transport-wagon:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-transport-file:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-transport-http:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-impl:1.8.0")
-
-//    //Most probably not required
-//    implementation("org.apache.maven.resolver:maven-resolver-spi:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-api:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-util:1.8.0")
-//    implementation("org.apache.maven.resolver:maven-resolver-named-locks:1.8.0")
-//    implementation("org.apache.maven:maven-resolver-provider:3.8.5")
-//    implementation("org.apache.httpcomponents:httpclient:4.5.13")
-    //-- END
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven-all:$kotlinVersion")
 
     implementation("commons-io:commons-io:2.11.0")
     implementation("commons-codec:commons-codec:1.15")
@@ -92,6 +70,8 @@ dependencies {
 val shadowJar by tasks.getting(ShadowJar::class) {
     // set empty string to classifier and version to get predictable jar file name: build/libs/kscript.jar
     archiveFileName.set("kscript.jar")
+    transform(ComponentsXmlResourceTransformer())
+
     doLast {
         copy {
             from(File(projectDir, "src/kscript"))
@@ -101,7 +81,7 @@ val shadowJar by tasks.getting(ShadowJar::class) {
 }
 
 application {
-    mainClassName = launcherClassName
+    mainClass.set(launcherClassName)
 }
 
 // Disable standard jar task to avoid building non-shadow jars
