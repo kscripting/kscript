@@ -9,6 +9,6 @@ enum class OsType(val osName: String) {
 
     companion object {
         fun findOrThrow(name: String) =
-            values().find { it.osName.equals(name, true) } ?: throw IllegalArgumentException("Unsupported OS: $name")
+            values().find { name.contains(it.osName, true) } ?: throw IllegalArgumentException("Unsupported OS: $name")
     }
 }
