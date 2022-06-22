@@ -47,8 +47,9 @@ object ProcessRunner {
         try {
             // simplify with https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
             val proc = ProcessBuilder(cmd).directory(wd).
-                // see https://youtrack.jetbrains.com/issue/KT-20785
-            apply { environment()["KOTLIN_RUNNER"] = "" }.start()
+            apply {
+                prepareMinimalEnvironment(environment())
+            }.start()
 
             // we need to gobble the streams to prevent that the internal pipes hit their respective buffer limits, which
             // would lock the sub-process execution (see see https://github.com/holgerbrandl/kscript/issues/55
@@ -66,6 +67,29 @@ object ProcessRunner {
         } catch (e: Exception) {
             throw IllegalStateException(e)
         }
+    }
+
+    private fun prepareMinimalEnvironment(env: MutableMap<String, String>) {
+        // see https://youtrack.jetbrains.com/issue/KT-20785
+        // on Windows also other env variables (like KOTLIN_OPTS) interfere with executed command, so they have to be cleaned
+
+        //NOTE: It would be better to prepare minimal env only with environment variables that are required,
+        //but it means that we should track, what are default env variables in different OSes
+
+        //Env variables set by Unix scripts (from kscript and Kotlin)
+        env.remove("KOTLIN_RUNNER")
+
+        //Env variables set by Windows scripts (from kscript and Kotlin)
+        env.remove("_KOTLIN_RUNNER")
+        env.remove("KOTLIN_OPTS")
+        env.remove("_version")
+        env.remove("_KOTLIN_HOME")
+        env.remove("_BIN_DIR")
+        env.remove("_KOTLIN_COMPILER")
+        env.remove("JAR_PATH")
+        env.remove("COMMAND")
+        env.remove("_java_major_version")
+        env.remove("ABS_KSCRIPT_PATH")
     }
 }
 

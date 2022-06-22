@@ -1,6 +1,7 @@
 package kscript.app.creator
 
 import kscript.app.model.Config
+import kscript.app.util.Logger.devMsg
 import net.igsoft.tablevis.TableBuilder
 import net.igsoft.tablevis.printer.text.TextTablePrinter
 import net.igsoft.tablevis.style.text.BoxTextTableStyleSet
@@ -13,6 +14,8 @@ class DebugInfoCreator {
             if (config.osConfig.osType.isWindowsLike() || config.osConfig.osType.isPosixHostedOnWindows()) ';' else ':'
 
         val table = TableBuilder(BoxTextTableStyleSet()) {
+            width = 160
+
             row {
                 cell { value = "Debugging information for KScript (using tablevis by aartiPl)" }
             }
@@ -40,6 +43,16 @@ class DebugInfoCreator {
                             .replace("file:", "")
                             .split(classpathSeparator)
                             .joinToString("\n")
+                }
+            }
+
+            row {
+                cell { id("header"); value = "Env variables" }
+                cell {
+                    value =
+                        System.getenv().asIterable().joinToString("\n") {
+                            it.key + " = " + it.value
+                        }
                 }
             }
 

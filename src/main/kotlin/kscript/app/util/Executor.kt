@@ -16,6 +16,8 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
 
         val scriptCompileResult = ShellUtils.evalBash(osConfig.osType, command)
 
+        devMsg("Script compilation result:\n$scriptCompileResult")
+
         if (scriptCompileResult.exitCode != 0) {
             throw IllegalStateException("Compilation of scriplet failed:\n$scriptCompileResult")
         }
