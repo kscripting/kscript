@@ -6,4 +6,5 @@
 * Fix for packaging + re-enable tests
 * Depreciation of @MavenRepository -> @Repository is Kotlin standard
 * Depreciation of some old features with WARN (comment based annotations, referencing script by $HOME and by '/' - those references won't work for web scripts)
+* OSPath handling ~ home
 * Improve Unit tests

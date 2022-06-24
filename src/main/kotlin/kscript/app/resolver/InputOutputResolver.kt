@@ -67,7 +67,17 @@ class InputOutputResolver(private val osConfig: OsConfig, private val cache: Cac
 
     fun resolveCurrentDir(): URI = File(".").toURI()
 
-    fun tryToCreateShellFilePath(path: String): OsPath? = OsPath.create(osConfig.osType, path)
+    fun tryToCreateShellFilePath(path: String): OsPath? {
+        val type = when (osConfig.osType) {
+            //Path provided by MSys is like:
+            //C:/Workspace/Kod/Repos/kscript/test/resources/multi_line_deps.kts (slashes instead of backslashes)
+            //Because of that it should be parsed as Windows path
+            OsType.MSYS -> OsType.WINDOWS
+            else -> osConfig.osType
+        }
+
+        return OsPath.create(type, path)
+    }
 
     fun isReadable(osPath: OsPath): Boolean = File(osPath.toNativeOsPath().stringPath()).canRead()
 

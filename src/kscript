@@ -43,7 +43,7 @@ if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
 fi
 
 ## expose the name of the script being run to the script itself
-export KSCRIPT_FILE="$1"
+export KSCRIPT_FILE=`basename "$0"`
 
 ## run it using command substitution to have just the user process once kscript is done
 COMMAND=$("${KOTLIN_BIN}kotlin" -classpath "${JAR_PATH}" kscript.app.KscriptKt "$OSTYPE" "$@")
