@@ -31,5 +31,5 @@ start_suite "kt_support" $REQUESTED_SUITES
 start_suite "custom_interpreters" $REQUESTED_SUITES
 start_suite "misc" $REQUESTED_SUITES
 start_suite "bootstrap_headers" $REQUESTED_SUITES
-#start_suite "packaging" $REQUESTED_SUITES
+start_suite "packaging" $REQUESTED_SUITES
 start_suite "idea" $REQUESTED_SUITES

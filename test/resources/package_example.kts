@@ -1,4 +1,4 @@
-@file:KotlinOpts("-J-Xmx5g")
+@file:KotlinOpts("-J-Xmx512m")
 @file:DependsOn("log4j:log4j:1.2.14")
 
 

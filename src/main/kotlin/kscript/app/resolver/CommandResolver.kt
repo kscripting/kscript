@@ -75,7 +75,7 @@ class CommandResolver(private val osConfig: OsConfig) {
     }
 
     fun createPackage(projectPath: OsPath): String {
-        return "cd '${projectPath}' && ${osConfig.gradleCommand} simpleCapsule"
+        return "cd '${projectPath}' && ${osConfig.gradleCommand} makeScript"
     }
 
     private fun resolveKotlinOpts(kotlinOpts: Set<KotlinOpt>) = kotlinOpts.joinToString(" ") { it.value }

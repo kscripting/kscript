@@ -38,7 +38,6 @@ object GradleTemplates {
             |""".trimMargin()
     }
 
-    //Capsule: https://github.com/ngyewch/gradle-capsule-plugin
     fun createGradlePackageScript(script: Script, jarArtifact: JarArtifact): String {
         val kotlinOptions = createCompilerOptionsSection(script.compilerOpts)
 
@@ -49,42 +48,63 @@ object GradleTemplates {
         ) + script.dependencies
 
         val capsuleApp = jarArtifact.execClassName
+        val baseName = script.scriptName
 
         return """
+        import java.io.*
+        import java.lang.System
+        import java.nio.file.Files
+        import java.nio.file.Paths
+
         plugins {
             id("org.jetbrains.kotlin.jvm") version "$kotlinVersion"
-            id("it.gianluz.capsule") version "1.0.3"
             application
         }
 
         repositories {
             mavenLocal()
             mavenCentral()
-            ${createGradleRepositoriesSection(script.repositories).prependIndent()}
+        ${createGradleRepositoriesSection(script.repositories).prependIndent()}
         }
-        
-        tasks.create<us.kirchmeier.capsule.task.FatCapsule>("simpleCapsule") {
-            applicationClass("$capsuleApp")
-            archiveFileName.set("${script.scriptName}")
 
-            // https://github.com/danthegoodman/gradle-capsule-plugin/blob/master/DOCUMENTATION.md#really-executable-capsules
-            reallyExecutable
+        tasks.jar {
+            manifest {
+                attributes["Main-Class"] = "$capsuleApp"
+            }
+            baseName = "$baseName"
+            configurations["compileClasspath"].forEach { file: File ->
+                from(zipTree(file.absoluteFile))
+            }
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
 
-            capsuleManifest.apply {
-                applicationClass = "$capsuleApp"
-                application = "${script.scriptName}"
-                applicationScript = "exec_header.sh"
-                jvmArgs = listOf()
+        tasks.register("makeScript") {
+            dependsOn(":jar")
+            doLast {
+                val headerDir = layout.projectDirectory.toString()
+                val jarFileName = layout.buildDirectory.file("libs/$baseName.jar").get().toString()
+                val outFileName = layout.buildDirectory.file("libs/$baseName").get().toString()
+                val lineSeparator = System.getProperty("line.separator").encodeToByteArray()
+                val headerPath = Paths.get(headerDir).resolve("exec_header.sh")
+                val headerBytes = Files.readAllBytes(headerPath)
+                val jarBytes = Files.readAllBytes(Paths.get(jarFileName))
+                val outFile = Paths.get(outFileName).toFile()
+                val fileStream = FileOutputStream(outFile)
+
+                fileStream.write(headerBytes)
+                fileStream.write(lineSeparator)
+                fileStream.write(jarBytes)
+                fileStream.close()
             }
         }
-        
+
         dependencies {
             implementation(files("${jarArtifact.path.parent.resolve("scriplet.jar")}"))
-            ${createGradleDependenciesSection(extendedDependencies).prependIndent()}
+        ${createGradleDependenciesSection(extendedDependencies).prependIndent()}
         }
 
         $kotlinOptions
-        """.trimIndent()
+        """.trimStart('\n').trimIndent()
     }
 
     private fun createGradleRepositoryCredentials(repository: Repository): String {
