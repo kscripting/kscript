@@ -6,6 +6,7 @@ import kscript.app.model.KotlinOpt
 import kscript.app.model.OsConfig
 import kscript.app.model.OsType
 import kscript.app.util.OsPath
+import kscript.app.util.toNativeOsPath
 
 class CommandResolver(private val osConfig: OsConfig) {
     //Syntax for different OS-es:
@@ -82,13 +83,16 @@ class CommandResolver(private val osConfig: OsConfig) {
 
     private fun resolveCompilerOpts(compilerOpts: Set<CompilerOpt>) = compilerOpts.joinToString(" ") { it.value }
 
-    private fun resolveJarFile(jar: OsPath): String = when (osConfig.osType) {
-        OsType.WINDOWS -> "\"${jar.stringPath()}\""
+    private fun resolveJarFile(jar: OsPath): String = when {
+        osConfig.osType == OsType.WINDOWS || osConfig.osType.isPosixHostedOnWindows() -> "\"${
+            jar.toNativeOsPath()
+                .stringPath()
+        }\""
         else -> "'${jar.stringPath()}'"
     }
 
-    private fun resolveFiles(filePaths: Set<OsPath>): String = when (osConfig.osType) {
-        OsType.WINDOWS -> filePaths.joinToString(" ") { "\"${it.stringPath()}\"" }
+    private fun resolveFiles(filePaths: Set<OsPath>): String = when {
+        osConfig.osType == OsType.WINDOWS || osConfig.osType.isPosixHostedOnWindows() -> filePaths.joinToString(" ") { "\"${it.stringPath()}\"" }
         else -> filePaths.joinToString(" ") { "'${it.stringPath()}'" }
     }
 
@@ -103,11 +107,14 @@ class CommandResolver(private val osConfig: OsConfig) {
         val classPathSeparator =
             if (osConfig.osType.isWindowsLike() || osConfig.osType.isPosixHostedOnWindows()) ';' else ':'
 
-        return "-classpath \"" + dependencies.joinToString(classPathSeparator.toString()) { it.stringPath() } + "\""
+        return "-classpath \"" + dependencies.joinToString(classPathSeparator.toString()) {
+            it.toNativeOsPath().stringPath()
+        } + "\""
     }
 
-    private fun resolveKotlinBinary(binary: String) =
-        osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
+    private fun resolveKotlinBinary(binary: String): String {
+        return osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
             .convert(osConfig.osType)
             .stringPath()
+    }
 }

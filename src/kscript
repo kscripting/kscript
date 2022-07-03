@@ -36,14 +36,15 @@ else
   KOTLIN_BIN="$KOTLIN_HOME/bin/"
 fi
 
-# OSTYPE can be: linux-gnu, freebsd, darwin, cygwin, msys
+# OSTYPE can be: linux*, freebsd, darwin*, cygwin, msys
 if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
   JAR_PATH=$(cygpath -w "${JAR_PATH}")
+  KOTLIN_BIN=$(cygpath "${KOTLIN_BIN}")
   true
 fi
 
 ## expose the name of the script being run to the script itself
-export KSCRIPT_FILE=`basename "$0"`
+export KSCRIPT_FILE="$1"
 
 ## run it using command substitution to have just the user process once kscript is done
 COMMAND=$("${KOTLIN_BIN}kotlin" -classpath "${JAR_PATH}" kscript.app.KscriptKt "$OSTYPE" "$@")

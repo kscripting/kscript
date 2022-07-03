@@ -9,7 +9,6 @@ import kscript.app.util.Logger.devMsg
 import kscript.app.util.Logger.infoMsg
 import kscript.app.util.OsPath
 import java.net.URI
-import java.nio.file.Path
 
 class IdeaProjectCreator {
     fun create(basePath: OsPath, script: Script, userArgs: List<String>, uriLocalPathProvider: (URI) -> OsPath): OsPath {
@@ -32,7 +31,7 @@ class IdeaProjectCreator {
 
         FileUtils.createFile(
             basePath.resolve(".idea/runConfigurations/Main.xml"),
-            Templates.runConfig(script.rootNode.scriptName, script.rootNode.scriptType, userArgs)
+            Templates.createRunConfig(script.rootNode.scriptName, script.rootNode.scriptType, userArgs)
         )
 
         FileUtils.createFile(

@@ -40,7 +40,7 @@ class JarArtifactCreator(private val executor: Executor) {
         // create main-wrapper for kts scripts
         if (script.scriptType == ScriptType.KTS) {
             val wrapper = FileUtils.createFile(
-                basePath.resolve("$execClassName.kt"), Templates.wrapperForScript(script.packageName, className)
+                basePath.resolve("$execClassName.kt"), Templates.createWrapperForScript(script.packageName, className)
             )
             filesToCompile.add(wrapper)
         }

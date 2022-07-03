@@ -9,10 +9,11 @@ Breaking changes
   KSCRIPT_IDEA_COMMAND -> KSCRIPT_COMMAND_IDEA
   KSCRIPT_GRADLE_COMMAND -> KSCRIPT_COMMAND_GRADLE
 
-Major Enhancements
+Enhancements
 
-* Initial Windows support
-* When creating IntelliJ project 'gradle' and 'idea' do not have to be in path 
+* Windows support and proper Cygwin and MSys support
+* When creating IntelliJ project 'gradle' and 'idea' do not have to be in path
+* Packaging fixes (thanks for help to [Vsajip](https://github.com/vsajip))
 
 Bugfixes
 * Fix for dependency resolution

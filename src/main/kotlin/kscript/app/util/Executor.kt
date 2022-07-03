@@ -14,12 +14,12 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         val command = commandResolver.compileKotlin(jar, dependencies, filePaths, compilerOpts)
         devMsg("JAR compile command: $command")
 
-        val scriptCompileResult = ShellUtils.evalBash(osConfig.osType, command)
+        val processResult = ShellUtils.evalBash(osConfig.osType, command)
 
-        devMsg("Script compilation result:\n$scriptCompileResult")
+        devMsg("Script compilation result:\n$processResult")
 
-        if (scriptCompileResult.exitCode != 0) {
-            throw IllegalStateException("Compilation of scriplet failed:\n$scriptCompileResult")
+        if (processResult.exitCode != 0) {
+            throw IllegalStateException("Compilation of scriplet failed:\n$processResult")
         }
     }
 
@@ -59,13 +59,14 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
 
     fun createPackage(projectPath: OsPath) {
         if (!ShellUtils.isInPath(osConfig.osType, osConfig.gradleCommand)) {
-            throw IllegalStateException("gradle is required to package scripts")
+            throw IllegalStateException("Gradle is required to package scripts.")
         }
 
         val command = commandResolver.createPackage(projectPath)
         devMsg("Create package command: $command")
 
         val result = ShellUtils.evalBash(osConfig.osType, command)
+
         if (result.exitCode != 0) {
             throw IllegalStateException("Packaging for path: '$projectPath' failed:$result")
         }

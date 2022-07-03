@@ -70,7 +70,7 @@ start_suite() {
     echo
     echo "Starting '$PARAM_SUITE' tests:"
 
-    SUITE_FILE="${PROJECT_DIR}/test/suite/${PARAM_SUITE}.sh"
+    SUITE_FILE="${PROJECT_DIR}/test/linux_suite/${PARAM_SUITE}.sh"
     if [[ -f ${SUITE_FILE} ]]; then
       source ${SUITE_FILE}
 

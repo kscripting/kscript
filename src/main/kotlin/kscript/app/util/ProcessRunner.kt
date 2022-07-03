@@ -44,6 +44,8 @@ object ProcessRunner {
         stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
         stderrConsumer: Consumer<String> = StringBuilderConsumer()
     ): ProcessResult {
+        devMsg("Provided cmd list: $cmd")
+
         try {
             // simplify with https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
             val proc = ProcessBuilder(cmd).directory(wd).
@@ -82,6 +84,7 @@ object ProcessRunner {
         //Env variables set by Windows scripts (from kscript and Kotlin)
         env.remove("_KOTLIN_RUNNER")
         env.remove("KOTLIN_OPTS")
+        env.remove("JAVA_OPTS")
         env.remove("_version")
         env.remove("_KOTLIN_HOME")
         env.remove("_BIN_DIR")

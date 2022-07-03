@@ -24,7 +24,7 @@ You can configure your working environment by sourcing setup environment script:
 
 ```bash
 cd $DIR/test
-source setup_environment.sh
+source linux_environment.sh
 ```
 
 Sourcing this script allows to use some useful for development commands:

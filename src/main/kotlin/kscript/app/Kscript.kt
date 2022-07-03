@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
         val remainingArgs = args.drop(1)
 
         // skip org.docopt for version and help to allow for lazy version-check
-        val usage = Templates.usageOptions(config.osConfig.selfName, KSCRIPT_VERSION)
+        val usage = Templates.createUsageOptions(config.osConfig.selfName, KSCRIPT_VERSION)
 
         if (remainingArgs.size == 1 && listOf("--help", "-h", "--version", "-v").contains(remainingArgs[0])) {
             Logger.info(usage)

@@ -67,7 +67,9 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
                 IdeaProjectCreator().create(basePath, script, userArgs, uriLocalPathProvider)
             }
 
-            infoMsg("Project set up at $path")
+            infoMsg("Idea project available at:")
+            infoMsg(path.stringPath())
+
             executor.runIdea(path)
             return
         }
@@ -90,11 +92,12 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
 
         //if requested try to package the into a standalone binary
         if (docopt.getBoolean("package")) {
-            val path = appDir.cache.getOrCreatePackage(script.digest) { basePath ->
-                PackageCreator(executor).packageKscript(basePath, script, jar)
+            val path = appDir.cache.getOrCreatePackage(script.digest, script.scriptName) { basePath, packagePath ->
+                PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
             }
 
-            infoMsg("Package created in: $path")
+            infoMsg("Packaged script '${script.scriptName}' available at path:")
+            infoMsg(path.stringPath())
             return
         }
 
