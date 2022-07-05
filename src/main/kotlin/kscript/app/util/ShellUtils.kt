@@ -7,6 +7,8 @@ import kotlin.system.exitProcess
 object ShellUtils {
 
     fun evalBash(osType: OsType, cmd: String, wd: File? = null): ProcessResult {
+        //NOTE: cmd is an argument to shell (bash/cmd), so it should stay not split by whitespace as a single string
+
         if (osType == OsType.WINDOWS) {
             return ProcessRunner.runProcess("cmd", "/c", cmd, wd = wd)
         }

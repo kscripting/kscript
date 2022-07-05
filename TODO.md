@@ -8,3 +8,7 @@
 * Improve Unit tests
 * Packaging:
   - Tests should be adjusted, so that they are using previously printed package location to do the checks.
+  - missing -classpath ?
+  - missing kotlin-args ?
+    (real java command should be taken from kotlinc script)
+* Use compilation option -include-runtime: https://kotlinlang.org/docs/command-line.html#create-and-run-an-application

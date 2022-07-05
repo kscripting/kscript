@@ -42,42 +42,40 @@ jobs:
         timeout-minutes: 10
         shell: bash
         run: |
-          echo "OsType:         $OSTYPE"
+          export OSTYPE=$OSTYPE
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            export OSTYPE=Windows
+          fi
           export PATH=./build/libs:${PATH}
           
-          if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+          echo "OsType:         $OSTYPE"
+          echo "kscript path:   $(which kscript)"
+          
+          if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
             ./test/linux_suite.sh
+            ./gradlew -Dtest.single=LinuxSuite integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
             ./gradlew clean build
-            echo "kscript path:   $(which kscript)"
-            kscript --help
-            kscript -d "println(1+1)"
+            ./gradlew -Dtest.single=MacSuite integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
-            ./gradlew clean build
             echo "kscript path:   $(which kscript)"
-            kscript --help
-            kscript -d "println(1+1)"                  
+            ./gradlew clean build
+            ./gradlew -Dtest.single=CygwinSuite integration                  
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
             ./gradlew clean build
-            echo "kscript path:   $(which kscript)"
-            kscript --help
-            kscript -d "println(1+1)"                  
+            ./gradlew -Dtest.single=MsysSuite integration                  
           elif [[ "$OSTYPE" == "win32" ]]; then
             echo "Windows test..."
             ./gradlew clean build
-            echo "kscript path:   $(which kscript)"
-            kscript --help
-            kscript -d "println(1+1)"                  
+            ./gradlew -Dtest.single=WindowsSuite integration                  
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
             ./gradlew clean build
-            echo "kscript path:   $(which kscript)"
-            kscript --help
-            kscript -d "println(1+1)"
+            ./gradlew -Dtest.single=OtherPosixSuite integration      
           else
             echo "Unknown OS"
             exit 1

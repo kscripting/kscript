@@ -21,8 +21,6 @@ class PackageCreator(private val executor: Executor) {
         executor.createPackage(basePath)
         packageFile.toNativeFile().setExecutable(true)
 
-        infoMsg("Packaging finished.")
-
         return packageFile
     }
 }

@@ -1,12 +1,10 @@
 package kscript.app.util
 
-import kscript.app.util.Logger.devMsg
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.function.Consumer
-import java.util.regex.Pattern
 
 data class ProcessResult(val command: String, val exitCode: Int, val stdout: String, val stderr: String) {
     override fun toString(): String {
@@ -20,20 +18,6 @@ data class ProcessResult(val command: String, val exitCode: Int, val stdout: Str
 }
 
 object ProcessRunner {
-    //Pattern for splitting command by space, but still keeping spaces inside quotes " or '
-    private val pattern = Pattern.compile("([^\"']\\S*|[\"|'].+?[\"|'])\\s*")
-
-    fun runProcess(cmd: String, wd: File? = null): ProcessResult {
-        val command = mutableListOf<String>()
-
-        val matcher = pattern.matcher(cmd)
-        while (matcher.find()) {
-            command.add(matcher.group(1))
-        }
-
-        return runProcess(command, wd = wd)
-    }
-
     fun runProcess(vararg cmd: String, wd: File? = null): ProcessResult {
         return runProcess(cmd.asList(), wd)
     }
@@ -44,12 +28,9 @@ object ProcessRunner {
         stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
         stderrConsumer: Consumer<String> = StringBuilderConsumer()
     ): ProcessResult {
-        devMsg("Provided cmd list: $cmd")
-
         try {
             // simplify with https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
-            val proc = ProcessBuilder(cmd).directory(wd).
-            apply {
+            val proc = ProcessBuilder(cmd).directory(wd).apply {
                 prepareMinimalEnvironment(environment())
             }.start()
 

@@ -1,7 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val kotlinVersion: String = "1.6.21"
 
@@ -9,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.6.21"
     application
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.adarshr.test-logger") version "3.2.0"
 }
 
 repositories {
@@ -17,28 +16,37 @@ repositories {
 
 group = "com.github.holgerbrandl.kscript.launcher"
 
-tasks.test {
-    useJUnitPlatform()
-
-    testLogging {
-        events(TestLogEvent.FAILED)
-        exceptionFormat = TestExceptionFormat.FULL
+sourceSets {
+    create("integration") {
+        java.srcDir("$projectDir/src/integration/kotlin")
+        resources.srcDir("$projectDir/src/integration/resources")
+        compileClasspath += main.get().output + test.get().output
+        runtimeClasspath += main.get().output + test.get().output
     }
 }
 
-tasks.withType<Test> {
-    addTestListener(object : TestListener {
-        override fun beforeSuite(suite: TestDescriptor) {
-            logger.quiet("\nTest class: ${suite.displayName}")
-        }
+configurations {
+    get("integrationImplementation").apply { extendsFrom(get("testImplementation")) }
+}
 
-        override fun beforeTest(testDescriptor: TestDescriptor) {}
-        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
-            logger.quiet("${String.format("%-60s - %-10s", testDescriptor.name, result.resultType)} ")
-        }
+tasks.create<Test>("integration") {
+    useJUnitPlatform()
 
-        override fun afterSuite(suite: TestDescriptor, result: TestResult) {}
-    })
+    description = "Runs the integration tests."
+    group = "verification"
+    testClassesDirs = sourceSets["integration"].output.classesDirs
+    classpath = sourceSets["integration"].runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter(tasks["test"])
+}
+
+testlogger {
+    showStandardStreams = true
+    showFullStackTraces = false
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 val launcherClassName: String = "kscript.app.KscriptKt"
@@ -63,6 +71,8 @@ dependencies {
 
     implementation("org.slf4j:slf4j-nop:1.7.36")
 
+
+    testImplementation("org.junit.platform:junit-platform-suite-engine:1.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
@@ -90,14 +100,14 @@ application {
 }
 
 // Disable standard jar task to avoid building non-shadow jars
-val jar by tasks.getting {
+val jar: Task by tasks.getting {
     enabled = false
 }
 // Build shadowJar when
-val assemble by tasks.getting {
+val assemble: Task by tasks.getting {
     dependsOn(shadowJar)
 }
 
-val test by tasks.getting {
+val test: Task by tasks.getting {
     inputs.dir("${project.projectDir}/test/resources")
 }
