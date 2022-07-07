@@ -32,6 +32,10 @@ configurations {
 tasks.create<Test>("integration") {
     useJUnitPlatform()
 
+    systemProperty("os.type", System.getProperty("os.type"))
+    systemProperty("shell.path", System.getProperty("shell.path"))
+    systemProperty("project.path", projectDir.absolutePath)
+
     description = "Runs the integration tests."
     group = "verification"
     testClassesDirs = sourceSets["integration"].output.classesDirs

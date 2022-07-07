@@ -25,13 +25,14 @@ object ProcessRunner {
     fun runProcess(
         cmd: List<String>,
         wd: File? = null,
+        env: Map<String, String> = emptyMap(),
         stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
         stderrConsumer: Consumer<String> = StringBuilderConsumer()
     ): ProcessResult {
         try {
             // simplify with https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
             val proc = ProcessBuilder(cmd).directory(wd).apply {
-                prepareMinimalEnvironment(environment())
+                prepareMinimalEnvironment(environment(), env)
             }.start()
 
             // we need to gobble the streams to prevent that the internal pipes hit their respective buffer limits, which
@@ -52,7 +53,7 @@ object ProcessRunner {
         }
     }
 
-    private fun prepareMinimalEnvironment(env: MutableMap<String, String>) {
+    private fun prepareMinimalEnvironment(environment: MutableMap<String, String>, env: Map<String, String>) {
         // see https://youtrack.jetbrains.com/issue/KT-20785
         // on Windows also other env variables (like KOTLIN_OPTS) interfere with executed command, so they have to be cleaned
 
@@ -60,20 +61,22 @@ object ProcessRunner {
         //but it means that we should track, what are default env variables in different OSes
 
         //Env variables set by Unix scripts (from kscript and Kotlin)
-        env.remove("KOTLIN_RUNNER")
+        environment.remove("KOTLIN_RUNNER")
 
         //Env variables set by Windows scripts (from kscript and Kotlin)
-        env.remove("_KOTLIN_RUNNER")
-        env.remove("KOTLIN_OPTS")
-        env.remove("JAVA_OPTS")
-        env.remove("_version")
-        env.remove("_KOTLIN_HOME")
-        env.remove("_BIN_DIR")
-        env.remove("_KOTLIN_COMPILER")
-        env.remove("JAR_PATH")
-        env.remove("COMMAND")
-        env.remove("_java_major_version")
-        env.remove("ABS_KSCRIPT_PATH")
+        environment.remove("_KOTLIN_RUNNER")
+        environment.remove("KOTLIN_OPTS")
+        environment.remove("JAVA_OPTS")
+        environment.remove("_version")
+        environment.remove("_KOTLIN_HOME")
+        environment.remove("_BIN_DIR")
+        environment.remove("_KOTLIN_COMPILER")
+        environment.remove("JAR_PATH")
+        environment.remove("COMMAND")
+        environment.remove("_java_major_version")
+        environment.remove("ABS_KSCRIPT_PATH")
+
+        environment.putAll(env)
     }
 }
 
