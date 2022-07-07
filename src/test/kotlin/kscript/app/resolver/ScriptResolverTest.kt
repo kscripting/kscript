@@ -15,7 +15,7 @@ import java.io.File
 class ScriptResolverTest {
     private val testHome = OsPath.createOrThrow(OsType.native, "build/tmp/script_resolver_test")
     private val config =
-        Config.builder().apply { osType = OsType.native.name; homeDir = testHome.resolve("home") }.build()
+        Config.builder().apply { osType = OsType.native.osName; homeDir = testHome.resolve("home") }.build()
 
     private val cache = Cache(testHome.resolve("cache"))
     private val inputOutputResolver = InputOutputResolver(config.osConfig, cache)
