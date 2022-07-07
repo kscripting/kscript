@@ -19,7 +19,7 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
         }
 
         require(path.pathType != PathType.ABSOLUTE) {
-            "Can not resolve absolute or relative path '${stringPath()}' using absolute path '${path.stringPath()}'"
+            "Can not resolve absolute, relative or undefined path '${stringPath()}' using absolute path '${path.stringPath()}'"
         }
 
         val newPath = stringPath() + pathSeparator + path.stringPath()
@@ -96,7 +96,7 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
     }
 
     fun stringPath(): String {
-        if (osType.isPosixLike() && pathParts[0] == "/") {
+        if (osType.isPosixLike() && pathParts.isNotEmpty() && pathParts[0] == "/") {
             return "/" + pathParts.subList(1, pathParts.size).joinToString(pathSeparator.toString()) { it }
         }
 
@@ -154,29 +154,36 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
 
             //Validate root element of path and find out if it is absolute or relative
             val rootElementSizeInInputPath: Int
-            val isAbsolute: Boolean
+            val pathType: PathType
 
             when {
+                pathPartsResolved.isEmpty() -> {
+                    pathType = PathType.UNDEFINED
+                    rootElementSizeInInputPath = 0
+                }
+                pathPartsResolved[0] == "~" -> {
+                    pathType = PathType.ABSOLUTE
+                    rootElementSizeInInputPath = 1
+                }
                 pathPartsResolved[0] == ".." || pathPartsResolved[0] == "." -> {
-                    isAbsolute = false
+                    pathType = PathType.RELATIVE
                     rootElementSizeInInputPath = pathPartsResolved[0].length
                 }
                 osType.isPosixLike() && path.startsWith("/") -> {
                     //After split first element is empty for absolute paths on Linux; assigning correct value below
                     pathPartsResolved.add(0, "/")
-                    isAbsolute = true
+                    pathType = PathType.ABSOLUTE
                     rootElementSizeInInputPath = 1
                 }
                 osType.isWindowsLike() && pathPartsResolved[0].length == 2 && pathPartsResolved[0][1] == ':' && alphaChars.contains(
                     pathPartsResolved[0][0]
                 ) -> {
-                    isAbsolute = true
+                    pathType = PathType.ABSOLUTE
                     rootElementSizeInInputPath = 2
                 }
                 else -> {
-                    //This is relative path, but without preceding '..' or '.'
-                    pathPartsResolved.add(0, ".")
-                    isAbsolute = false
+                    //This is undefined path
+                    pathType = PathType.UNDEFINED
                     rootElementSizeInInputPath = 0
                 }
             }
@@ -190,8 +197,6 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
 
             //Remove empty path parts - there were duplicated or trailing slashes / backslashes in initial path
             pathPartsResolved.removeAll { it.isEmpty() }
-
-            val pathType = if (isAbsolute) PathType.ABSOLUTE else PathType.RELATIVE
 
             val normalizedPath = when (val result = normalize(path, pathPartsResolved, pathType)) {
                 is Either.Right -> result.value
@@ -214,9 +219,12 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
             // /a/../ --> /
 
             val newParts = mutableListOf<String>()
+            var index = 0
 
-            newParts.add(pathParts[0])
-            var index = 1
+            if (pathType != PathType.UNDEFINED) {
+                newParts.add(pathParts[0])
+                index = 1
+            }
 
             while (index < pathParts.size) {
                 if (pathParts[index] == ".") {

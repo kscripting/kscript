@@ -2,5 +2,5 @@ package kscript.app.model
 
 
 enum class PathType {
-    ABSOLUTE, RELATIVE
+    ABSOLUTE, RELATIVE, UNDEFINED
 }

@@ -1,10 +1,7 @@
 package kscript.integration
 
 import kscript.app.model.OsType
-import kscript.app.util.OsPath
-import kscript.app.util.ProcessResult
-import kscript.app.util.ProcessRunner
-import kscript.app.util.toNativeOsPath
+import kscript.app.util.*
 
 object Tools {
     //./gradlew -Dtest.single=LinuxSuite -Dos.type=msys -Dshell.path=C:\Programy\Programowanie\Git\usr\bin\bash.exe integration
@@ -30,7 +27,7 @@ object Tools {
     fun resolveKscript(): String = "$projectDir/build/libs/kscript"
     fun resolvePath(path: String): String = path
     fun runProcess(command: String): ProcessResult {
-        val result = ProcessRunner.runProcess(shell + command, env = mapOf("OSTYPE" to osType.osName))
+        val result = ShellUtils.evalBash(osType, command)
         println(result)
         return result
     }

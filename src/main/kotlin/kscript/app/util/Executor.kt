@@ -43,7 +43,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
     fun runIdea(projectPath: OsPath) {
         if (ShellUtils.isInPath(osConfig.osType, osConfig.gradleCommand)) {
             // Create gradle wrapper
-            ProcessRunner.runProcess("${osConfig.gradleCommand} wrapper", wd = projectPath.toNativeFile())
+            ShellUtils.evalBash(osConfig.osType, "gradle wrapper", wd = projectPath.toNativeFile())
         } else {
             warnMsg("Could not find '${osConfig.gradleCommand}' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_COMMAND_GRADLE' env property")
         }

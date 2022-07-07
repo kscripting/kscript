@@ -29,8 +29,14 @@ class OsPathTest {
         }
 
         assertThat(OsPath.createOrThrow(OsType.LINUX, "")).let {
-            it.prop(OsPath::pathParts).isEqualTo(listOf("."))
-            it.prop(OsPath::pathType).isEqualTo(PathType.RELATIVE)
+            it.prop(OsPath::pathParts).isEqualTo(emptyList())
+            it.prop(OsPath::pathType).isEqualTo(PathType.UNDEFINED)
+            it.prop(OsPath::osType).isEqualTo(OsType.LINUX)
+        }
+
+        assertThat(OsPath.createOrThrow(OsType.LINUX, "file.txt")).let {
+            it.prop(OsPath::pathParts).isEqualTo(listOf("file.txt"))
+            it.prop(OsPath::pathType).isEqualTo(PathType.UNDEFINED)
             it.prop(OsPath::osType).isEqualTo(OsType.LINUX)
         }
 
@@ -104,6 +110,7 @@ class OsPathTest {
         assertThat(OsPath.createOrThrow(OsType.LINUX, "/home/admin/.kscript").stringPath()).isEqualTo("/home/admin/.kscript")
         assertThat(OsPath.createOrThrow(OsType.LINUX, "/a/b/c/../d/script").stringPath()).isEqualTo("/a/b/d/script")
         assertThat(OsPath.createOrThrow(OsType.LINUX, "./././../../script").stringPath()).isEqualTo("../../script")
+        assertThat(OsPath.createOrThrow(OsType.LINUX, "script/file.txt").stringPath()).isEqualTo("script/file.txt")
     }
 
     @Test
@@ -146,7 +153,7 @@ class OsPathTest {
             OsPath.createOrThrow(OsType.LINUX, "./home/admin").resolve(OsPath.createOrThrow(OsType.LINUX, "/run"))
         }.isFailure()
             .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage("Can not resolve absolute or relative path './home/admin' using absolute path '/run'")
+            .hasMessage("Can not resolve absolute, relative or undefined path './home/admin' using absolute path '/run'")
     }
 
     // ************************************************* WINDOWS PATHS *************************************************
@@ -166,8 +173,14 @@ class OsPathTest {
         }
 
         assertThat(OsPath.createOrThrow(OsType.WINDOWS, "")).let {
-            it.prop(OsPath::pathParts).isEqualTo(listOf("."))
-            it.prop(OsPath::pathType).isEqualTo(PathType.RELATIVE)
+            it.prop(OsPath::pathParts).isEqualTo(emptyList())
+            it.prop(OsPath::pathType).isEqualTo(PathType.UNDEFINED)
+            it.prop(OsPath::osType).isEqualTo(OsType.WINDOWS)
+        }
+
+        assertThat(OsPath.createOrThrow(OsType.WINDOWS, "file.txt")).let {
+            it.prop(OsPath::pathParts).isEqualTo(listOf("file.txt"))
+            it.prop(OsPath::pathType).isEqualTo(PathType.UNDEFINED)
             it.prop(OsPath::osType).isEqualTo(OsType.WINDOWS)
         }
 
@@ -251,6 +264,7 @@ class OsPathTest {
             OsPath.createOrThrow(OsType.WINDOWS, "c:\\a\\b\\c\\..\\d\\script").stringPath()
         ).isEqualTo("c:\\a\\b\\d\\script")
         assertThat(OsPath.createOrThrow(OsType.WINDOWS, ".\\.\\.\\..\\..\\script").stringPath()).isEqualTo("..\\..\\script")
+        assertThat(OsPath.createOrThrow(OsType.WINDOWS, "script\\file.txt").stringPath()).isEqualTo("script\\file.txt")
     }
 
     // ****************************************** WINDOWS <-> CYGWIN <-> MSYS ******************************************
