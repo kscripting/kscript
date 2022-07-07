@@ -64,11 +64,11 @@ jobs:
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
             ./test/linux_suite.sh
-            ./gradlew -Dtest.single=LinuxSuite -Dos.type=linux -Dshell.path=/usr/bin/bash integration
+            ./gradlew -Dtest.single=LinuxSuite -Dos.type=linux -Dshell.path=bash integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
             ./gradlew clean build
-            ./gradlew -Dtest.single=MacSuite -Dos.type=darwin -Dshell.path=/usr/bin/bash integration
+            ./gradlew -Dtest.single=MacSuite -Dos.type=darwin -Dshell.path=bash integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
             echo "kscript path:   $(which kscript)"
