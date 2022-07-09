@@ -18,20 +18,20 @@ data class ProcessResult(val command: String, val exitCode: Int, val stdout: Str
 }
 
 object ProcessRunner {
-    fun runProcess(vararg cmd: String, wd: File? = null): ProcessResult {
+    fun runProcess(vararg cmd: String, wd: OsPath? = null): ProcessResult {
         return runProcess(cmd.asList(), wd)
     }
 
     fun runProcess(
         cmd: List<String>,
-        wd: File? = null,
+        wd: OsPath? = null,
         env: Map<String, String> = emptyMap(),
         stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
         stderrConsumer: Consumer<String> = StringBuilderConsumer()
     ): ProcessResult {
         try {
             // simplify with https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
-            val proc = ProcessBuilder(cmd).directory(wd).apply {
+            val proc = ProcessBuilder(cmd).directory(wd?.toNativeFile()).apply {
                 prepareMinimalEnvironment(environment(), env)
             }.start()
 

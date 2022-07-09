@@ -48,6 +48,24 @@ class CommandResolverTest {
         )
     }
 
+    @Test
+    fun `Msys commands`() {
+        val (config, jarPath, jarArtifact, depPaths, filePaths) = createTestData(
+            OsType.MSYS,
+            "/c/My Workspace/",
+            "/c/My Home/kotlin/"
+        )
+        val commandResolver = CommandResolver(config.osConfig)
+
+        assertThat(commandResolver.compileKotlin(jarPath, depPaths, filePaths, compilerOpts)).isEqualTo(
+            """/c/My Home/kotlin/bin/kotlinc -abc -def --experimental -classpath 'c:\My Workspace\.m2\somepath\dep1.jar;c:\My Workspace\.m2\somepath\dep2.jar;c:\My Workspace\.m2\somepath\dep3.jar' -d 'c:\My Workspace\.kscript\cache\somefile.jar' '/c/My Workspace/source/somepath/dep1.kt' '/c/My Workspace/source/somepath/dep2.kts'"""
+        )
+
+        assertThat(commandResolver.executeKotlin(jarArtifact, depPaths, userArgs, kotlinOpts)).isEqualTo(
+            """/c/My Home/kotlin/bin/kotlin -k1 -k2 --disable -classpath 'c:\My Workspace\.m2\somepath\dep1.jar;c:\My Workspace\.m2\somepath\dep2.jar;c:\My Workspace\.m2\somepath\dep3.jar;c:\My Workspace\.kscript\cache\somefile.jar;c:\My Home\kotlin\lib\kotlin-script-runtime.jar' mainClass "arg" "u" "ments""""
+        )
+    }
+
     private data class TestData(
         val config: Config,
         val jarPath: OsPath,
@@ -59,25 +77,6 @@ class CommandResolverTest {
     private fun createTestData(osType: OsType, homeDirString: String, kotlinDirString: String): TestData {
         val homeDir: OsPath = OsPath.createOrThrow(osType, homeDirString)
         val kotlinDir: OsPath = OsPath.createOrThrow(osType, kotlinDirString)
-
-//        when (osType) {
-//            OsType.LINUX, OsType.MAC, OsType.FREEBSD -> {
-//                homeDir = OsPath.createOrThrow(osType, "/My Workspace/Code")
-//                kotlinDir = OsPath.createOrThrow(osType, "/usr/local/sdkman/candidates/kotlin/1.6.21")
-//            }
-//            OsType.WINDOWS -> {
-//                homeDir = OsPath.createOrThrow(osType, "C:\\My Workspace\\Code")
-//                kotlinDir = OsPath.createOrThrow(osType, "/usr/local/sdkman/candidates/kotlin/1.6.21")
-//            }
-//            OsType.CYGWIN -> {
-//                homeDir = OsPath.createOrThrow(osType, "/cygdrive/c/My Workspace/Code")
-//                kotlinDir = OsPath.createOrThrow(osType, "/usr/local/sdkman/candidates/kotlin/1.6.21")
-//            }
-//            OsType.MSYS -> {
-//                homeDir = OsPath.createOrThrow(osType, "/c/My Workspace/Code")
-//                kotlinDir = OsPath.createOrThrow(osType, "/usr/local/sdkman/candidates/kotlin/1.6.21")
-//            }
-//        }
 
         val osConfig = OsConfig(
             osType,

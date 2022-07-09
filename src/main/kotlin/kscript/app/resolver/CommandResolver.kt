@@ -9,6 +9,9 @@ import kscript.app.util.OsPath
 import kscript.app.util.toNativeOsPath
 
 class CommandResolver(private val osConfig: OsConfig) {
+    private val classPathSeparator =
+        if (osConfig.osType.isWindowsLike() || osConfig.osType.isPosixHostedOnWindows()) ";" else ":"
+
     //Syntax for different OS-es:
     //LINUX:    /usr/local/sdkman/..../kotlin  -classpath "/home/vagrant/workspace/Kod/Repos/kscript/test:/home/vagrant/.kscript/cache/jar_2ccd53e06b0355d3573a4ae8698398fe/scriplet.jar:/usr/local/sdkman/candidates/kotlin/1.6.21/lib/kotlin-script-runtime.jar" Main_Scriplet
     //GIT-BASH: /c/Users/Admin/.sdkman/candidates/kotlin/current/bin/kotlin  -classpath "C:\Users\Admin;C:\Users\Admin\.kscript\cache\jar_2ccd53e06b0355d3573a4ae8698398fe\scriplet.jar;C:\Users\Admin\.sdkman\candidates\kotlin\current\lib\kotlin-script-runtime.jar" Main_Scriplet
@@ -75,41 +78,60 @@ class CommandResolver(private val osConfig: OsConfig) {
         return "${osConfig.intellijCommand} \"$projectPath\""
     }
 
-    fun createPackage(projectPath: OsPath): String {
-        return "cd '${projectPath}' && ${osConfig.gradleCommand} makeScript"
+    fun createPackage(): String {
+        return "${osConfig.gradleCommand} makeScript"
     }
 
     private fun resolveKotlinOpts(kotlinOpts: Set<KotlinOpt>) = kotlinOpts.joinToString(" ") { it.value }
 
     private fun resolveCompilerOpts(compilerOpts: Set<CompilerOpt>) = compilerOpts.joinToString(" ") { it.value }
 
-    private fun resolveJarFile(jar: OsPath): String = when {
-        osConfig.osType == OsType.WINDOWS || osConfig.osType.isPosixHostedOnWindows() -> "\"${
-            jar.toNativeOsPath()
-                .stringPath()
-        }\""
-        else -> "'${jar.stringPath()}'"
+    private fun resolveJarFile(jar: OsPath): String {
+        val jarFileDelimiter: Char = when (osConfig.osType) {
+            OsType.WINDOWS -> '"'
+            OsType.MSYS -> '\''
+            else -> '\''
+        }
+
+        return "${jarFileDelimiter}${jar.toNativeOsPath().stringPath()}${jarFileDelimiter}"
     }
 
-    private fun resolveFiles(filePaths: Set<OsPath>): String = when {
-        osConfig.osType == OsType.WINDOWS || osConfig.osType.isPosixHostedOnWindows() -> filePaths.joinToString(" ") { "\"${it.stringPath()}\"" }
-        else -> filePaths.joinToString(" ") { "'${it.stringPath()}'" }
+    private fun resolveFiles(filePaths: Set<OsPath>): String {
+        val filePathDelimiter: Char = when (osConfig.osType) {
+            OsType.WINDOWS -> '"'
+            OsType.MSYS -> '\''
+            else -> '\''
+        }
+
+        return filePaths.joinToString(" ") { "${filePathDelimiter}${it.stringPath()}${filePathDelimiter}" }
     }
 
-    private fun resolveUserArgs(userArgs: List<String>) =
-        userArgs.joinToString(" ") { "\"${it.replace("\"", "\\\"")}\"" }
+    private fun resolveUserArgs(userArgs: List<String>): String {
+        val userArgDelimiter: Char = when (osConfig.osType) {
+            OsType.WINDOWS -> '"'
+            OsType.MSYS -> '"'
+            else -> '"'
+        }
+
+        return userArgs.joinToString(" ") { "${userArgDelimiter}${it.replace("\"", "\\\"")}${userArgDelimiter}" }
+    }
 
     private fun resolveClasspath(dependencies: Set<OsPath>): String {
         if (dependencies.isEmpty()) {
             return ""
         }
 
-        val classPathSeparator =
-            if (osConfig.osType.isWindowsLike() || osConfig.osType.isPosixHostedOnWindows()) ';' else ':'
+        val classpathParameterDelimiter: Char = when (osConfig.osType) {
+            OsType.WINDOWS -> '"'
+            OsType.MSYS -> '\''
+            else -> '"'
+        }
 
-        return "-classpath \"" + dependencies.joinToString(classPathSeparator.toString()) {
+        val classpath = classpathParameterDelimiter + dependencies.joinToString(classPathSeparator) {
             it.toNativeOsPath().stringPath()
-        } + "\""
+        } + classpathParameterDelimiter
+
+        return "-classpath $classpath"
     }
 
     private fun resolveKotlinBinary(binary: String): String {

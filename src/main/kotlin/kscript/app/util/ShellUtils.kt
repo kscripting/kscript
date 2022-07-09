@@ -1,19 +1,18 @@
 package kscript.app.util
 
 import kscript.app.model.OsType
-import java.io.File
 import kotlin.system.exitProcess
 
 object ShellUtils {
 
-    fun evalBash(osType: OsType, cmd: String, wd: File? = null): ProcessResult {
+    fun evalBash(osType: OsType, cmd: String, workingDirectory: OsPath? = null): ProcessResult {
         //NOTE: cmd is an argument to shell (bash/cmd), so it should stay not split by whitespace as a single string
 
         if (osType == OsType.WINDOWS) {
-            return ProcessRunner.runProcess("cmd", "/c", cmd, wd = wd)
+            return ProcessRunner.runProcess("cmd", "/c", cmd, wd = workingDirectory)
         }
 
-        return ProcessRunner.runProcess("bash", "-c", cmd, wd = wd)
+        return ProcessRunner.runProcess("bash", "-c", cmd, wd = workingDirectory)
     }
 
     fun isInPath(osType: OsType, tool: String) =

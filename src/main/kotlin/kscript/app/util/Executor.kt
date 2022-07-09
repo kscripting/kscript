@@ -43,7 +43,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
     fun runIdea(projectPath: OsPath) {
         if (ShellUtils.isInPath(osConfig.osType, osConfig.gradleCommand)) {
             // Create gradle wrapper
-            ShellUtils.evalBash(osConfig.osType, "gradle wrapper", wd = projectPath.toNativeFile())
+            ShellUtils.evalBash(osConfig.osType, "gradle wrapper", workingDirectory = projectPath)
         } else {
             warnMsg("Could not find '${osConfig.gradleCommand}' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_COMMAND_GRADLE' env property")
         }
@@ -62,10 +62,10 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
             throw IllegalStateException("Gradle is required to package scripts.")
         }
 
-        val command = commandResolver.createPackage(projectPath)
+        val command = commandResolver.createPackage()
         devMsg("Create package command: $command")
 
-        val result = ShellUtils.evalBash(osConfig.osType, command)
+        val result = ShellUtils.evalBash(osConfig.osType, command, workingDirectory = projectPath)
 
         if (result.exitCode != 0) {
             throw IllegalStateException("Packaging for path: '$projectPath' failed:$result")

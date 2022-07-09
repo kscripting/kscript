@@ -52,10 +52,8 @@ jobs:
         timeout-minutes: 10
         shell: bash
         run: |
-          export OSTYPE=$OSTYPE
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            export OSTYPE=Windows
-          fi
+          # For Windows this action is running MSYS Os type
+          
           export PATH=./build/libs:${PATH}
           
           echo "OsType:         $OSTYPE"
@@ -64,28 +62,28 @@ jobs:
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
             ./test/linux_suite.sh
-            ./gradlew -Dtest.single=LinuxSuite -Dos.type=linux -Dshell.path=bash integration
+            ./gradlew -Dtest.single=LinuxSuite -Dos.type=$OSTYPE integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
             ./gradlew clean build
-            ./gradlew -Dtest.single=MacSuite -Dos.type=darwin -Dshell.path=bash integration
+            ./gradlew -Dtest.single=MacSuite -Dos.type=$OSTYPE integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
             echo "kscript path:   $(which kscript)"
             ./gradlew clean build
-            ./gradlew -Dtest.single=CygwinSuite integration                  
+            ./gradlew -Dtest.single=CygwinSuite -Dos.type=$OSTYPE integration                  
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
             ./gradlew clean build
-            ./gradlew -Dtest.single=MsysSuite integration                  
+            ./gradlew -Dtest.single=MsysSuite -Dos.type=$OSTYPE integration                  
           elif [[ "$OSTYPE" == "win32" ]]; then
             echo "Windows test..."
             ./gradlew clean build
-            ./gradlew -Dtest.single=WindowsSuite integration                  
+            ./gradlew -Dtest.single=WindowsSuite -Dos.type=$OSTYPE integration                  
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
             ./gradlew clean build
-            ./gradlew -Dtest.single=OtherPosixSuite integration      
+            ./gradlew -Dtest.single=OtherPosixSuite -Dos.type=$OSTYPE integration      
           else
             echo "Unknown OS"
             exit 1

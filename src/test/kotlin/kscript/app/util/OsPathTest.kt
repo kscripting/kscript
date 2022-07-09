@@ -253,6 +253,10 @@ class OsPathTest {
         assertThat { OsPath.createOrThrow(OsType.WINDOWS, "C:\\adas?df") }.isFailure()
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("Invalid character '?' in path 'C:\\adas?df'")
+
+        assertThat { OsPath.createOrThrow(OsType.WINDOWS, "home:\\vagrant") }.isFailure()
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Invalid character ':' in path 'home:\\vagrant'")
     }
 
     @Test
