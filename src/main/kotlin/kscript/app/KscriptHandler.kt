@@ -1,6 +1,6 @@
 package kscript.app
 
-import kscript.app.appdir.AppDir
+import kscript.app.appdir.Cache
 import kscript.app.code.Templates
 import kscript.app.creator.*
 import kscript.app.model.Config
@@ -28,13 +28,12 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             devMsg(System.getProperty("java.class.path"))
         }
 
-        // create kscript dir if it does not yet exist
-        val appDir = AppDir(config.kscriptDir)
+        val cache = Cache(config.cacheDir)
 
         // optionally clear up the jar cache
         if (docopt.getBoolean("clear-cache")) {
             Logger.info("Cleaning up cache...")
-            appDir.clearCache()
+            cache.clear()
             return
         }
 
@@ -48,7 +47,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             add(config.customPreamble)
         }
 
-        val contentResolver = ContentResolver(appDir.cache)
+        val contentResolver = ContentResolver(cache)
         // see https://github.com/holgerbrandl/kscript/issues/127
 //        val fileResolver = FileSystemDependenciesResolver()
         val sectionResolver = SectionResolver(Parser(), contentResolver, config)
@@ -61,14 +60,14 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         }
 
         val script = scriptResolver.resolve(docopt.getString("script"), preambles)
-        val resolvedDependencies = appDir.cache.getOrCreateDependencies(script.digest) {
+        val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
             DependencyResolver(script.repositories).resolve(script.dependencies)
         }
         val executor = Executor(CommandResolver(config, script), config)
 
         //  Create temporary dev environment
         if (docopt.getBoolean("idea")) {
-            val path = appDir.cache.getOrCreateIdeaProject(script.digest) { basePath ->
+            val path = cache.getOrCreateIdeaProject(script.digest) { basePath ->
                 val uriLocalPathProvider = { uri: URI -> contentResolver.resolve(uri).localPath }
                 IdeaProjectCreator().create(basePath, script, userArgs, uriLocalPathProvider)
             }
@@ -90,13 +89,13 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             throw IllegalStateException("@Entry directive is just supported for kt class files")
         }
 
-        val jar = appDir.cache.getOrCreateJar(script.digest) { basePath ->
+        val jar = cache.getOrCreateJar(script.digest) { basePath ->
             JarArtifactCreator(executor).create(basePath, script, resolvedDependencies)
         }
 
         //if requested try to package the into a standalone binary
         if (docopt.getBoolean("package")) {
-            val path = appDir.cache.getOrCreatePackage(script.digest) { basePath ->
+            val path = cache.getOrCreatePackage(script.digest) { basePath ->
                 PackageCreator(executor).packageKscript(basePath, script, jar)
             }
 

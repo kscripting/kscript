@@ -5,7 +5,7 @@ import java.nio.file.Path
 data class Config(
     val osType: OsType,
     val selfName: String,
-    val kscriptDir: Path,
+    val cacheDir: Path,
     val customPreamble: String,
     val intellijCommand: String,
     val gradleCommand: String,

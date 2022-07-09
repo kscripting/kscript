@@ -4,6 +4,7 @@ import kscript.app.creator.JarArtifact
 import kscript.app.model.Content
 import kscript.app.model.ScriptType
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.FileUtils
 import java.net.URI
 import java.net.URL
 import java.nio.file.Path
@@ -14,6 +15,10 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 class Cache(private val path: Path) {
+    init {
+        path.createDirectories()
+    }
+    
     fun getOrCreateIdeaProject(digest: String, creator: (Path) -> Path): Path {
         return directoryCache(path.resolve("idea_$digest"), creator)
     }
@@ -84,6 +89,10 @@ class Cache(private val path: Path) {
         contentFile.writeText(dependencies.joinToString("\n") { it.toString() })
 
         return dependencies
+    }
+
+    fun clear() {
+        FileUtils.cleanDirectory(path.toFile())
     }
 
     private fun directoryCache(path: Path, creator: (Path) -> Path): Path {
