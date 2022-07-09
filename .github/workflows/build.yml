@@ -44,11 +44,29 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
             choco install zip
+            choco install cygwin
             # Overwrite the WSL bash.exe
-            cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
+            #cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
+            mv /c/Windows/System32/bash.exe /c/Windows/System32/wsl-bash.exe
           fi
 
-      - name: Run tests
+      - name: Run tests specific for Windows (cmd shell)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo "Windows test..."
+          ./gradlew clean build
+          ./gradlew -Dtest.single=WindowsSuite -Dos.type=windows integration 
+
+      - name: Run tests specific for Windows (cygwin shell)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo "Cygwin test..."
+          #./gradlew clean build
+          #./gradlew -Dtest.single=WindowsSuite -Dos.type=windows integration
+
+      - name: Run tests for Posix (and MSYS on Windows)
         timeout-minutes: 10
         shell: bash
         run: |
@@ -71,15 +89,11 @@ jobs:
             echo "Cygwin test..."
             echo "kscript path:   $(which kscript)"
             ./gradlew clean build
-            ./gradlew -Dtest.single=CygwinSuite -Dos.type=$OSTYPE integration                  
+            ./gradlew -Dtest.single=CygwinSuite -Dos.type=$OSTYPE integration
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
             ./gradlew clean build
-            ./gradlew -Dtest.single=MsysSuite -Dos.type=$OSTYPE integration                  
-          elif [[ "$OSTYPE" == "win32" ]]; then
-            echo "Windows test..."
-            ./gradlew clean build
-            ./gradlew -Dtest.single=WindowsSuite -Dos.type=$OSTYPE integration                  
+            ./gradlew -Dtest.single=MsysSuite -Dos.type=$OSTYPE integration
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
             ./gradlew clean build
