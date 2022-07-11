@@ -87,33 +87,40 @@ class CommandResolver(private val osConfig: OsConfig) {
     private fun resolveCompilerOpts(compilerOpts: Set<CompilerOpt>) = compilerOpts.joinToString(" ") { it.value }
 
     private fun resolveJarFile(jar: OsPath): String {
-        val jarFileDelimiter: Char = when (osConfig.osType) {
+        val jarFileQuotationMark: Char = when (osConfig.osType) {
             OsType.WINDOWS -> '"'
-            OsType.MSYS -> '\''
             else -> '\''
         }
 
-        return "${jarFileDelimiter}${jar.toNativeOsPath().stringPath()}${jarFileDelimiter}"
+        return "${jarFileQuotationMark}${resolveQuotedPath(jar)}${jarFileQuotationMark}"
     }
 
     private fun resolveFiles(filePaths: Set<OsPath>): String {
-        val filePathDelimiter: Char = when (osConfig.osType) {
+        val filePathQuotationMark: Char = when (osConfig.osType) {
             OsType.WINDOWS -> '"'
-            OsType.MSYS -> '\''
             else -> '\''
         }
 
-        return filePaths.joinToString(" ") { "${filePathDelimiter}${it.stringPath()}${filePathDelimiter}" }
+        return filePaths.joinToString(" ") {
+            "${filePathQuotationMark}${
+                resolveQuotedPath(it)
+            }${filePathQuotationMark}"
+        }
     }
 
     private fun resolveUserArgs(userArgs: List<String>): String {
-        val userArgDelimiter: Char = when (osConfig.osType) {
+        val userArgQuotationMark: Char = when (osConfig.osType) {
             OsType.WINDOWS -> '"'
-            OsType.MSYS -> '"'
-            else -> '"'
+            else -> '\''
         }
 
-        return userArgs.joinToString(" ") { "${userArgDelimiter}${it.replace("\"", "\\\"")}${userArgDelimiter}" }
+        return userArgs.joinToString(" ") {
+            "${userArgQuotationMark}${
+                it.replace(
+                    "\"", "\\\""
+                )
+            }${userArgQuotationMark}"
+        }
     }
 
     private fun resolveClasspath(dependencies: Set<OsPath>): String {
@@ -121,18 +128,19 @@ class CommandResolver(private val osConfig: OsConfig) {
             return ""
         }
 
-        val classpathParameterDelimiter: Char = when (osConfig.osType) {
+        val classpathParameterQuotationMark: Char = when (osConfig.osType) {
             OsType.WINDOWS -> '"'
-            OsType.MSYS -> '\''
-            else -> '"'
+            else -> '\''
         }
 
-        val classpath = classpathParameterDelimiter + dependencies.joinToString(classPathSeparator) {
-            it.toNativeOsPath().stringPath()
-        } + classpathParameterDelimiter
+        val classpath = classpathParameterQuotationMark + dependencies.joinToString(classPathSeparator) {
+            resolveQuotedPath(it)
+        } + classpathParameterQuotationMark
 
         return "-classpath $classpath"
     }
+
+    private fun resolveQuotedPath(osPath: OsPath): String = osPath.toNativeOsPath().stringPath()
 
     private fun resolveKotlinBinary(binary: String): String {
         return osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)

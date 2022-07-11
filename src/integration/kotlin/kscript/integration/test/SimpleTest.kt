@@ -4,11 +4,10 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
 import kscript.integration.Tools
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-class SimpleTest {
+class SimpleTest : TestBase {
     @Test
     @Tag("posix")
     @Tag("windows")
@@ -25,16 +24,5 @@ class SimpleTest {
         val kscriptProcess = Tools.runProcess("$kscript --help")
         assertThat(kscriptProcess.exitCode).isEqualTo(0)
         assertThat(kscriptProcess.stderr.trim()).startsWith("kscript - Enhanced scripting support for Kotlin on *nix-based systems.")
-    }
-
-    companion object {
-        private val projectDir = Tools.resolveProjectDir()
-        private val kscript = Tools.resolveKscript()
-
-        @BeforeAll
-        @JvmStatic
-        fun setUp() {
-            Tools.runProcess("$kscript --clear-cache")
-        }
     }
 }

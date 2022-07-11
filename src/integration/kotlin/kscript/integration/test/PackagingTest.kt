@@ -3,11 +3,10 @@ package kscript.integration.test
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kscript.integration.Tools
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-class PackagingTest {
+class PackagingTest : TestBase {
     @Test
     @Tag("posix")
     fun `Packaged script is cached`() {
@@ -50,16 +49,5 @@ class PackagingTest {
         val packagingExecutionProcess = Tools.runProcess("$command three arg uments")
         assertThat(packagingExecutionProcess.exitCode).isEqualTo(0)
         assertThat(packagingExecutionProcess.stdout.trim()).isEqualTo("3")
-    }
-
-    companion object {
-        private val projectDir = Tools.resolveProjectDir()
-        private val kscript = Tools.resolveKscript()
-
-        @BeforeAll
-        @JvmStatic
-        fun setUp() {
-            Tools.runProcess("$kscript --clear-cache")
-        }
     }
 }

@@ -23,17 +23,14 @@ object Tools {
     fun resolveKscript(): String = "$projectDir/build/libs/kscript"
     fun resolvePath(path: String): String = path
     fun runProcess(command: String): ProcessResult {
-        //TODO: in case of Cygwin/Msys/Windows there might be different interpreters: e.g. bash in Windows directory or
-        //in Cygwin or in Msys - shouldn't we provide shell command path here?
-        //val shellPath = OsPath.createOrThrow(nativeType, System.getProperty("shell.path")).toNativeOsPath()
-
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //Default MSYS bash interpreter is also replacing double quotes into the single quotes.
         //(see: bash -xc 'kscript "println(1+1)"')
-        val newCommand = when(osType) {
-            OsType.MSYS -> command.replace('"', '\'')
+        val newCommand = when {
+            osType.isPosixHostedOnWindows() -> command.replace('"', '\'')
             else -> command
         }
+
         val result = ShellUtils.evalBash(osType, newCommand)
 
         println(result)
