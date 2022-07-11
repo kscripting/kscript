@@ -99,7 +99,7 @@ object GradleTemplates {
             |}
             |
             |dependencies {
-            |    implementation(files("${jarArtifact.path.parent.resolve("scriplet.jar")}"))
+            |    implementation(files("${jarArtifact.path.stringPath().replace("\\", "\\\\")}"))
             |${createGradleDependenciesSection(extendedDependencies).prependIndent()}
             |}
             |

@@ -68,7 +68,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             }
 
             infoMsg("Idea project available at:")
-            infoMsg(path.stringPath())
+            infoMsg(path.convert(config.osConfig.osType).stringPath())
 
             executor.runIdea(path)
             return
@@ -97,7 +97,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             }
 
             infoMsg("Packaged script '${script.scriptName}' available at path:")
-            infoMsg(path.stringPath())
+            infoMsg(path.convert(config.osConfig.osType).stringPath())
             return
         }
 
