@@ -3,9 +3,9 @@ package kscript.app.model
 import org.apache.commons.lang3.SystemUtils
 
 enum class OsType(val osName: String) {
-    LINUX("linux"), MAC("darwin"), WINDOWS("windows"), CYGWIN("cygwin"), MSYS("msys"), FREEBSD("freebsd");
+    LINUX("linux"), MACOS("darwin"), WINDOWS("windows"), CYGWIN("cygwin"), MSYS("msys"), FREEBSD("freebsd");
 
-    fun isPosixLike() = (this == LINUX || this == MAC || this == FREEBSD || this == CYGWIN || this == MSYS)
+    fun isPosixLike() = (this == LINUX || this == MACOS || this == FREEBSD || this == CYGWIN || this == MSYS)
     fun isPosixHostedOnWindows() = (this == CYGWIN || this == MSYS)
     fun isWindowsLike() = (this == WINDOWS)
 
@@ -23,7 +23,7 @@ enum class OsType(val osName: String) {
         private fun guessNativeType(): OsType {
             when {
                 SystemUtils.IS_OS_LINUX -> return LINUX
-                SystemUtils.IS_OS_MAC -> return MAC
+                SystemUtils.IS_OS_MAC -> return MACOS
                 SystemUtils.IS_OS_WINDOWS -> return WINDOWS
                 SystemUtils.IS_OS_FREE_BSD -> return FREEBSD
             }
