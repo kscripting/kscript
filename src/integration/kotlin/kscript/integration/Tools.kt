@@ -4,8 +4,6 @@ import kscript.app.model.OsType
 import kscript.app.util.*
 
 object Tools {
-    //./gradlew -Dtest.single=LinuxSuite -Dos.type=msys -Dshell.path=C:\Programy\Programowanie\Git\usr\bin\bash.exe integration
-
     private val osType: OsType = OsType.findOrThrow(System.getProperty("os.type"))
     private val projectDir: String
 
@@ -21,7 +19,7 @@ object Tools {
     }
 
     fun resolveKscript(): String = "$projectDir/build/libs/kscript"
-    fun resolvePath(path: String): String = path
+
     fun runProcess(command: String): ProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //Default MSYS bash interpreter is also replacing double quotes into the single quotes.

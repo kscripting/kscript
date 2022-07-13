@@ -32,10 +32,10 @@ fun File.toOsPath() : OsPath = OsPath.createOrThrow(OsType.native, absolutePath)
 fun Path.toOsPath(): OsPath = OsPath.createOrThrow(OsType.native, absolutePathString())
 
 val OsPath.leaf
-    get() = pathParts.last()
+    get() = if (pathParts.isEmpty()) "" else pathParts.last()
 
 val OsPath.root
-    get() = pathParts.first()
+    get() = if (pathParts.isEmpty()) "" else pathParts.first()
 
 val OsPath.rootOsPath
     get() = OsPath.createOrThrow(osType, root)

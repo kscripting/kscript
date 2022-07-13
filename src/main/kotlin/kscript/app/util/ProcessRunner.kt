@@ -1,19 +1,45 @@
 package kscript.app.util
 
-import java.io.BufferedReader
-import java.io.File
 import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.function.Consumer
+import java.util.concurrent.TimeUnit
 
 data class ProcessResult(val command: String, val exitCode: Int, val stdout: String, val stderr: String) {
     override fun toString(): String {
-        return """
-                Command     : $command
-                Exit Code   : $exitCode   
-                Stdout      : $stdout
-                Stderr      : 
-                """.trimIndent() + "\n" + stderr
+        return """|Command     : '$command'
+                  |Exit Code   : $exitCode   
+                  |Stdout      : '${stdout.replace("\n", "[nl]")}'
+                  |Stderr      : '${stderr.replace("\n", "[nl]")}'
+                  |""".trimMargin()
+    }
+}
+
+class StreamGobbler(
+    private val inputStream: InputStream
+) {
+    private val stringBuilder = StringBuilder()
+    private var thread: Thread? = null
+
+    val output: String
+        get() {
+            thread?.join()
+            return stringBuilder.toString()
+        }
+
+    fun start(): StreamGobbler {
+        thread = Thread { readInputStreamSequentially() }
+        thread!!.start()
+
+        return this
+    }
+
+    private fun readInputStreamSequentially() {
+        val buffer = ByteArray(1024)
+        var length: Int
+
+        while (inputStream.read(buffer).also { length = it } != -1) {
+            val readContent = String(buffer, 0, length)
+            stringBuilder.append(readContent)
+        }
     }
 }
 
@@ -26,9 +52,9 @@ object ProcessRunner {
         cmd: List<String>,
         wd: OsPath? = null,
         env: Map<String, String> = emptyMap(),
-        stdoutConsumer: Consumer<String> = StringBuilderConsumer(),
-        stderrConsumer: Consumer<String> = StringBuilderConsumer()
     ): ProcessResult {
+        val command = cmd.joinToString(" ")
+
         try {
             // simplify with https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
             val proc = ProcessBuilder(cmd).directory(wd?.toNativeFile()).apply {
@@ -38,18 +64,20 @@ object ProcessRunner {
             // we need to gobble the streams to prevent that the internal pipes hit their respective buffer limits, which
             // would lock the sub-process execution (see see https://github.com/holgerbrandl/kscript/issues/55
             // https://stackoverflow.com/questions/14165517/processbuilder-forwarding-stdout-and-stderr-of-started-processes-without-blocki
-            val stdoutGobbler = StreamGobbler(proc.inputStream, stdoutConsumer).apply { start() }
-            val stderrGobbler = StreamGobbler(proc.errorStream, stderrConsumer).apply { start() }
+            val inputStreamReader = StreamGobbler(proc.inputStream).start()
+            val errorStreamReader = StreamGobbler(proc.errorStream).start()
 
-            val exitVal = proc.waitFor()
+            val waitTimeMinutes = 10L
+            val exitedNormally = proc.waitFor(waitTimeMinutes, TimeUnit.MINUTES)
+
+            if (!exitedNormally) {
+                throw IllegalStateException("Command has timed out after $waitTimeMinutes minutes.")
+            }
 
             // we need to wait for the gobbler threads, or we may lose some output (e.g. in case of short-lived processes
-            stderrGobbler.join()
-            stdoutGobbler.join()
-
-            return ProcessResult(cmd.joinToString(" "), exitVal, stdoutConsumer.toString(), stderrConsumer.toString())
+            return ProcessResult(command, proc.exitValue(), inputStreamReader.output, errorStreamReader.output)
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw IllegalStateException("Error executing command: '$command'", e)
         }
     }
 
@@ -77,25 +105,5 @@ object ProcessRunner {
         environment.remove("ABS_KSCRIPT_PATH")
 
         environment.putAll(env)
-    }
-}
-
-private class StreamGobbler(private val inputStream: InputStream, private val consumeInputLine: Consumer<String>) :
-    Thread() {
-
-    override fun run() {
-        BufferedReader(InputStreamReader(inputStream)).lines().forEach(consumeInputLine)
-    }
-}
-
-private open class StringBuilderConsumer : Consumer<String> {
-    private val sb = StringBuilder()
-
-    override fun accept(t: String) {
-        sb.appendLine(t)
-    }
-
-    override fun toString(): String {
-        return sb.toString()
     }
 }

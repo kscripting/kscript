@@ -1,9 +1,5 @@
 package kscript.integration.test
 
-import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.startsWith
-import kscript.integration.Tools
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -12,17 +8,15 @@ class SimpleTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Providing source code works`() {
-        val kscriptProcess = Tools.runProcess("$kscript \"println(1+1)\"")
-        assertThat(kscriptProcess.exitCode).isEqualTo(0)
-        assertThat(kscriptProcess.stdout.trim()).isEqualTo("2")
+        verify("$kscript \"println(1+1)\"", 0, "2\n")
     }
 
     @Test
     @Tag("posix")
     @Tag("windows")
     fun `Help is printed`() {
-        val kscriptProcess = Tools.runProcess("$kscript --help")
-        assertThat(kscriptProcess.exitCode).isEqualTo(0)
-        assertThat(kscriptProcess.stderr.trim()).startsWith("kscript - Enhanced scripting support for Kotlin on *nix-based systems.")
+        //@formatter:off
+        verify("$kscript --help", 0, "", startsWith("kscript - Enhanced scripting support for Kotlin on *nix-based systems."))
+        //@formatter:on
     }
 }

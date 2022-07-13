@@ -24,7 +24,7 @@ assert "source ${PROJECT_DIR}/test/resources/here_doc_test.sh" "hello kotlin"
 assert "source ${PROJECT_DIR}/test/resources/cmd_subst_test.sh" "command substitution works as well"
 
 ## make sure that it runs with local script files
-assert "source ${PROJECT_DIR}/test/resources/local_script_file.sh" "kscript rocks!"
+assert "source ${PROJECT_DIR}/test/resources/local_script_file.sh $KSCRIPT_TEST_DIR" "kscript rocks!"
 #assert "echo foo" "bar" # known to fail
 
 ## make sure that it runs with local script files

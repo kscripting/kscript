@@ -34,6 +34,12 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             return
         }
 
+        val scriptSource = docopt.getString("script")
+
+        if (scriptSource.isBlank()) {
+            return
+        }
+
         val enableSupportApi = docopt.getBoolean("text")
 
         val preambles = buildList {
@@ -49,12 +55,12 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, config.scriptingConfig)
 
         if (docopt.getBoolean("add-bootstrap-header")) {
-            val script = scriptResolver.resolve(docopt.getString("script"), maxResolutionLevel = 0)
+            val script = scriptResolver.resolve(scriptSource, maxResolutionLevel = 0)
             BootstrapCreator().create(script)
             return
         }
 
-        val script = scriptResolver.resolve(docopt.getString("script"), preambles)
+        val script = scriptResolver.resolve(scriptSource, preambles)
         val resolvedDependencies = appDir.cache.getOrCreateDependencies(script.digest) {
             DependencyResolver(script.repositories).resolve(script.dependencies)
         }
