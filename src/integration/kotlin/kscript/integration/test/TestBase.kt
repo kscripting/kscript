@@ -17,17 +17,22 @@ class AnyMatch : TestMatcher {
     override fun matches(string: String): Boolean = true
 }
 
-class StartsWith(private val expectedString: String, private val ignoreCase: Boolean = false) : TestMatcher {
+class StartsWith(private val expectedString: String, private val ignoreCase: Boolean) : TestMatcher {
     override fun matches(string: String): Boolean = string.startsWith(normalize(expectedString), ignoreCase)
 }
 
+class Contains(private val expectedString: String, private val ignoreCase: Boolean) : TestMatcher {
+    override fun matches(string: String): Boolean = string.contains(normalize(expectedString), ignoreCase)
+}
+
 interface TestBase {
+    val kscript: String get() = Companion.kscript
     val projectDir: String get() = Companion.projectDir
     val testDir: String get() = "projectDir/build/tmp/test"
-    val kscript: String get() = Companion.kscript
 
     fun any() = AnyMatch()
-    fun startsWith(string: String, ignoreCase: Boolean = false) = StartsWith(string)
+    fun startsWith(string: String, ignoreCase: Boolean = false) = StartsWith(string, ignoreCase)
+    fun contains(string: String, ignoreCase: Boolean = false) = Contains(string, ignoreCase)
 
     fun verify(
         command: String, exitCode: Int = 0, stdOutMatcher: TestMatcher, stdErr: String = ""
@@ -80,7 +85,7 @@ interface TestBase {
     companion object {
         private val projectDir = Tools.resolveProjectDir()
         private val kscript = Tools.resolveKscript()
-        val nl = System.getProperty("line.separator")
+        val nl: String = System.getProperty("line.separator")
 
         @BeforeAll
         @JvmStatic

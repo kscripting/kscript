@@ -9,10 +9,10 @@ assert 'kscript "println(args[0])" "foo bar"' "foo bar" ## make sure quotes are 
 assert "echo \"println(123)\" > $KSCRIPT_TEST_DIR/123foo.kts; kscript $KSCRIPT_TEST_DIR/123foo.kts" "123"
 
 ## prevent regression of #185
-assert "source ${PROJECT_DIR}/test/resources/home_dir_include.sh" "42"
+assert "source ${PROJECT_DIR}/test/resources/home_dir_include.sh $KSCRIPT_TEST_DIR" "42"
 
 ## prevent regression of #173
-assert "source ${PROJECT_DIR}/test/resources/compiler_opts_with_includes.sh" "hello42"
+assert "source ${PROJECT_DIR}/test/resources/compiler_opts_with_includes.sh $KSCRIPT_TEST_DIR" "hello42"
 
 ## Ensure relative includes with in shebang mode
 assert_raises "${PROJECT_DIR}/test/resources/includes/shebang_mode_includes" 0
