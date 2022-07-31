@@ -44,8 +44,8 @@ class StreamGobbler(
 }
 
 object ProcessRunner {
-    fun runProcess(vararg cmd: String, wd: OsPath? = null): ProcessResult {
-        return runProcess(cmd.asList(), wd)
+    fun runProcess(vararg cmd: String, wd: OsPath? = null, env: Map<String, String> = emptyMap()): ProcessResult {
+        return runProcess(cmd.asList(), wd, env)
     }
 
     fun runProcess(

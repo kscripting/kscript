@@ -8,6 +8,11 @@ import org.junit.platform.suite.api.Suite
 //or
 //https://junit.org/junit5/docs/current/user-guide/#running-tests-console-launcher
 //java -jar junit-platform-console-standalone-1.8.2.jar <Options>
+//or
+//gradle -Dos.type=linux integration --tests CustomInterpretersTest
+
+//Way to provide tags from command line:
+//https://javabydeveloper.com/run-tag-specific-junit-5-tests-from-gradle-command/
 
 @Suite
 @SelectPackages("kscript.integration.test.*")

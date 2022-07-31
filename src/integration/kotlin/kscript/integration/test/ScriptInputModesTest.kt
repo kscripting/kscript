@@ -1,5 +1,7 @@
 package kscript.integration.test
 
+import kscript.integration.tool.TestAssertion.startsWith
+import kscript.integration.tool.TestAssertion.verify
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 

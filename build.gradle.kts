@@ -18,11 +18,14 @@ group = "com.github.holgerbrandl.kscript.launcher"
 
 sourceSets {
     create("integration") {
-        java.srcDir("$projectDir/src/integration/kotlin")
-        resources.srcDir("$projectDir/src/integration/resources")
-        compileClasspath += main.get().output + test.get().output
-        runtimeClasspath += main.get().output + test.get().output
-    }
+//        test {  //With that idea can understand that 'integration' is test source set and do not complain about test
+//        names starting with upper case, but it doesn't compile correctly with it
+            java.srcDir("$projectDir/src/integration/kotlin")
+            resources.srcDir("$projectDir/src/integration/resources")
+            compileClasspath += main.get().output + test.get().output
+            runtimeClasspath += main.get().output + test.get().output
+        }
+//    }
 }
 
 configurations {
@@ -42,6 +45,12 @@ tasks.create<Test>("integration") {
     classpath = sourceSets["integration"].runtimeClasspath
     outputs.upToDateWhen { false }
     mustRunAfter(tasks["test"])
+}
+
+tasks.create<Task>("printIntegrationClasspath") {
+    doLast {
+        println(sourceSets["integration"].runtimeClasspath.asPath)
+    }
 }
 
 testlogger {
@@ -77,6 +86,8 @@ dependencies {
 
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.8.2")
+    testImplementation("org.junit.platform:junit-platform-suite-api:1.8.2")
+    testImplementation("org.junit.platform:junit-platform-suite-commons:1.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")

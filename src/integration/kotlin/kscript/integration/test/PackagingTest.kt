@@ -1,7 +1,9 @@
 package kscript.integration.test
 
-import assertk.assertThat
-import assertk.assertions.isEqualTo
+import kscript.integration.tool.TestAssertion.any
+import kscript.integration.tool.TestAssertion.startsWith
+import kscript.integration.tool.TestAssertion.verify
+import kscript.integration.tool.TestContext.resolvePath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
