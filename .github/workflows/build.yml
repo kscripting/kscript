@@ -55,7 +55,6 @@ jobs:
         shell: cmd
         run: |
           echo "Windows test..."
-          ./gradlew clean build
           ./gradlew -Dtest.single=WindowsSuite -Dos.type=windows integration 
 
       - name: Run tests specific for Windows (cygwin shell)
@@ -63,7 +62,6 @@ jobs:
         shell: cmd
         run: |
           echo "Cygwin test..."
-          rem ./gradlew clean build
           rem ./gradlew -Dtest.single=CygwinSuite -Dos.type=windows integration
 
       - name: Run tests for Posix (and MSYS on Windows)

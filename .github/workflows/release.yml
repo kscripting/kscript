@@ -1,5 +1,7 @@
 # Created with https://github.com/marketplace/actions/create-a-release
 
+name: release
+
 on:
   push:
     # Sequence of patterns matched against refs/tags
@@ -7,8 +9,6 @@ on:
 #      - master
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-
-name: Create Release
 
 
 jobs:

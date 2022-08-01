@@ -61,7 +61,11 @@ class AnnotationTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Ensure dependencies are solved correctly #345`() {
-        FileUtils.cleanDirectory(File(System.getProperty("user.home") + "/.m2/repository/com/beust"))
+        val dependencyDirectory = File(System.getProperty("user.home") + "/.m2/repository/com/beust")
+        if (dependencyDirectory.exists()) {
+            FileUtils.cleanDirectory(dependencyDirectory)
+        }
+
         verify(
             "kscript $projectDir/test/resources/depends_on_klaxon.kts",
             0,

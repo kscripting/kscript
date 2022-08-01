@@ -56,6 +56,7 @@ object TestContext {
         val targetFile = File(executionDir + "/" + sourceFile.name)
 
         sourceFile.copyTo(targetFile, overwrite = true)
+        targetFile.setExecutable(true)
     }
 
     fun printKscriptPath() {
