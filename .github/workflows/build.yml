@@ -67,7 +67,6 @@ jobs:
           rem ./gradlew -Dtest.single=CygwinSuite -Dos.type=windows integration
 
       - name: Run tests for Posix (and MSYS on Windows)
-        timeout-minutes: 10
         shell: bash
         run: |
           # For Windows this action is running MSYS Os type
@@ -83,21 +82,17 @@ jobs:
             ./gradlew -Dtest.single=LinuxSuite -Dos.type=$OSTYPE integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
-            ./gradlew clean build
-            ./gradlew -Dtest.single=MacSuite -Dos.type=$OSTYPE integration
+            ./gradlew -Dtest.single=MacSuite -Dos.type=$OSTYPE clean integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
             echo "kscript path:   $(which kscript)"
-            ./gradlew clean build
-            ./gradlew -Dtest.single=CygwinSuite -Dos.type=$OSTYPE integration
+            ./gradlew -Dtest.single=CygwinSuite -Dos.type=$OSTYPE clean integration
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
-            ./gradlew clean build
-            ./gradlew -Dtest.single=MsysSuite -Dos.type=$OSTYPE integration
+            ./gradlew -Dtest.single=MsysSuite -Dos.type=$OSTYPE clean integration
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
-            ./gradlew clean build
-            ./gradlew -Dtest.single=OtherPosixSuite -Dos.type=$OSTYPE integration      
+            ./gradlew -Dtest.single=OtherPosixSuite -Dos.type=$OSTYPE clean integration      
           else
             echo "Unknown OS"
             exit 1
