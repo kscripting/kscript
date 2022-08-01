@@ -2,6 +2,7 @@ package kscript.integration.test
 
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.verify
+import kscript.integration.tool.TestContext.projectDir
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -21,10 +22,10 @@ class KtSupportTest : TestBase {
     @Test
     @Tag("posix")
     fun `Test misc entry point with or without package configurations`() {
-        verify("$kscript $projectDir/test/resources/kt_tests/custom_entry_nopckg.kt", 0, "foo companion was called\n")
-        verify("$kscript $projectDir/test/resources/kt_tests/custom_entry_withpckg.kt", 0, "foo companion was called\n")
-        verify("$kscript $projectDir/test/resources/kt_tests/default_entry_nopckg.kt", 0, "main was called\n")
-        verify("$kscript $projectDir/test/resources/kt_tests/default_entry_withpckg.kt", 0, "main was called\n")
+        verify("kscript $projectDir/test/resources/kt_tests/custom_entry_nopckg.kt", 0, "foo companion was called\n")
+        verify("kscript $projectDir/test/resources/kt_tests/custom_entry_withpckg.kt", 0, "foo companion was called\n")
+        verify("kscript $projectDir/test/resources/kt_tests/default_entry_nopckg.kt", 0, "main was called\n")
+        verify("kscript $projectDir/test/resources/kt_tests/default_entry_withpckg.kt", 0, "main was called\n")
         verify("", 0, "")
     }
 

@@ -3,6 +3,8 @@ package kscript.integration.test
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.contains
 import kscript.integration.tool.TestAssertion.verify
+import kscript.integration.tool.TestContext.projectDir
+import kscript.integration.tool.TestContext.testDir
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -10,17 +12,17 @@ class MiscTest : TestBase {
     @Test
     @Tag("posix")
     fun `Prevent regressions of #98 (it fails to process empty or space-containing arguments)`() {
-        verify("""$kscript "print(args.size)" foo bar""", 0, "2") //regular args
-        verify("""$kscript "print(args.size)" "" foo bar""", 0, "3") //accept empty args
-        verify("""$kscript "print(args.size)" "--params foo"""", 0, "1") //make sure dash args are not confused with options
-        verify("""$kscript "print(args.size)" "foo bar"""", 0, "1") //allow for spaces
-        verify("""$kscript "print(args[0])" "foo bar"""", 0, "foo bar") //make sure quotes are not propagated into args
+        verify("""kscript "print(args.size)" foo bar""", 0, "2") //regular args
+        verify("""kscript "print(args.size)" "" foo bar""", 0, "3") //accept empty args
+        verify("""kscript "print(args.size)" "--params foo"""", 0, "1") //make sure dash args are not confused with options
+        verify("""kscript "print(args.size)" "foo bar"""", 0, "1") //allow for spaces
+        verify("""kscript "print(args[0])" "foo bar"""", 0, "foo bar") //make sure quotes are not propagated into args
     }
 
     @Test
     @Tag("posix")
     fun `Prevent regression of #181`() {
-        verify("""echo "println(123)" > $testDir/123foo.kts; $kscript $testDir/123foo.kts""", 0, "123\n")
+        verify("""echo "println(123)" > $testDir/123foo.kts; kscript $testDir/123foo.kts""", 0, "123\n")
     }
 
     @Test
@@ -45,8 +47,8 @@ class MiscTest : TestBase {
     @Tag("posix")
     fun `Ensure that compilation errors are not cached #349`() {
         //first run (not yet cached)
-        verify("$kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("[kscript] [ERROR] Compilation of scriplet failed:"))
+        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("[kscript] [ERROR] Compilation of scriplet failed:"))
         //real test
-        verify("$kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("[kscript] [ERROR] Compilation of scriplet failed:"))
+        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("[kscript] [ERROR] Compilation of scriplet failed:"))
     }
 }

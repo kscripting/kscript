@@ -3,6 +3,7 @@ package kscript.integration.test
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.startsWith
 import kscript.integration.tool.TestAssertion.verify
+import kscript.integration.tool.TestContext.projectDir
 import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -13,28 +14,28 @@ class AnnotationTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `There are some dependencies which are not jar, but maybe pom, aar and others - make sure they work, too`() {
-        verify("$kscript $projectDir/test/resources/depends_on_with_type.kts", 0, "getBigDecimal(1L): 1\n", any())
+        verify("kscript $projectDir/test/resources/depends_on_with_type.kts", 0, "getBigDecimal(1L): 1\n", any())
     }
 
     @Test
     @Tag("posix")
     @Tag("windows")
     fun `Make sure that DependsOn is parsed correctly`() {
-        verify("$kscript $projectDir/test/resources/depends_on_annot.kts", 0, "kscript with annotations rocks!\n", any())
+        verify("kscript $projectDir/test/resources/depends_on_annot.kts", 0, "kscript with annotations rocks!\n", any())
     }
 
     @Test
     @Tag("posix")
     @Tag("windows")
     fun `Make sure that DependsOnMaven is parsed correctly`() {
-        verify("$kscript $projectDir/test/resources/depends_on_maven_annot.kts", 0, "kscript with annotations rocks!\n", any())
+        verify("kscript $projectDir/test/resources/depends_on_maven_annot.kts", 0, "kscript with annotations rocks!\n", any())
     }
 
     @Test
     @Tag("posix")
     @Tag("windows")
     fun `Make sure that dynamic versions are matched properly`() {
-        verify("$kscript $projectDir/test/resources/depends_on_dynamic.kts", 0, "dynamic kscript rocks!\n", any())
+        verify("kscript $projectDir/test/resources/depends_on_dynamic.kts", 0, "dynamic kscript rocks!\n", any())
     }
 
     @Test
@@ -42,18 +43,18 @@ class AnnotationTest : TestBase {
     @Tag("windows")
     fun `Make sure that MavenRepository is parsed correctly`() {
         verify(
-            "$kscript $projectDir/test/resources/custom_mvn_repo_annot.kts",
+            "kscript $projectDir/test/resources/custom_mvn_repo_annot.kts",
             0,
             "kscript with annotations rocks!\n",
             startsWith("[kscript] Adding repository: Repository(id=imagej-releases, url=http://maven.imagej.net/content/repositories/releases, user=, password=)\n")
         )
         verify(
-            "$kscript $projectDir/test/resources/illegal_depends_on_arg.kts",
+            "kscript $projectDir/test/resources/illegal_depends_on_arg.kts",
             1,
             "",
             "[kscript] [ERROR] Artifact locators must be provided as separate annotation arguments and not as comma-separated list: [com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0]\n"
         )
-        verify("$kscript $projectDir/test/resources/script_with_compile_flags.kts", 0, "hoo_ray\n", any())
+        verify("kscript $projectDir/test/resources/script_with_compile_flags.kts", 0, "hoo_ray\n", any())
     }
 
     @Test
@@ -62,7 +63,7 @@ class AnnotationTest : TestBase {
     fun `Ensure dependencies are solved correctly #345`() {
         FileUtils.cleanDirectory(File(System.getProperty("user.home") + "/.m2/repository/com/beust"))
         verify(
-            "$kscript $projectDir/test/resources/depends_on_klaxon.kts",
+            "kscript $projectDir/test/resources/depends_on_klaxon.kts",
             0,
             "Successfully resolved klaxon\n",
             "[kscript] Resolving com.beust:klaxon:5.5...\n"

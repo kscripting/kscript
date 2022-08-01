@@ -3,6 +3,7 @@ package kscript.integration.test
 import kscript.integration.tool.TestContext.copyToExecutionPath
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.verify
+import kscript.integration.tool.TestContext.projectDir
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 

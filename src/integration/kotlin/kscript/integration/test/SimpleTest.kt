@@ -10,7 +10,7 @@ class SimpleTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Providing source code works`() {
-        verify("$kscript \"println(1+1)\"", 0, "2\n")
+        verify("kscript \"println(1+1)\"", 0, "2\n")
     }
 
     @Test
@@ -18,7 +18,7 @@ class SimpleTest : TestBase {
     @Tag("windows")
     fun `Help is printed`() {
         //@formatter:off
-        verify("$kscript --help", 0, "", startsWith("kscript - Enhanced scripting support for Kotlin on *nix-based systems."))
+        verify("kscript --help", 0, "", startsWith("kscript - Enhanced scripting support for Kotlin on *nix-based systems."))
         //@formatter:on
     }
 }

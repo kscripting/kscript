@@ -45,6 +45,7 @@ tasks.create<Test>("integration") {
     classpath = sourceSets["integration"].runtimeClasspath
     outputs.upToDateWhen { false }
     mustRunAfter(tasks["test"])
+    dependsOn(tasks["assemble"])
 }
 
 tasks.create<Task>("printIntegrationClasspath") {
