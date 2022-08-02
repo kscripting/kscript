@@ -1,6 +1,6 @@
 package kscript.integration.test
 
-import kscript.integration.tool.TestContext.copyToExecutionPath
+import kscript.integration.tool.TestContext.copyToExecutablePath
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.verify
 import kscript.integration.tool.TestContext.projectDir
@@ -22,7 +22,7 @@ class CustomInterpretersTest : TestBase {
 
     companion object {
         init {
-            copyToExecutionPath("/test/resources/custom_dsl/mydsl")
+            copyToExecutablePath("/test/resources/custom_dsl/mydsl")
         }
     }
 }

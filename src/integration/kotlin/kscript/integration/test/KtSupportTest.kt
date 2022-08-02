@@ -26,7 +26,6 @@ class KtSupportTest : TestBase {
         verify("kscript $projectDir/test/resources/kt_tests/custom_entry_withpckg.kt", 0, "foo companion was called\n")
         verify("kscript $projectDir/test/resources/kt_tests/default_entry_nopckg.kt", 0, "main was called\n")
         verify("kscript $projectDir/test/resources/kt_tests/default_entry_withpckg.kt", 0, "main was called\n")
-        verify("", 0, "")
     }
 
     @Test

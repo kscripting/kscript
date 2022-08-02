@@ -51,7 +51,7 @@ object TestContext {
         return result
     }
 
-    fun copyToExecutionPath(source: String) {
+    fun copyToExecutablePath(source: String) {
         val sourceFile = File(projectDir + source)
         val targetFile = File(executionDir + "/" + sourceFile.name)
 

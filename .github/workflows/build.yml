@@ -50,20 +50,6 @@ jobs:
             mv /c/Windows/System32/bash.exe /c/Windows/System32/wsl-bash.exe
           fi
 
-      - name: Run tests specific for Windows (cmd shell)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          echo "Windows test..."
-          ./gradlew -Dtest.single=WindowsSuite -Dos.type=windows integration 
-
-      - name: Run tests specific for Windows (cygwin shell)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          echo "Cygwin test..."
-          rem ./gradlew -Dtest.single=CygwinSuite -Dos.type=windows integration
-
       - name: Run tests for Posix (and MSYS on Windows)
         shell: bash
         run: |
@@ -77,21 +63,35 @@ jobs:
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
             ./test/linux_suite.sh
-            ./gradlew -Dtest.single=LinuxSuite -Dos.type=$OSTYPE integration
+            gradle -Dtest.single=LinuxSuite -Dos.type=$OSTYPE integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
-            ./gradlew -Dtest.single=MacSuite -Dos.type=$OSTYPE clean integration
+            gradle -Dtest.single=MacSuite -Dos.type=$OSTYPE clean integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
             echo "kscript path:   $(which kscript)"
-            ./gradlew -Dtest.single=CygwinSuite -Dos.type=$OSTYPE clean integration
+            gradle -Dtest.single=CygwinSuite -Dos.type=$OSTYPE clean integration
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
-            ./gradlew -Dtest.single=MsysSuite -Dos.type=$OSTYPE clean integration
+            gradle -Dtest.single=MsysSuite -Dos.type=$OSTYPE clean integration
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
-            ./gradlew -Dtest.single=OtherPosixSuite -Dos.type=$OSTYPE clean integration      
+            gradle -Dtest.single=OtherPosixSuite -Dos.type=$OSTYPE clean integration      
           else
             echo "Unknown OS"
             exit 1
           fi
+
+      - name: Run tests specific for Windows (cmd shell)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo "Windows test..."
+          gradle -Dtest.single=WindowsSuite -Dos.type=windows integration 
+
+      - name: Run tests specific for Windows (cygwin shell)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo "Cygwin test..."
+          rem gradle -Dtest.single=CygwinSuite -Dos.type=windows integration
