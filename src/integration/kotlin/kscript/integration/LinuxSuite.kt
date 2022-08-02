@@ -19,5 +19,5 @@ import org.junit.platform.suite.api.Suite
 
 @Suite
 @SelectPackages("kscript.integration.test.*")
-@IncludeTags("posix")
+@IncludeTags("posix", "linux")
 class LinuxSuite

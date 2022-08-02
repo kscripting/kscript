@@ -5,12 +5,14 @@ import java.util.concurrent.TimeUnit
 
 data class ProcessResult(val command: String, val exitCode: Int, val stdout: String, val stderr: String) {
     override fun toString(): String {
-        return """|Command     : '$command'
+        return """|Command     : '${normalize(command)}'
                   |Exit Code   : $exitCode   
-                  |Stdout      : '${stdout.replace("\n", "[nl]")}'
-                  |Stderr      : '${stderr.replace("\n", "[nl]")}'
+                  |Stdout      : '${normalize(stdout)}'
+                  |Stderr      : '${normalize(stderr)}'
                   |""".trimMargin()
     }
+
+    private fun normalize(string: String): String = string.lines().joinToString("[nl]")
 }
 
 class StreamGobbler(
