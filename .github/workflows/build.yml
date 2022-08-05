@@ -14,7 +14,7 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-latest
+          - macos-12
           - windows-2022
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -86,7 +86,7 @@ jobs:
           echo "Windows test..."
           gradle -Dos.type=$OSTYPE -DincludeTags='windows' integration 
 
-      - name: Run tests specific for Windows (cygwin shell)
+      - name: Install Cygwin (only Windows)
         if: runner.os == 'Windows'
         uses: cygwin/cygwin-install-action@master
 
@@ -94,6 +94,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
+          echo $OSTYPE
           echo "Cygwin test..."
           gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
           gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration
