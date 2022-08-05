@@ -1,6 +1,6 @@
 package kscript.integration
 
-import kscript.integration.tool.TestContext
+import kscript.integration.tools.TestContext
 import org.junit.jupiter.api.BeforeAll
 
 interface TestBase {

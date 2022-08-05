@@ -1,8 +1,8 @@
 package kscript.integration
 
-import kscript.integration.tool.TestAssertion.any
-import kscript.integration.tool.TestAssertion.verify
-import kscript.integration.tool.TestContext.nl
+import kscript.integration.tools.TestAssertion.any
+import kscript.integration.tools.TestAssertion.verify
+import kscript.integration.tools.TestContext.nl
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 

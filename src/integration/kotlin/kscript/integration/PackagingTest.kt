@@ -1,10 +1,10 @@
 package kscript.integration
 
-import kscript.integration.tool.TestAssertion.any
-import kscript.integration.tool.TestAssertion.startsWith
-import kscript.integration.tool.TestAssertion.verify
-import kscript.integration.tool.TestContext.projectDir
-import kscript.integration.tool.TestContext.resolvePath
+import kscript.integration.tools.TestAssertion.any
+import kscript.integration.tools.TestAssertion.startsWith
+import kscript.integration.tools.TestAssertion.verify
+import kscript.integration.tools.TestContext.projectDir
+import kscript.integration.tools.TestContext.resolvePath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 

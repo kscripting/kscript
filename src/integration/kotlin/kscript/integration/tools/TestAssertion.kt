@@ -1,10 +1,10 @@
-package kscript.integration.tool
+package kscript.integration.tools
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import kscript.app.util.ProcessResult
-import kscript.integration.tool.TestContext.runProcess
+import kscript.integration.tools.TestContext.runProcess
 
 object TestAssertion {
     fun any() = AnyMatch()

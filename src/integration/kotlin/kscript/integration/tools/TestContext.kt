@@ -1,4 +1,4 @@
-package kscript.integration.tool
+package kscript.integration.tools
 
 import kscript.app.model.OsType
 import kscript.app.util.*

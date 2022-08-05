@@ -1,4 +1,4 @@
-package kscript.integration.tool
+package kscript.integration.tools
 
 interface TestMatcher {
     fun matches(string: String): Boolean

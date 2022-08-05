@@ -17,7 +17,7 @@ jobs:
           - macos-12
           - windows-2022
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Checkout code
