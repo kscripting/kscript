@@ -1,4 +1,4 @@
-package kscript.integration.test
+package kscript.integration
 
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.verify
@@ -26,7 +26,7 @@ class IdeaTest : TestBase {
 
     companion object {
         init {
-            copyToExecutablePath("/test/resources/idea")
+            copyToExecutablePath("test/resources/idea")
         }
     }
 }

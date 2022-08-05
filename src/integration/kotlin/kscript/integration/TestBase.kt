@@ -1,4 +1,4 @@
-package kscript.integration.test
+package kscript.integration
 
 import kscript.integration.tool.TestContext
 import org.junit.jupiter.api.BeforeAll

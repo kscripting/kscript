@@ -33,7 +33,21 @@ configurations {
 }
 
 tasks.create<Test>("integration") {
-    useJUnitPlatform()
+    val itags = System.getProperty("includeTags") ?: ""
+    val etags = System.getProperty("excludeTags") ?: ""
+
+    println("Include tags: $itags")
+    println("Exclude tags: $etags")
+
+    useJUnitPlatform {
+        if (!itags.isNullOrBlank()) {
+            includeTags(itags)
+        }
+
+        if (!etags.isNullOrBlank()) {
+            excludeTags(etags)
+        }
+    }
 
     systemProperty("os.type", System.getProperty("os.type"))
     systemProperty("shell.path", System.getProperty("shell.path"))
@@ -45,7 +59,7 @@ tasks.create<Test>("integration") {
     classpath = sourceSets["integration"].runtimeClasspath
     outputs.upToDateWhen { false }
     mustRunAfter(tasks["test"])
-    dependsOn(tasks["assemble"], tasks["test"])
+    //dependsOn(tasks["assemble"], tasks["test"])
 }
 
 tasks.create<Task>("printIntegrationClasspath") {

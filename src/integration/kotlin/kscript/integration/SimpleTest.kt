@@ -1,4 +1,4 @@
-package kscript.integration.test
+package kscript.integration
 
 import kscript.integration.tool.TestAssertion.startsWith
 import kscript.integration.tool.TestAssertion.verify

@@ -55,28 +55,26 @@ jobs:
         run: |
           # For Windows this action is running MSYS Os type
           
-          export PATH=./build/libs:${PATH}
-          
           echo "OsType:         $OSTYPE"
-          echo "kscript path:   $(which kscript)"
+          
+          gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
           
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
             ./test/linux_suite.sh
-            gradle -Dtest.single=LinuxSuite -Dos.type=$OSTYPE integration
+            gradle -Dos.type=$OSTYPE -DincludeTags='posix | linux' integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
-            gradle -Dtest.single=MacSuite -Dos.type=$OSTYPE clean integration
+            gradle -Dos.type=$OSTYPE -DincludeTags='posix | macos' integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
-            echo "kscript path:   $(which kscript)"
-            gradle -Dtest.single=CygwinSuite -Dos.type=$OSTYPE clean integration
+            gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
-            gradle -Dtest.single=MsysSuite -Dos.type=$OSTYPE clean integration
+            gradle -Dos.type=$OSTYPE -DincludeTags='posix | msys' integration
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
-            gradle -Dtest.single=OtherPosixSuite -Dos.type=$OSTYPE clean integration      
+            gradle -Dos.type=$OSTYPE -DincludeTags='posix' integration      
           else
             echo "Unknown OS"
             exit 1
@@ -87,11 +85,11 @@ jobs:
         shell: cmd
         run: |
           echo "Windows test..."
-          gradle -Dtest.single=WindowsSuite -Dos.type=windows integration 
+          gradle -Dos.type=$OSTYPE -DincludeTags='windows' integration 
 
       - name: Run tests specific for Windows (cygwin shell)
         if: runner.os == 'Windows'
         shell: cmd
         run: |
           echo "Cygwin test..."
-          rem gradle -Dtest.single=CygwinSuite -Dos.type=windows integration
+          rem gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration

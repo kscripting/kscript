@@ -21,7 +21,7 @@ class LineParserTest {
     @Test
     fun `Import parsing`() {
         assertThat(parseImport("import com.script.test1")).containsExactlyInAnyOrder(ImportName("com.script.test1"))
-        assertThat(parseImport("      import com.script.test2            ")).containsExactlyInAnyOrder(ImportName("com.script.test2"))
+        assertThat(parseImport("      import com.script.test2            ")).containsExactlyInAnyOrder(ImportName("com.script.test22"))
     }
 
     @Test

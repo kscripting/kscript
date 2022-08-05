@@ -1,4 +1,4 @@
-package kscript.integration.test
+package kscript.integration
 
 import kscript.integration.tool.TestContext.copyToExecutablePath
 import kscript.integration.tool.TestAssertion.any
@@ -22,7 +22,7 @@ class CustomInterpretersTest : TestBase {
 
     companion object {
         init {
-            copyToExecutablePath("/test/resources/custom_dsl/mydsl")
+            copyToExecutablePath("test/resources/custom_dsl/mydsl")
         }
     }
 }

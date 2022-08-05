@@ -1,4 +1,4 @@
-package kscript.integration.test
+package kscript.integration
 
 import kscript.integration.tool.TestAssertion.any
 import kscript.integration.tool.TestAssertion.contains
