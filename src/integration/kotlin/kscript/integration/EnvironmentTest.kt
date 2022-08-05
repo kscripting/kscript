@@ -25,6 +25,6 @@ class EnvironmentTest : TestBase {
     @Tag("posix")
     fun `Run script that tries to find out its own filename via environment variable`() {
         val path = "$projectDir/test/resources/uses_self_file_name.kts"
-        verify(path, 0, "Usage: $path [-ae] [--foo] file+\n")
+        verify(path, 0, "Usage: uses_self_file_name.kts [-ae] [--foo] file+\n")
     }
 }

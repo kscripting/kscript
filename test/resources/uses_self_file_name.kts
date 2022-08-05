@@ -1,2 +1,3 @@
 #!/usr/bin/env kscript
-println("Usage: ${System.getenv("KSCRIPT_FILE")} [-ae] [--foo] file+")
+val fileName = System.getenv("KSCRIPT_FILE").split('/', '\\').last()
+println("Usage: $fileName [-ae] [--foo] file+")
