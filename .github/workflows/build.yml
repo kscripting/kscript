@@ -14,7 +14,7 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-10.15
+          - macos-latest
           - windows-2022
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -44,7 +44,6 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
             choco install zip
-            choco install cygwin
             # Overwrite the WSL bash.exe
             # cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
             mv /c/Windows/System32/bash.exe /c/Windows/System32/wsl-bash.exe
@@ -89,7 +88,9 @@ jobs:
 
       - name: Run tests specific for Windows (cygwin shell)
         if: runner.os == 'Windows'
-        shell: cmd
+        uses: cygwin/cygwin-install-action@master
+        shell: bash
         run: |
           echo "Cygwin test..."
-          rem gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration
+          gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
+          gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration

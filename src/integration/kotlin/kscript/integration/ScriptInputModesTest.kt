@@ -59,6 +59,7 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("linux")
+    @Tag("macos")
     //Command substitution doesn't work on msys and cygwin
     fun `Make sure that command substitution works as expected`() {
         verify("source ${projectDir}/test/resources/cmd_subst_test.sh", 0, "command substitution works as well\n")
