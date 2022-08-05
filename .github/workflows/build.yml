@@ -89,6 +89,9 @@ jobs:
       - name: Run tests specific for Windows (cygwin shell)
         if: runner.os == 'Windows'
         uses: cygwin/cygwin-install-action@master
+
+      - name: Run tests specific for Windows (cygwin shell)
+        if: runner.os == 'Windows'
         shell: bash
         run: |
           echo "Cygwin test..."
