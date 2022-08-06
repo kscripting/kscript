@@ -57,7 +57,7 @@ jobs:
           fi
 
       - name: Run tests for Posix (and MSYS on Windows)
-        if: matrix.variant == posix
+        if: matrix.variant == 'posix'
         shell: bash
         run: |
           # For Windows this action is running MSYS Os type
@@ -87,7 +87,7 @@ jobs:
           fi
 
       - name: Run tests specific for Windows (cmd shell)
-        if: matrix.variant == cmd
+        if: matrix.variant == 'cmd'
         shell: cmd
         run: |
           echo "Windows test..."
@@ -95,11 +95,11 @@ jobs:
           gradle -Dos.type=$OSTYPE -DincludeTags='windows' integration
 
       - name: Install Cygwin (only Windows)
-        if: matrix.variant == cygwin
+        if: matrix.variant == 'cygwin'
         uses: cygwin/cygwin-install-action@master
 
       - name: Run tests specific for Cygwin
-        if: matrix.variant == cygwin
+        if: matrix.variant == 'cygwin'
         shell: bash
         run: |
           echo $OSTYPE
