@@ -52,7 +52,6 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    @Tag("windows")
     fun `Make sure that heredoc is accepted as argument`() {
         verify("source ${projectDir}/test/resources/here_doc_test.sh", 0, "hello kotlin\n")
     }
@@ -67,7 +66,6 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    @Tag("windows")
     fun `Make sure that it runs with local bash script files`() {
         verify("source ${projectDir}/test/resources/local_script_file.sh $testDir", 0, "kscript rocks!\n")
     }

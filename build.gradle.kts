@@ -40,18 +40,18 @@ tasks.create<Test>("integration") {
     println("Exclude tags: $etags")
 
     useJUnitPlatform {
-        if (!itags.isNullOrBlank()) {
+        if (itags.isNotBlank()) {
             includeTags(itags)
         }
 
-        if (!etags.isNullOrBlank()) {
+        if (etags.isNotBlank()) {
             excludeTags(etags)
         }
     }
 
-    systemProperty("os.type", System.getProperty("os.type"))
-    systemProperty("shell.path", System.getProperty("shell.path"))
-    systemProperty("project.path", projectDir.absolutePath)
+    systemProperty("osType", System.getProperty("osType"))
+    systemProperty("projectPath", projectDir.absolutePath)
+    systemProperty("shellPath", System.getProperty("shellPath"))
 
     description = "Runs the integration tests."
     group = "verification"

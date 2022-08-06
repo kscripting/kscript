@@ -4,25 +4,26 @@ import kscript.app.model.OsType
 import kscript.app.util.*
 
 object TestContext {
-    private val osType: OsType = OsType.findOrThrow(System.getProperty("os.type"))
+    private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
     private val nativeType = if (osType.isPosixHostedOnWindows()) OsType.WINDOWS else osType
 
-    private val projectPath: OsPath = OsPath.createOrThrow(nativeType, System.getProperty("project.path"))
+    private val projectPath: OsPath = OsPath.createOrThrow(nativeType, System.getProperty("projectPath"))
     private val execPath: OsPath = projectPath.resolve("build/libs")
     private val testPath: OsPath = projectPath.resolve("build/tmp/test")
+    private val pathEnvName = if (osType.isWindowsLike()) "Path" else "PATH"
+    private val systemPath: String = System.getenv()[pathEnvName]!!
 
-    private val systemPath: String = System.getenv()["PATH"]!!
-    private val classPathSeparator: String = if (osType.isWindowsLike() || osType.isPosixHostedOnWindows()) ";" else ":"
-    private val envPath: String = "${execPath.convert(osType)}$classPathSeparator$systemPath"
-    private val envMap = mapOf("PATH" to envPath)
+    private val pathSeparator: String = if (osType.isWindowsLike() || osType.isPosixHostedOnWindows()) ";" else ":"
+    private val envPath: String = "${execPath.convert(osType)}$pathSeparator$systemPath"
+    private val envMap = mapOf(pathEnvName to envPath)
 
     val nl: String = System.getProperty("line.separator")
     val projectDir: String = projectPath.convert(osType).stringPath()
     val testDir: String = testPath.convert(osType).stringPath()
 
     init {
-        println("os.type        : $osType")
-        println("native.type    : $nativeType")
+        println("osType         : $osType")
+        println("nativeType     : $nativeType")
         println("projectDir     : $projectDir")
         println("testDir        : $testDir")
         println("execDir        : ${execPath.convert(osType)}")

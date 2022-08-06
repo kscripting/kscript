@@ -68,19 +68,19 @@ jobs:
           
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
-            gradle -Dos.type=$OSTYPE -DincludeTags='posix | linux' integration
+            gradle -DosType=$OSTYPE -DincludeTags='posix | linux' integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
-            gradle -Dos.type=$OSTYPE -DincludeTags='posix | macos' integration
+            gradle -DosType=$OSTYPE -DincludeTags='posix | macos' integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
-            gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration
+            gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
-            gradle -Dos.type=$OSTYPE -DincludeTags='posix | msys' integration
+            gradle -DosType=$OSTYPE -DincludeTags='posix | msys' integration
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
-            gradle -Dos.type=$OSTYPE -DincludeTags='posix' integration      
+            gradle -DosType=$OSTYPE -DincludeTags='posix' integration      
           else
             echo "Unknown OS"
             exit 1
@@ -92,7 +92,8 @@ jobs:
         run: |
           echo "Windows test..."
           gradle clean assemble test
-          gradle -Dos.type=$OSTYPE -DincludeTags='windows' integration
+          if %errorlevel% neq 0 exit /b %errorlevel%
+          gradle -DosType=windows -DincludeTags="windows" integration
 
       - name: Install Cygwin (only Windows)
         if: matrix.variant == 'cygwin'
@@ -105,4 +106,4 @@ jobs:
           echo $OSTYPE
           echo "Cygwin test..."
           gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
-          gradle -Dos.type=$OSTYPE -DincludeTags='posix | cygwin' integration
+          gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
