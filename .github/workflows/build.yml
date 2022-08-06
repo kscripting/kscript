@@ -97,6 +97,9 @@ jobs:
       - name: Install Cygwin (only Windows)
         if: matrix.variant == cygwin
         uses: cygwin/cygwin-install-action@master
+
+      - name: Run tests specific for Cygwin
+        if: matrix.variant == cygwin
         shell: bash
         run: |
           echo $OSTYPE
