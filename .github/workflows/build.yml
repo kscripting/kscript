@@ -20,9 +20,9 @@ jobs:
           - standard
         include:
           - os: windows-2022
-            variant: cygwin
-          - os: windows-2022
-            variant: cmd
+            variant:
+              - cygwin
+              - cmd
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 
