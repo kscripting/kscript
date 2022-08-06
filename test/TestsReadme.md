@@ -23,41 +23,35 @@ Put the cloned repository into $DIR directory.
 You can configure your working environment by sourcing setup environment script:
 
 ```bash
-cd $DIR/test
+cd $DIR
 source linux_environment.sh
 ```
 
 Sourcing this script allows to use some useful for development commands:
 ```bash
-copy_executables() # copies all executables necessary for tests to $KSCRIPT_EXEC_DIR
 cdk # bash alias which moves you to your kscript development directory
 switchPath # adds/removes development kscript from $PATH env variable
 help-dev # prints some useful commands 
 ```
 
-#### 5. Run test suite
-To run the tests, just run the [`linux_suite.sh`](test_suite.sh)
+#### 5. Run integration test suite
 
 ```bash
-cd $DIR/test
-./linux_suite.sh
+cdk
+./gradlew clean assemble test
+./gradlew -Dos.type=linux -DincludeTags='posix' integration
+<or> 
+./gradlew -Dos.type=linux -DincludeTags='posix' integration --tests BootstrapHeaderTest 
 ```
 
-You can customize what is executed by giving parameters to test suite script:
+os.type is usually same as $OSTYPE, except of windows 'cmd' shell.
 
-* put names of the suite which you want to execute - other scripts will be skipped
+includeTags can be combined:
+https://junit.org/junit5/docs/current/user-guide/#running-tests-tag-syntax-rules
+usually you would like something like 'posix | linux' (all tests for posix + linux specific tests)
 
-```bash
-./linux_suite.sh misc idea  # only misc and idea test suites will be executed
-```
-
-* put 'ALL' and '^<suite name>' to execute all test suites without given
-
-```bash
-./linux_suite.sh ALL ^misc ^idea  # all tests except misc and idea will be executed
-```
-
-* calling linux_suite.sh without parameters is equivalent to passing as a parameter 'ALL'
+-- tests - comes from Gradle:
+https://docs.gradle.org/current/userguide/java_testing.html#test_filtering
 
 
 #### 6. Check if all tests passed...

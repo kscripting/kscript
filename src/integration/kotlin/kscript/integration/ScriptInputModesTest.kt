@@ -95,7 +95,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Scripts with additional dots in the file name should work as well`() {
-        //We also test innner uppercase letters in file name here by using .*T*est
+        //We also test inner uppercase letters in file name here by using .*T*est
         verify("kscript $projectDir/test/resources/dot.Test.kts", 0, "dot alarm!\n")
     }
 

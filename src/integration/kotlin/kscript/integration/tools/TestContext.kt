@@ -54,6 +54,13 @@ object TestContext {
         targetFile.setExecutable(true)
     }
 
+    fun copyToTestPath(source: String) {
+        val sourceFile = projectPath.resolve(source).toNativeFile()
+        val targetFile = testPath.resolve(sourceFile.name).toNativeFile()
+
+        sourceFile.copyTo(targetFile, overwrite = true)
+    }
+
     fun printKscriptPath() {
         val kscriptPath = ShellUtils.commandPath(osType, "kscript", envMap)
         println("kscript path: $kscriptPath")
