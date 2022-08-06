@@ -59,6 +59,7 @@ object TestContext {
         val targetFile = testPath.resolve(sourceFile.name).toNativeFile()
 
         sourceFile.copyTo(targetFile, overwrite = true)
+        targetFile.setExecutable(true) //Needed if the file is kotlin script
     }
 
     fun printKscriptPath() {
