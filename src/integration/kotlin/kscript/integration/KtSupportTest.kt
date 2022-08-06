@@ -16,12 +16,14 @@ class KtSupportTest : TestBase {
 
     @Test
     @Tag("posix")
+    @Tag("windows")
     fun `Run kt via interpreter mode with dependencies`() {
         verify("kscript ${resolvePath("$projectDir/test/resources/kt_tests/main_with_deps.kt")}", 0, "made it!\n", "[kscript] Resolving log4j:log4j:1.2.14...\n")
     }
 
     @Test
     @Tag("posix")
+    @Tag("windows")
     fun `Test misc entry point with or without package configurations`() {
         verify("kscript ${resolvePath("$projectDir/test/resources/kt_tests/custom_entry_nopckg.kt")}", 0, "foo companion was called\n")
         verify("kscript ${resolvePath("$projectDir/test/resources/kt_tests/custom_entry_withpckg.kt")}", 0, "foo companion was called\n")

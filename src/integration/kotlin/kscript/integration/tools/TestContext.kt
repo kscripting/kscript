@@ -32,7 +32,7 @@ object TestContext {
     }
 
     fun resolvePath(path: String): String {
-        return OsPath.createOrThrow(osType, path).toNativeOsPath().stringPath()
+        return OsPath.createOrThrow(osType, path).stringPath()
     }
 
     fun runProcess(command: String): ProcessResult {
