@@ -17,12 +17,12 @@ jobs:
           - macos-12
           - windows-2022
         variant:
-          - standard
+          - posix
         include:
           - os: windows-2022
-            variant:
-              - cygwin
-              - cmd
+            variant: cygwin
+          - os: windows-2022
+            variant: cmd
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 
@@ -57,6 +57,7 @@ jobs:
           fi
 
       - name: Run tests for Posix (and MSYS on Windows)
+        if: matrix.variant == posix
         shell: bash
         run: |
           # For Windows this action is running MSYS Os type
@@ -86,18 +87,16 @@ jobs:
           fi
 
       - name: Run tests specific for Windows (cmd shell)
-        if: runner.os == 'Windows'
+        if: matrix.variant == cmd
         shell: cmd
         run: |
           echo "Windows test..."
-          gradle -Dos.type=$OSTYPE -DincludeTags='windows' integration 
+          gradle clean assemble test
+          gradle -Dos.type=$OSTYPE -DincludeTags='windows' integration
 
       - name: Install Cygwin (only Windows)
-        if: runner.os == 'Windows'
+        if: matrix.variant == cygwin
         uses: cygwin/cygwin-install-action@master
-
-      - name: Run tests specific for Windows (cygwin shell)
-        if: runner.os == 'Windows'
         shell: bash
         run: |
           echo $OSTYPE
