@@ -16,6 +16,11 @@ jobs:
           - ubuntu-20.04
           - macos-12
           - windows-2022
+        include:
+          - os: windows-2022
+            variant: cygwin
+          - os: windows-2022
+            variant: cmd
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 
