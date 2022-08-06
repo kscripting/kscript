@@ -16,6 +16,8 @@ jobs:
           - ubuntu-20.04
           - macos-12
           - windows-2022
+        variant:
+          - standard
         include:
           - os: windows-2022
             variant: cygwin
