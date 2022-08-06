@@ -3,6 +3,7 @@ package kscript.integration
 import kscript.integration.tools.TestAssertion.startsWith
 import kscript.integration.tools.TestAssertion.verify
 import kscript.integration.tools.TestContext.projectDir
+import kscript.integration.tools.TestContext.resolvePath
 import kscript.integration.tools.TestContext.testDir
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -75,7 +76,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("windows")
     fun `Make sure that it runs with local script files`() {
         verify(
-            "kscript ${projectDir}/test/resources/multi_line_deps.kts",
+            "kscript ${resolvePath("${projectDir}/test/resources/multi_line_deps.kts")}",
             0,
             "kscript is  cool!\n",
             "[kscript] Resolving com.offbytwo:docopt:0.6.0.20150202...\n[kscript] Resolving log4j:log4j:1.2.14...\n"
@@ -86,7 +87,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Scripts with dashes in the file name should work as well`() {
-        verify("kscript $projectDir/test/resources/dash-test.kts", 0, "dash alarm!\n")
+        verify("kscript ${resolvePath("$projectDir/test/resources/dash-test.kts")}", 0, "dash alarm!\n")
     }
 
     @Test
@@ -94,7 +95,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("windows")
     fun `Scripts with additional dots in the file name should work as well`() {
         //We also test inner uppercase letters in file name here by using .*T*est
-        verify("kscript $projectDir/test/resources/dot.Test.kts", 0, "dot alarm!\n")
+        verify("kscript ${resolvePath("$projectDir/test/resources/dot.Test.kts")}", 0, "dot alarm!\n")
     }
 
     @Test

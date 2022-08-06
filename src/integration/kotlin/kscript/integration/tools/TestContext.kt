@@ -31,7 +31,9 @@ object TestContext {
         testPath.createDirectories()
     }
 
-    fun resolvePath(path: String): String = path
+    fun resolvePath(path: String): String {
+        return OsPath.createOrThrow(osType, path).toNativeOsPath().stringPath()
+    }
 
     fun runProcess(command: String): ProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.

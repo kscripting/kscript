@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test
 class MiscTest : TestBase {
     @Test
     @Tag("posix")
+    @Tag("windows")
     fun `Prevent regressions of #98 (it fails to process empty or space-containing arguments)`() {
         verify("""kscript "print(args.size)" foo bar""", 0, "2") //regular args
         verify("""kscript "print(args.size)" "" foo bar""", 0, "3") //accept empty args
