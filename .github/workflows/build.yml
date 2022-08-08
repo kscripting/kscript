@@ -97,11 +97,11 @@ jobs:
 
       - name: Install Cygwin (only Windows)
         if: matrix.variant == 'cygwin'
-        uses: cygwin/cygwin-install-action@master
+        uses: egor-tensin/setup-cygwin@v3
 
       - name: Run tests specific for Cygwin
         if: matrix.variant == 'cygwin'
-        shell: bash
+        shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
         run: |
           echo $OSTYPE
           echo "Cygwin test..."
