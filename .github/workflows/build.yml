@@ -105,6 +105,7 @@ jobs:
         run: |
           echo $OSTYPE
           echo "Cygwin test..."
+          echo "Changing directory to $GITHUB_WORKSPACE ..."
           cd $GITHUB_WORKSPACE
           gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
           gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
