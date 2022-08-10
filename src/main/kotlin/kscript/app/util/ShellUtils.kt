@@ -31,7 +31,7 @@ object ShellUtils {
 
             //Default case - Kotlin is installed manually and added to path
             whereKotlinOutput.forEach {
-                val path = it.substringBefore("\\bin\\kotlinc.bat").ifBlank { null }
+                val path = it.substringBefore("\\bin\\kotlinc.bat", "").ifBlank { null }
 
                 if (path != null) {
                     return path
@@ -41,13 +41,13 @@ object ShellUtils {
             //Scoop installer
             if (whereKotlinOutputString.contains("scoop")) {
                 whereKotlinOutput.forEach {
-                    val path = it.substringBefore("kotlinc.cmd").ifBlank { null }
+                    val path = it.substringBefore("kotlinc.cmd", "").ifBlank { null }
                     if (path != null) {
                         val outerScoopPath = OsPath.createOrThrow(OsType.WINDOWS, "$path\\kotlin.cmd")
                         val scoopScript = outerScoopPath.readText().lines()
 
                         scoopScript.forEach {
-                            val scoopPath = it.substringBefore("\\bin\\kotlinc.bat").ifBlank { null }
+                            val scoopPath = it.substringBefore("\\bin\\kotlinc.bat", "").ifBlank { null }
 
                             if (scoopPath != null) {
                                 return scoopPath.substringAfter("@rem ").ifEmpty { null }
