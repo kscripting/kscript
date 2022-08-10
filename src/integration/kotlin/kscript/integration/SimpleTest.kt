@@ -1,5 +1,6 @@
 package kscript.integration
 
+import kscript.integration.tools.TestAssertion.contains
 import kscript.integration.tools.TestAssertion.startsWith
 import kscript.integration.tools.TestAssertion.verify
 import org.junit.jupiter.api.Tag
@@ -17,7 +18,7 @@ class SimpleTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Debugging information is printed`() {
-        verify("kscript -d \"println(1+1)\"", 0, "2\n")
+        verify("kscript -d \"println(1+1)\"", 0, "2\n", contains("Debugging information for KScript"))
     }
 
     @Test

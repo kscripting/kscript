@@ -66,9 +66,9 @@ object TestContext {
     }
 
     fun printPaths() {
-        val kscriptPath = ShellUtils.commandPath(osType, "kscript", envMap)
+        val kscriptPath = ShellUtils.commandPaths(osType, "kscript", envMap)
         println("kscript path: $kscriptPath")
-        val kotlincPath = ShellUtils.commandPath(osType, "kotlinc", envMap)
+        val kotlincPath = ShellUtils.commandPaths(osType, "kotlinc", envMap)
         println("kotlinc path: $kotlincPath")
     }
 

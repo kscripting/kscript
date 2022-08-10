@@ -1,18 +1,48 @@
 package kscript.integration.tools
 
-interface TestMatcher {
-    fun matches(string: String): Boolean
-    fun normalize(string: String) = string.replace("\n", TestContext.nl)
+import kscript.app.util.ShellUtils.whitespaceCharsToSymbols
+import kscript.integration.tools.TestContext.nl
+import org.opentest4j.AssertionFailedError
+
+abstract class TestMatcher<T>(protected val expectedValue: T, private val expressionName: String) {
+    abstract fun matches(value: T): Boolean
+
+    fun checkAssertion(assertionName: String, value: T) {
+        if (matches(value)) {
+            return
+        }
+
+        throw AssertionFailedError(
+            "$nl$nl$assertionName: expected that value '${
+                whitespaceCharsToSymbols(value.toString())
+            }' $expressionName '${
+                whitespaceCharsToSymbols(expectedValue.toString())
+            }'$nl$nl"
+        )
+    }
 }
 
-class AnyMatch : TestMatcher {
-    override fun matches(string: String): Boolean = true
+class GenericEquals<T : Any>(expectedValue: T) : TestMatcher<T>(expectedValue, "is equal to") {
+    override fun matches(value: T): Boolean = (value == expectedValue)
 }
 
-class StartsWith(private val expectedString: String, private val ignoreCase: Boolean) : TestMatcher {
-    override fun matches(string: String): Boolean = string.startsWith(normalize(expectedString), ignoreCase)
+class AnyMatch : TestMatcher<String>("", "has any value") {
+    override fun matches(value: String): Boolean = true
 }
 
-class Contains(private val expectedString: String, private val ignoreCase: Boolean) : TestMatcher {
-    override fun matches(string: String): Boolean = string.contains(normalize(expectedString), ignoreCase)
+class Equals(private val expectedString: String, private val ignoreCase: Boolean) :
+    TestMatcher<String>(expectedString, "is equal to") {
+    override fun matches(value: String): Boolean = value.equals(normalize(expectedString), ignoreCase)
 }
+
+class StartsWith(private val expectedString: String, private val ignoreCase: Boolean) :
+    TestMatcher<String>(expectedString, "starts with") {
+    override fun matches(value: String): Boolean = value.startsWith(normalize(expectedString), ignoreCase)
+}
+
+class Contains(private val expectedString: String, private val ignoreCase: Boolean) :
+    TestMatcher<String>(expectedString, "contains") {
+    override fun matches(value: String): Boolean = value.contains(normalize(expectedString), ignoreCase)
+}
+
+private fun normalize(string: String) = string.replace("\n", nl)

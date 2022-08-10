@@ -1,57 +1,36 @@
 package kscript.integration.tools
 
-import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isTrue
 import kscript.app.util.ProcessResult
 import kscript.integration.tools.TestContext.runProcess
 
 object TestAssertion {
+    fun <T : Any> geq(value: T) = GenericEquals(value)
+
     fun any() = AnyMatch()
+    fun eq(string: String, ignoreCase: Boolean = false) = Equals(string, ignoreCase)
     fun startsWith(string: String, ignoreCase: Boolean = false) = StartsWith(string, ignoreCase)
     fun contains(string: String, ignoreCase: Boolean = false) = Contains(string, ignoreCase)
 
-    fun verify(
-        command: String, exitCode: Int = 0, stdOutMatcher: TestMatcher, stdErr: String = ""
-    ): ProcessResult {
-        val processResult = runProcess(command)
+    fun verify(command: String, exitCode: Int = 0, stdOut: TestMatcher<String>, stdErr: String = ""): ProcessResult =
+        verify(command, exitCode, stdOut, eq(stdErr))
 
-        assertThat(processResult.exitCode).isEqualTo(exitCode)
-        assertThat(stdOutMatcher.matches(processResult.stdout)).isTrue()
-        assertThat(processResult.stderr).isEqualTo(stdErr.replace("\n", TestContext.nl))
-        return processResult
-    }
+    fun verify(command: String, exitCode: Int = 0, stdOut: String, stdErr: TestMatcher<String>): ProcessResult =
+        verify(command, exitCode, eq(stdOut), stdErr)
+
+    fun verify(command: String, exitCode: Int = 0, stdOut: String = "", stdErr: String = ""): ProcessResult =
+        verify(command, exitCode, eq(stdOut), eq(stdErr))
 
     fun verify(
-        command: String, exitCode: Int = 0, stdOut: String, stdErrMatcher: TestMatcher
+        command: String, exitCode: Int = 0, stdOut: TestMatcher<String>, stdErr: TestMatcher<String>
     ): ProcessResult {
         val processResult = runProcess(command)
+        val extCde = geq(exitCode)
 
-        assertThat(processResult.exitCode).isEqualTo(exitCode)
-        assertThat(processResult.stdout).isEqualTo(stdOut.replace("\n", TestContext.nl))
-        assertThat(stdErrMatcher.matches(processResult.stderr)).isTrue()
-        return processResult
-    }
+        extCde.checkAssertion("ExitCode", processResult.exitCode)
+        stdOut.checkAssertion("StdOut", processResult.stdout)
+        stdErr.checkAssertion("StdErr", processResult.stderr)
+        println()
 
-    fun verify(
-        command: String, exitCode: Int = 0, stdOutMatcher: TestMatcher, stdErrMatcher: TestMatcher
-    ): ProcessResult {
-        val processResult = runProcess(command)
-
-        assertThat(processResult.exitCode).isEqualTo(exitCode)
-        assertThat(stdOutMatcher.matches(processResult.stdout)).isTrue()
-        assertThat(stdErrMatcher.matches(processResult.stderr)).isTrue()
-        return processResult
-    }
-
-    fun verify(
-        command: String, exitCode: Int = 0, stdOut: String = "", stdErr: String = ""
-    ): ProcessResult {
-        val processResult = runProcess(command)
-
-        assertThat(processResult.exitCode).isEqualTo(exitCode)
-        assertThat(processResult.stdout).isEqualTo(stdOut.replace("\n", TestContext.nl))
-        assertThat(processResult.stderr).isEqualTo(stdErr.replace("\n", TestContext.nl))
         return processResult
     }
 }

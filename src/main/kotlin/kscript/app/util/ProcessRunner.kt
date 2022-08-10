@@ -1,18 +1,17 @@
 package kscript.app.util
 
+import kscript.app.util.ShellUtils.whitespaceCharsToSymbols
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 data class ProcessResult(val command: String, val exitCode: Int, val stdout: String, val stderr: String) {
     override fun toString(): String {
-        return """|Command     : '${normalize(command)}'
+        return """|Command     : '${whitespaceCharsToSymbols(command)}'
                   |Exit Code   : $exitCode   
-                  |Stdout      : '${normalize(stdout)}'
-                  |Stderr      : '${normalize(stderr)}'
+                  |Stdout      : '${whitespaceCharsToSymbols(stdout)}'
+                  |Stderr      : '${whitespaceCharsToSymbols(stderr)}'
                   |""".trimMargin()
     }
-
-    private fun normalize(string: String): String = string.replace("\\", "[bs]").lines().joinToString("[nl]")
 }
 
 class StreamGobbler(
