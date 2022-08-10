@@ -31,7 +31,7 @@ object ShellUtils {
 
             //Default case - Kotlin is installed manually and added to path
             whereKotlinOutput.forEach {
-                val path = it.substringBefore("/bin/kotlinc.bat").ifBlank { null }
+                val path = it.substringBefore("\\bin\\kotlinc.bat").ifBlank { null }
 
                 if (path != null) {
                     return path
