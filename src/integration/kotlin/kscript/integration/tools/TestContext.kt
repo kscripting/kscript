@@ -65,9 +65,11 @@ object TestContext {
         targetFile.setExecutable(true) //Needed if the file is kotlin script
     }
 
-    fun printKscriptPath() {
+    fun printPaths() {
         val kscriptPath = ShellUtils.commandPath(osType, "kscript", envMap)
         println("kscript path: $kscriptPath")
+        val kotlincPath = ShellUtils.commandPath(osType, "kotlinc", envMap)
+        println("kotlinc path: $kotlincPath")
     }
 
     fun clearCache() {

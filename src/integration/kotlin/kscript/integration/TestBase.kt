@@ -9,7 +9,8 @@ interface TestBase {
         @JvmStatic
         fun setUp() {
             TestContext.clearCache()
-            TestContext.printKscriptPath()
+            TestContext.printPaths()
+            println("[nl] - new line; [bs] - backspace")
         }
     }
 }

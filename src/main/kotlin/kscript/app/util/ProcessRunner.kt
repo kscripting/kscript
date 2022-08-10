@@ -12,7 +12,7 @@ data class ProcessResult(val command: String, val exitCode: Int, val stdout: Str
                   |""".trimMargin()
     }
 
-    private fun normalize(string: String): String = string.lines().joinToString("[nl]")
+    private fun normalize(string: String): String = string.replace("\\", "[bs]").lines().joinToString("[nl]")
 }
 
 class StreamGobbler(
