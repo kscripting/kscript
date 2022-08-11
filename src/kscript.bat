@@ -6,12 +6,10 @@ set JAR_PATH=%ABS_KSCRIPT_PATH:~0,-4%.jar
 
 set COMMAND=kotlin -classpath %JAR_PATH% kscript.app.KscriptKt windows %*
 
-set RESULT=1
-set RESULT=
-set ERRORLEVEL=1
+set STDOUT=
 set ERRORLEVEL=
 
-for /f "tokens=* USEBACKQ" %%o in (`%COMMAND%`) do set RESULT=%%o
+for /f "tokens=* USEBACKQ" %%o in (`%COMMAND%`) do set STDOUT=%%o
 
 rem https://stackoverflow.com/questions/10935693/foolproof-way-to-check-for-nonzero-error-return-code-in-windows-batch-file/10936093#10936093
 if ERRORLEVEL 1 (
@@ -19,10 +17,10 @@ if ERRORLEVEL 1 (
     exit /b %ERRORLEVEL%
 )
 
-if not defined RESULT (
+if not defined STDOUT (
     exit /b %ERRORLEVEL%
 )
 
-%RESULT%
+%STDOUT%
 
 exit /b %ERRORLEVEL%

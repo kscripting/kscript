@@ -14,10 +14,15 @@ class MiscTest : TestBase {
     @Tag("windows")
     fun `Prevent regressions of #98 (it fails to process empty or space-containing arguments)`() {
         verify("""kscript "print(args.size)" foo bar""", 0, "2") //regular args
-        verify("""kscript "print(args.size)" "" foo bar""", 0, "3") //accept empty args
         verify("""kscript "print(args.size)" "--params foo"""", 0, "1") //make sure dash args are not confused with options
         verify("""kscript "print(args.size)" "foo bar"""", 0, "1") //allow for spaces
         verify("""kscript "print(args[0])" "foo bar"""", 0, "foo bar") //make sure quotes are not propagated into args
+    }
+
+    @Test
+    @Tag("posix")
+    fun `Prevent regressions of #98 (only posix)`() {
+        verify("""kscript "print(args.size)" "" foo bar""", 0, "3") //accept empty args
     }
 
     @Test

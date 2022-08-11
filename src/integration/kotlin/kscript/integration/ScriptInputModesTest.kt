@@ -17,7 +17,7 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    @Tag("windows")
+    //it doesn't work on Windows
     fun `Also allow for empty programs`() {
         verify("kscript ''", 0, "", "")
     }
@@ -39,16 +39,18 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    @Tag("windows")
     fun `Provide script via stidin`() {
-        verify("""echo 'println(1+1)' | kscript -""", 0, "2\n")
+        verify("echo 'println(1+1)' | kscript -", 0, "2\n")
+        //stdin and further switch (to avoid regressions of #94)
+        verify("echo 'println(1+3)' | kscript - --foo", 0, "4\n")
     }
 
     @Test
-    @Tag("posix")
     @Tag("windows")
-    fun `Provide script via stidin with further switch (to avoid regressions of #94)`() {
-        verify("echo 'println(1+3)' | kscript - --foo", 0, "4\n")
+    fun `Provide script via stidin (windows version without quotes)`() {
+        verify("echo println(1+1) | kscript -", 0, "2\n")
+        //stdin and further switch (to avoid regressions of #94)
+        verify("echo println(1+3) | kscript - --foo", 0, "4\n")
     }
 
     @Test

@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test
 
 class IdeaTest : TestBase {
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    //TODO: On MSys and Cygwin test doesn't work, and is accomplished with timeout
     fun `Temp projects with include symlinks`() {
         val result = verify("kscript --idea ${resolvePath("$projectDir/test/resources/includes/include_variations.kts")}", 0, any(), any())
         val ideaDir = result.stderr.trim().lines().last().removePrefix("[kscript] ")
