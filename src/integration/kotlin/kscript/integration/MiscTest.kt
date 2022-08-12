@@ -41,7 +41,10 @@ class MiscTest : TestBase {
     }
 
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    @Tag("msys")
+    //TODO: @Tag("cygwin") - doesn't work on cygwin
     fun `Prevent regression of #185`() {
         verify("source $projectDir/test/resources/home_dir_include.sh $testDir", 0, "42\n")
     }
