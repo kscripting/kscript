@@ -33,7 +33,8 @@ class KtSupportTest : TestBase {
     }
 
     @Test
-    @Tag("cygwin")
+    @Tag("posix")
+    @Tag("windows")
     fun `Test misc entry point with or without package configurations`() {
         verify("kscript ${resolvePath("$projectDir/test/resources/kt_tests/custom_entry_nopckg.kt")}", 0, "foo companion was called\n")
         verify("kscript ${resolvePath("$projectDir/test/resources/kt_tests/custom_entry_withpckg.kt")}", 0, "foo companion was called\n")

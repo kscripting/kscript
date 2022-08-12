@@ -14,6 +14,7 @@ class MiscTest : TestBase {
     @Tag("macos")
     @Tag("msys")
     @Tag("windows")
+    //TODO: Additional new lines are in stdout for cygwin
     fun `Prevent regressions of #98 (no cygwin)`() {
         verify("""kscript "print(args[0])" "foo bar"""", 0, "foo bar") //make sure quotes are not propagated into args
     }
