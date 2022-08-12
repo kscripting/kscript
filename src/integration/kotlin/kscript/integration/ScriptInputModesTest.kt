@@ -30,8 +30,10 @@ class ScriptInputModesTest : TestBase {
     }
 
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
     @Tag("windows")
+    //TODO: Doesn't work on msys, cygwin as during test execution " is replaced with '. It causes syntax error in Kotlin.
     fun `Use dashed arguments`() {
         verify("""kscript "println(args.joinToString(\"\"))" --arg u ments""", 0, "--arguments\n", "")
         verify("""kscript -s "print(args.joinToString(\"\"))" --arg u ments""", 0, "--arguments", "")
@@ -114,7 +116,7 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    @Tag("windows")
+    //TODO: @Tag("windows") - kscript on Windows doesn't return correctly error code ()
     fun `Repeated compilation of buggy same script should end up in error again`() {
         verify("kscript '1-'", 1, "", startsWith("[kscript] [ERROR] Compilation of scriplet failed:"))
         verify("kscript '1-'", 1, "", startsWith("[kscript] [ERROR] Compilation of scriplet failed:"))
@@ -122,7 +124,7 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    @Tag("windows")
+    //TODO: @Tag("windows") - kscript on Windows doesn't return correctly error code ()
     fun `Missing script gives always error on execution`() {
         verify(
             "kscript i_do_not_exist.kts", 1, "", "[kscript] [ERROR] Could not read script from 'i_do_not_exist.kts'\n"

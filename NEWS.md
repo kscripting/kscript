@@ -12,8 +12,12 @@ Breaking changes
 Enhancements
 
 * Windows support and proper Cygwin and MSys support
+* Multiplatform tests for different OS-es on Github
+* Ability to use configuration file for kscript (thanks to [meztihn](https://github.com/meztihn)) 
+* kscript follows XDG Spec (Issue #323) (thanks to [meztihn](https://github.com/meztihn))
+* Packaging scripts works again (thanks to [Vsajip](https://github.com/vsajip))
 * When creating IntelliJ project 'gradle' and 'idea' do not have to be in path
-* Packaging fixes (thanks for help to [Vsajip](https://github.com/vsajip))
+* Integration tests rewritten from bash to JUnit
 
 Bugfixes
 * Fix for dependency resolution

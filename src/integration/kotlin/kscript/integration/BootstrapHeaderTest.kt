@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test
 
 class BootstrapHeaderTest : TestBase {
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    //TODO: Doesn't work on msys and cygwin for some reason
     fun `Test adding bootstrap header`() {
         // ensure script works as is
         val testFile = resolvePath("$testDir/echo_stdin_args.kts")

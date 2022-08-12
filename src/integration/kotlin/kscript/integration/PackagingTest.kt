@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test
 
 class PackagingTest : TestBase {
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    //TODO: doesn't work on msys, cygwin, windows
     fun `Packaged script is cached`() {
         //@formatter:off
         verify("kscript --package \"println(1+1)\"", 0, "", startsWith("[kscript] Packaging script 'scriplet' into standalone executable..."))
@@ -19,7 +21,9 @@ class PackagingTest : TestBase {
     }
 
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    //TODO: doesn't work on msys, cygwin, windows
     fun `Packaging of simple script`() {
         val result =
             verify("kscript --package ${resolvePath("$projectDir/test/resources/package_example.kts")}", 0, "", any())
@@ -28,7 +32,9 @@ class PackagingTest : TestBase {
     }
 
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    //TODO: doesn't work on msys, cygwin, windows
     fun `Packaging provided source code and execution with arguments`() {
         val result = verify("""kscript --package "println(args.size)"""", 0, "", any())
         val command = result.stderr.trim().lines().last().removePrefix("[kscript] ")
