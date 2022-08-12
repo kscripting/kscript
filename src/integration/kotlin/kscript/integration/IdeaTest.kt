@@ -20,7 +20,9 @@ class IdeaTest : TestBase {
     }
 
     @Test
-    @Tag("posix")
+    @Tag("linux")
+    @Tag("macos")
+    //TODO: On MSys and Cygwin test doesn't work, and is accomplished with timeout
     fun `Support diamond-shaped include schemes (see #133)`() {
         val result = verify("kscript --idea ${resolvePath("$projectDir/test/resources/includes/diamond.kts")}", 0, any(), any())
         val ideaDir = result.stderr.trim().lines().last().removePrefix("[kscript] ")

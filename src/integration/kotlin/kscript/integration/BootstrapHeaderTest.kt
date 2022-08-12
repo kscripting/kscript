@@ -4,6 +4,7 @@ import kscript.integration.tools.TestAssertion.contains
 import kscript.integration.tools.TestAssertion.startsWith
 import kscript.integration.tools.TestAssertion.verify
 import kscript.integration.tools.TestContext.copyToTestPath
+import kscript.integration.tools.TestContext.resolvePath
 import kscript.integration.tools.TestContext.testDir
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -13,7 +14,7 @@ class BootstrapHeaderTest : TestBase {
     @Tag("posix")
     fun `Test adding bootstrap header`() {
         // ensure script works as is
-        val testFile = "$testDir/echo_stdin_args.kts"
+        val testFile = resolvePath("$testDir/echo_stdin_args.kts")
         verify("echo stdin | '$testFile' --foo bar", 0, "stdin | script --foo bar\n")
 
         // add bootstrap header
