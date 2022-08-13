@@ -17,7 +17,7 @@ value class CompilerOpt(val value: String) : ScriptAnnotation
 @JvmInline
 value class Entry(val value: String) : ScriptAnnotation
 
-data class Deprecated(val file: String, val line: Int, val message: String) : ScriptAnnotation
+data class Deprecated(val location: Location, val line: Int, val message: String) : ScriptAnnotation
 
 data class Repository(val id: String, val url: String, val user: String = "", val password: String = "") : ScriptAnnotation
 

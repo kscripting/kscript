@@ -1,6 +1,7 @@
 package kscript.app.parser
 
 import kscript.app.model.Code
+import kscript.app.model.Location
 import kscript.app.model.Section
 
 class Parser {
@@ -16,26 +17,26 @@ class Parser {
         LineParser::parsePackage,
     )
 
-    fun parse(string: String): List<Section> {
+    fun parse(location: Location, string: String): List<Section> {
         val codeTextAsLines = string.lines()
 
         val sections = mutableListOf<Section>()
 
-        for (line in codeTextAsLines) {
-            val section = parseLine(line)
+        for (line in codeTextAsLines.withIndex()) {
+            val section = parseLine(location, line.index, line.value)
             sections += section
         }
         return sections
     }
 
-    private fun parseLine(line: String): Section {
+    private fun parseLine(location: Location, line: Int, text: String): Section {
         for (parser in annotationParsers) {
-            val parsedAnnotations = parser(line)
+            val parsedAnnotations = parser(location, line, text)
 
             if (parsedAnnotations.isNotEmpty()) {
-                return Section(line, parsedAnnotations)
+                return Section(text, parsedAnnotations)
             }
         }
-        return Section(line, listOf(Code))
+        return Section(text, listOf(Code))
     }
 }

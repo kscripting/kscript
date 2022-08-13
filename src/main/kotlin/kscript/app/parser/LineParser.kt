@@ -1,28 +1,36 @@
 package kscript.app.parser
 
 import kscript.app.model.*
+import kscript.app.model.Deprecated
 
-
+@Suppress("UNUSED_PARAMETER")
 object LineParser {
+    private val annotationStartingWithCommentError = "Annotation starting with comment are deprecated:"
     private val sheBang = listOf(SheBang)
 
-    fun parseSheBang(line: String): List<ScriptAnnotation> {
-        if (line.startsWith("#!/")) {
+    fun parseSheBang(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+        if (text.startsWith("#!/")) {
             return sheBang
         }
         return emptyList()
     }
 
-    fun parseInclude(line: String): List<ScriptAnnotation> {
+    fun parseInclude(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val fileInclude = "@file:Include"
         val include = "//INCLUDE "
 
-        line.trim().let {
+        text.trim().let {
             return when {
                 it.startsWith(fileInclude) -> listOf(
                     Include(extractQuotedValueInParenthesis(it.substring(fileInclude.length)))
                 )
-                it.startsWith(include) -> listOf(Include(extractValue(it.substring(include.length))))
+
+                it.startsWith(include) -> listOf(
+                    Include(extractValue(it.substring(include.length))), Deprecated(
+                        location, line, "$annotationStartingWithCommentError\n$text"
+                    )
+                )
+
                 else -> emptyList()
             }
         }
@@ -36,12 +44,12 @@ object LineParser {
         return dependency
     }
 
-    fun parseDependency(line: String): List<ScriptAnnotation> {
+    fun parseDependency(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val fileDependsOn = "@file:DependsOn"
         val fileDependsOnMaven = "@file:DependsOnMaven"
         val depends = "//DEPS "
 
-        line.trim().let { s ->
+        text.trim().let { s ->
             val dependencies = when {
                 s.startsWith(fileDependsOnMaven) -> extractQuotedValuesInParenthesis(s.substring(fileDependsOnMaven.length))
                 s.startsWith(fileDependsOn) -> extractQuotedValuesInParenthesis(s.substring(fileDependsOn.length))
@@ -56,33 +64,33 @@ object LineParser {
         }
     }
 
-    fun parseEntry(line: String): List<ScriptAnnotation> {
+    fun parseEntry(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val fileEntry = "@file:EntryPoint"
         val entry = "//ENTRY "
 
-        line.trim().let {
+        text.trim().let {
             return when {
                 it.startsWith(fileEntry) -> listOf(
                     Entry(extractQuotedValueInParenthesis(it.substring(fileEntry.length)))
                 )
+
                 it.startsWith(entry) -> listOf(Entry(extractValue(it.substring(entry.length))))
                 else -> emptyList()
             }
         }
     }
 
-    fun parseRepository(line: String): List<ScriptAnnotation> {
+    fun parseRepository(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         //Format:
         // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/")
         // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/", user="user", password="pass")
 
         val fileMavenRepository = "@file:MavenRepository"
 
-        line.trim().let {
+        text.trim().let {
             return when {
                 it.startsWith(fileMavenRepository) -> {
                     val value = it.substring(fileMavenRepository.length).substringBeforeLast(")")
-
 
                     val repository = value.split(",").map { it.trim(' ', '"', '(') }.let { annotationParams ->
                         val keyValSep = "[ ]*=[ ]*\"".toRegex()
@@ -106,16 +114,17 @@ object LineParser {
                     }
                     return listOf(repository)
                 }
+
                 else -> emptyList()
             }
         }
     }
 
-    fun parseKotlinOpts(line: String): List<ScriptAnnotation> {
+    fun parseKotlinOpts(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val fileKotlinOpts = "@file:KotlinOpts"
         val kotlinOpts = "//KOTLIN_OPTS "
 
-        line.trim().let {
+        text.trim().let {
             return when {
                 it.startsWith(fileKotlinOpts) -> extractQuotedValuesInParenthesis(it.substring(fileKotlinOpts.length)).map {
                     KotlinOpt(it)
@@ -127,11 +136,11 @@ object LineParser {
         }
     }
 
-    fun parseCompilerOpts(line: String): List<ScriptAnnotation> {
+    fun parseCompilerOpts(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val fileCompilerOpts = "@file:CompilerOpts"
         val compilerOpts = "//COMPILER_OPTS "
 
-        line.trim().let {
+        text.trim().let {
             return when {
                 it.startsWith(fileCompilerOpts) -> extractQuotedValuesInParenthesis(it.substring(fileCompilerOpts.length)).map {
                     CompilerOpt(it)
@@ -140,15 +149,16 @@ object LineParser {
                 it.startsWith(compilerOpts) -> extractValues(it.substring(compilerOpts.length)).map {
                     CompilerOpt(it)
                 }
+
                 else -> emptyList()
             }
         }
     }
 
-    fun parsePackage(line: String): List<ScriptAnnotation> {
+    fun parsePackage(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val packagePrefix = "package "
 
-        line.trim().let {
+        text.trim().let {
             if (it.startsWith(packagePrefix)) {
                 return listOf(PackageName(it.substring(packagePrefix.length)))
             }
@@ -156,10 +166,10 @@ object LineParser {
         }
     }
 
-    fun parseImport(line: String): List<ScriptAnnotation> {
+    fun parseImport(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         val importPrefix = "import "
 
-        line.trim().let {
+        text.trim().let {
             if (it.startsWith(importPrefix)) {
                 return listOf(ImportName(it.substring(importPrefix.length)))
             }

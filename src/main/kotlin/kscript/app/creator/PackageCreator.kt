@@ -11,7 +11,7 @@ import kscript.app.shell.toNativeFile
 
 class PackageCreator(private val executor: Executor) {
     fun packageKscript(basePath: OsPath, packageFile: OsPath, script: Script, jarArtifact: JarArtifact): OsPath {
-        infoMsg("Packaging script '${script.scriptName}' into standalone executable...")
+        infoMsg("Packaging script '${script.location.scriptName}' into standalone executable...")
 
         FileUtils.createFile(basePath.resolve("exec_header.sh"), Templates.createExecuteHeader(script.kotlinOpts))
         FileUtils.createFile(

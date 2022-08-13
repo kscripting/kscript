@@ -10,12 +10,9 @@ class GradleTemplatesTest {
 
     @Test
     fun `Create Idea script without any Gradle additions`() {
+        val location = Location(0, ScriptSource.HTTP, ScriptType.KT, null, URI("."), "script")
         val script = Script(
-            scriptSource = ScriptSource.HTTP,
-            scriptType = ScriptType.KT,
-            sourceUri = null,
-            sourceContextUri = URI("."),
-            scriptName = "script",
+            location = location,
             resolvedCode = "code",
             packageName = PackageName("package"),
             entryPoint = null,
@@ -26,7 +23,8 @@ class GradleTemplatesTest {
             kotlinOpts = setOf(),
             compilerOpts = setOf(),
             scriptNodes = setOf(),
-            rootNode = ScriptNode(0, ScriptSource.HTTP, ScriptType.KT, null, URI("."), "script.kt", listOf()),
+            deprecated = setOf(),
+            rootNode = ScriptNode(location, listOf()),
             digest = "w4r53453"
         )
 
@@ -60,12 +58,9 @@ class GradleTemplatesTest {
 
     @Test
     fun `Create Idea script with all Gradle additions`() {
+        val location = Location(0, ScriptSource.HTTP, ScriptType.KT, null, URI("."), "script")
         val script = Script(
-            scriptSource = ScriptSource.HTTP,
-            scriptType = ScriptType.KT,
-            sourceUri = null,
-            sourceContextUri = URI("."),
-            scriptName = "script",
+            location = location,
             resolvedCode = "code",
             packageName = PackageName("package"),
             entryPoint = null,
@@ -76,7 +71,8 @@ class GradleTemplatesTest {
             kotlinOpts = setOf(KotlinOpt("-J-Xmx5g"), KotlinOpt("-J-server")),
             compilerOpts = setOf(CompilerOpt("-progressive"), CompilerOpt("-verbose"), CompilerOpt("-jvm-target 1.8")),
             scriptNodes = setOf(),
-            rootNode = ScriptNode(0, ScriptSource.HTTP, ScriptType.KT, null, URI("."), "script.kt", listOf()),
+            deprecated = setOf(),
+            rootNode = ScriptNode(location, listOf()),
             digest = "w4r53453"
         )
 

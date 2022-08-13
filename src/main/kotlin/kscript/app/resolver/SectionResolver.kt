@@ -1,8 +1,8 @@
 package kscript.app.resolver
 
 import kscript.app.model.*
+import kscript.app.model.Deprecated
 import kscript.app.parser.Parser
-import kscript.app.util.ScriptUtils
 import kscript.app.util.UriUtils
 import java.net.URI
 
@@ -12,14 +12,13 @@ class SectionResolver(
     private val scriptingConfig: ScriptingConfig
 ) {
     fun resolve(
+        location: Location,
         scriptText: String,
-        includeContext: URI,
         allowLocalReferences: Boolean,
-        currentLevel: Int,
         maxResolutionLevel: Int,
         resolutionContext: ResolutionContext
     ): List<Section> {
-        val sections = parser.parse(scriptText)
+        val sections = parser.parse(location, scriptText)
         val resultingSections = mutableListOf<Section>()
 
         for (section in sections) {
@@ -28,9 +27,9 @@ class SectionResolver(
             for (annotation in section.scriptAnnotations) {
                 resultingScriptAnnotations += resolveAnnotation(
                     annotation,
-                    includeContext,
+                    location.sourceContextUri,
                     allowLocalReferences,
-                    currentLevel,
+                    location.level,
                     maxResolutionLevel,
                     resolutionContext
                 )
@@ -73,24 +72,19 @@ class SectionResolver(
 
                     val content = inputOutputResolver.resolveContent(uri)
 
+                    val location = Location(
+                        currentLevel + 1, scriptSource, content.scriptType, uri, content.contextUri, content.fileName
+                    )
+
                     val newSections = resolve(
+                        location,
                         content.text,
-                        content.contextUri,
                         allowLocalReferences && scriptSource == ScriptSource.FILE,
-                        currentLevel + 1,
                         maxResolutionLevel,
                         resolutionContext
                     )
 
-                    val scriptNode = ScriptNode(
-                        currentLevel + 1,
-                        scriptSource,
-                        content.scriptType,
-                        uri,
-                        content.contextUri,
-                        content.fileName,
-                        newSections
-                    )
+                    val scriptNode = ScriptNode(location, newSections)
 
                     resolutionContext.scriptNodes.add(scriptNode)
                     resolvedScriptAnnotations += scriptNode
@@ -149,6 +143,10 @@ class SectionResolver(
 
                 resolutionContext.repositories.add(repository)
                 resolvedScriptAnnotations += repository
+            }
+
+            is Deprecated -> {
+                resolutionContext.deprecated.add(scriptAnnotation)
             }
         }
 

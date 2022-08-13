@@ -15,18 +15,20 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.net.URI
 import java.util.stream.Stream
 
 class LineParserTest {
+    private val location = Location(0, ScriptSource.HTTP, ScriptType.KT, URI("http://example/test.kt"), URI("http://example/"), "test")
     @Test
     fun `Import parsing`() {
-        assertThat(parseImport("import com.script.test1")).containsExactlyInAnyOrder(ImportName("com.script.test1"))
-        assertThat(parseImport("      import com.script.test2            ")).containsExactlyInAnyOrder(ImportName("com.script.test2"))
+        assertThat(parseImport(location, 1, "import com.script.test1")).containsExactlyInAnyOrder(ImportName("com.script.test1"))
+        assertThat(parseImport(location, 1, "      import com.script.test2            ")).containsExactlyInAnyOrder(ImportName("com.script.test2"))
     }
 
     @Test
     fun `Repository parsing`() {
-        assertThat(parseRepository("@file:MavenRepository(\"imagej-releases\",\"http://maven.imagej.net/content/repositories/releases\" )")).containsExactlyInAnyOrder(
+        assertThat(parseRepository(location, 1, "@file:MavenRepository(\"imagej-releases\",\"http://maven.imagej.net/content/repositories/releases\" )")).containsExactlyInAnyOrder(
             Repository("imagej-releases", "http://maven.imagej.net/content/repositories/releases")
         )
     }
@@ -47,7 +49,7 @@ class LineParserTest {
             "    //DEPS $listWithoutQuotesStrangelyFormatted",
         )) {
             println("Case: '$line'")
-            assertThat(parseDependency(line)).containsExactlyInAnyOrder(*list.map { Dependency(it.trim()) }
+            assertThat(parseDependency(location, 1, line)).containsExactlyInAnyOrder(*list.map { Dependency(it.trim()) }
                 .toTypedArray())
         }
     }
@@ -64,7 +66,7 @@ class LineParserTest {
             "      @file:DependsOnMaven($listWithQuotes)    ",
         )) {
             println("Case: '$line'")
-            assertThat(parseDependency(line)).containsExactlyInAnyOrder(*list.map { Dependency(it) }.toTypedArray())
+            assertThat(parseDependency(location, 1, line)).containsExactlyInAnyOrder(*list.map { Dependency(it) }.toTypedArray())
         }
     }
 
@@ -83,13 +85,13 @@ class LineParserTest {
             "    //DEPS $listWithoutQuotes",
         )) {
             println("Case: '$line'")
-            assertThat { parseDependency(line) }.isFailure().messageContains(message)
+            assertThat { parseDependency(location, 1, line) }.isFailure().messageContains(message)
         }
     }
 
     @Test
     fun `Dependency parsing - invalid quoting`() {
-        assertThat { parseDependency("@file:DependsOn(\"com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0\") //Comment") }.isFailure()
+        assertThat { parseDependency(location, 1, "@file:DependsOn(\"com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0\") //Comment") }.isFailure()
             .messageContains("Artifact locators must be provided as separate annotation arguments and not as comma-separated list")
     }
 
@@ -97,21 +99,21 @@ class LineParserTest {
     @MethodSource("repositories")
     fun `Repository parsing`(line: String, repository: Repository) {
         println("Repository: '$line'")
-        assertThat(parseRepository(line)).containsExactly(repository)
+        assertThat(parseRepository(location, 1, line)).containsExactly(repository)
     }
 
     @ParameterizedTest
     @MethodSource("kotlinOpts")
     fun `Kotlin options parsing`(line: String, kotlinOpts: List<KotlinOpt>) {
         println("KotlinOpts: '$line'")
-        assertThat(parseKotlinOpts(line)).containsExactlyInAnyOrder(*kotlinOpts.toTypedArray())
+        assertThat(parseKotlinOpts(location, 1, line)).containsExactlyInAnyOrder(*kotlinOpts.toTypedArray())
     }
 
     @ParameterizedTest
     @MethodSource("entryPoint")
     fun `Entry point parsing`(line: String, entry: String) {
         println("Entry point: '$line'")
-        assertThat(parseEntry(line)).containsExactlyInAnyOrder(Entry(entry))
+        assertThat(parseEntry(location, 1, line)).containsExactlyInAnyOrder(Entry(entry))
     }
 
     companion object {

@@ -2,9 +2,9 @@ package kscript.app.resolver
 
 import kscript.app.model.*
 import kscript.app.parser.LineParser.extractValues
+import kscript.app.shell.leaf
 import kscript.app.util.ScriptUtils
 import kscript.app.util.UriUtils
-import kscript.app.shell.leaf
 import java.net.URI
 
 class ScriptResolver(
@@ -27,15 +27,18 @@ class ScriptResolver(
             val scriptText = ScriptUtils.prependPreambles(preambles, generateSequence { readLine() }.joinToString("\n"))
             val scriptType = ScriptUtils.resolveScriptType(scriptText)
 
+            val location =
+                Location(
+                    0,
+                    ScriptSource.STD_INPUT,
+                    scriptType,
+                    null,
+                    inputOutputResolver.resolveCurrentDir(),
+                    scripletName
+                )
+
             return createScript(
-                ScriptSource.STD_INPUT,
-                scriptType,
-                null,
-                inputOutputResolver.resolveCurrentDir(),
-                scripletName,
-                scriptText,
-                true,
-                maxResolutionLevel
+                location, scriptText, true, maxResolutionLevel
             )
         }
 
@@ -44,15 +47,11 @@ class ScriptResolver(
             val content = inputOutputResolver.resolveContent(URI(string))
             val scriptText = ScriptUtils.prependPreambles(preambles, content.text)
 
+            val location =
+                Location(0, ScriptSource.HTTP, content.scriptType, content.uri, content.contextUri, content.fileName)
+
             return createScript(
-                ScriptSource.HTTP,
-                content.scriptType,
-                content.uri,
-                content.contextUri,
-                content.fileName,
-                scriptText,
-                false,
-                maxResolutionLevel
+                location, scriptText, false, maxResolutionLevel
             )
         }
 
@@ -67,15 +66,18 @@ class ScriptResolver(
                     val content = inputOutputResolver.resolveContent(filePath)
                     val scriptText = ScriptUtils.prependPreambles(preambles, content.text)
 
+                    val location =
+                        Location(
+                            0,
+                            ScriptSource.FILE,
+                            content.scriptType,
+                            content.uri,
+                            content.contextUri,
+                            content.fileName
+                        )
+
                     return createScript(
-                        ScriptSource.FILE,
-                        content.scriptType,
-                        content.uri,
-                        content.contextUri,
-                        content.fileName,
-                        scriptText,
-                        true,
-                        maxResolutionLevel
+                        location, scriptText, true, maxResolutionLevel
                     )
                 }
 
@@ -84,15 +86,18 @@ class ScriptResolver(
                 val content = inputOutputResolver.resolveContentUsingInputStream(filePath)
                 val scriptText = ScriptUtils.prependPreambles(preambles, content.text)
 
+                val location =
+                    Location(
+                        0,
+                        ScriptSource.OTHER_FILE,
+                        content.scriptType,
+                        content.uri,
+                        content.contextUri,
+                        scripletName
+                    )
+
                 return createScript(
-                    ScriptSource.OTHER_FILE,
-                    content.scriptType,
-                    content.uri,
-                    content.contextUri,
-                    scripletName,
-                    scriptText,
-                    true,
-                    maxResolutionLevel
+                    location, scriptText, true, maxResolutionLevel
                 )
             }
 
@@ -105,12 +110,11 @@ class ScriptResolver(
         val scriptText = ScriptUtils.prependPreambles(preambles, string)
         val scriptType = ScriptUtils.resolveScriptType(scriptText)
 
+        val location =
+            Location(0, ScriptSource.PARAMETER, scriptType, null, inputOutputResolver.resolveCurrentDir(), scripletName)
+
         return createScript(
-            ScriptSource.PARAMETER,
-            scriptType,
-            null,
-            inputOutputResolver.resolveCurrentDir(),
-            scripletName,
+            location,
             scriptText,
             true,
             maxResolutionLevel
@@ -118,22 +122,13 @@ class ScriptResolver(
     }
 
     private fun createScript(
-        scriptSource: ScriptSource,
-        scriptType: ScriptType,
-        sourceUri: URI?,
-        sourceContextUri: URI,
-        scriptName: String,
-        scriptText: String,
-        allowLocalReferences: Boolean,
-        maxResolutionLevel: Int
+        location: Location, scriptText: String, allowLocalReferences: Boolean, maxResolutionLevel: Int
     ): Script {
-        val level = 0
         val resolutionContext = ResolutionContext()
-        val sections = sectionResolver.resolve(
-            scriptText, sourceContextUri, allowLocalReferences, level, maxResolutionLevel, resolutionContext
-        )
+        val sections =
+            sectionResolver.resolve(location, scriptText, allowLocalReferences, maxResolutionLevel, resolutionContext)
 
-        val scriptNode = ScriptNode(level, scriptSource, scriptType, sourceUri, sourceContextUri, scriptName, sections)
+        val scriptNode = ScriptNode(location, sections)
         resolutionContext.scriptNodes.add(scriptNode)
         resolutionContext.packageName = resolutionContext.packageName ?: PackageName("kscript.scriplet")
 
@@ -148,11 +143,7 @@ class ScriptResolver(
         val digest = ScriptUtils.calculateHash(code, resolutionContext)
 
         return Script(
-            scriptSource,
-            scriptType,
-            sourceUri,
-            sourceContextUri,
-            scriptName,
+            location,
             code,
             resolutionContext.packageName!!,
             resolutionContext.entryPoint,
@@ -162,6 +153,7 @@ class ScriptResolver(
             resolutionContext.repositories,
             resolutionContext.kotlinOpts,
             resolutionContext.compilerOpts,
+            resolutionContext.deprecated,
             resolutionContext.scriptNodes,
             scriptNode,
             digest

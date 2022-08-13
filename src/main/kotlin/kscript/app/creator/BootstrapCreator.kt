@@ -8,7 +8,7 @@ import java.io.File
 
 class BootstrapCreator {
     fun create(script: Script) {
-        if (script.scriptSource != ScriptSource.FILE) {
+        if (script.location.scriptSource != ScriptSource.FILE) {
             throw IllegalStateException("Can not add bootstrap header to resources, which are not regular Kotlin files.")
         }
 
@@ -24,7 +24,7 @@ class BootstrapCreator {
             throw IllegalStateException("Bootstrap header already detected:\n\n$preexistingHeader\n\nYou can remove it to force the re-generation")
         }
 
-        File(script.sourceUri!!).writeText((bootstrapHeader + scriptLines).joinToString("\n"))
-        Logger.infoMsg("${script.sourceUri} updated")
+        File(script.location.sourceUri!!).writeText((bootstrapHeader + scriptLines).joinToString("\n"))
+        Logger.infoMsg("${script.location.sourceUri} updated")
     }
 }

@@ -16,8 +16,8 @@ class IdeaProjectCreator {
         val srcPath = basePath.resolve("src/")
 
         for (scriptNode in script.scriptNodes) {
-            val sourceUri = scriptNode.sourceUri
-            val filePath = resolveUniqueFilePath(srcPath, scriptNode.scriptName, scriptNode.scriptType)
+            val sourceUri = scriptNode.location.sourceUri
+            val filePath = resolveUniqueFilePath(srcPath, scriptNode.location.scriptName, scriptNode.location.scriptType)
 
             if (sourceUri == null) {
                 FileUtils.createFile(filePath, scriptNode.sections.joinToString("\n") { it.code })
@@ -31,7 +31,7 @@ class IdeaProjectCreator {
 
         FileUtils.createFile(
             basePath.resolve(".idea/runConfigurations/Main.xml"),
-            Templates.createRunConfig(script.rootNode.scriptName, script.rootNode.scriptType, userArgs)
+            Templates.createRunConfig(script.rootNode.location.scriptName, script.rootNode.location.scriptType, userArgs)
         )
 
         FileUtils.createFile(
