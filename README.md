@@ -6,7 +6,7 @@
 
 Enhanced scripting support for [Kotlin](https://kotlinlang.org/) on *nix-based systems.
 
-Kotlin has some built-in support for scripting already but it is not yet feature-rich enough to be a viable alternative
+Kotlin has some built-in support for scripting already, but it is not yet feature-rich enough to be a viable alternative
 in the shell.
 
 In particular this wrapper around `kotlinc` adds
@@ -44,6 +44,7 @@ kotlin scripting interpreter.
 - [Boostrap IDEA from a `kscript`let](#boostrap-idea-from-a-kscriptlet)
 - [Deploy scripts as standalone binaries](#deploy-scripts-as-standalone-binaries)
 - [Embed kscript installer within your script](#embed-kscript-installer-within-your-script)
+- [KScript configuration file](#kscript-configuration-file)
 - [FAQ](#faq)
 - [Support](#support)
 - [How to contribute?](#how-to-contribute)
@@ -89,7 +90,7 @@ docker run -i holgerbrandl/kscript 'println("Hello, world!")'
 docker run -i holgerbrandl/kscript:2.9.3 'println("Hello, world!")'
 ```
 
-To use a script file outside of the container as input, you could do
+To use a script file outside the container as input, you could do
 
 ```bash
 docker run -i holgerbrandl/kscript - < script.kts
@@ -104,7 +105,7 @@ instance [bind mounts](https://docs.docker.com/storage/bind-mounts/).
 
 #### Installation without `sdkman`
 
-If you have Kotlin already and you would like to install the latest `kscript` release without using `sdkman`
+If you have Kotlin already, and you would like to install the latest `kscript` release without using `sdkman`
 you can do so by unzipping the [latest ](https://github.com/holgerbrandl/kscript/releases/latest) binary release. Don't forget to update your `$PATH` accordingly.
 
 #### Installation with Homebrew
@@ -525,7 +526,7 @@ Embed kscript installer within your script
 
 To make a script automatically [install kscript](#installation) and its dependencies on first run if necessary, run:
 
- ```bash
+```bash
 kscript --add-bootstrap-header some_script.kts
 ```
 
@@ -539,6 +540,49 @@ scripts.
 On the other hand this doesn't embed dependencies within the script("fat jar"), so internet connection may be required
 on its first run.
 
+kscript configuration file
+--------------------------------------
+
+To keep some options stored permanently in configuration you can create kscript configuration file.
+
+KScript follows XDG directory standard, so the file should be created in:
+
+
+| OS          | PATH                                                                            |
+|-------------|---------------------------------------------------------------------------------|
+| **Windows** | %LOCALAPPDATA%\kscript.properties                                               |
+| **Posix**   | ${XDG_CONFIG_DIR}/kscript.properties or ${user.home}/.config/kscript.properties |
+
+
+Content of kscript.properties file is a standard Java format, with following properties available:
+
+```
+scripting.preamble=
+scripting.kotlin.opts=
+scripting.repository.url=
+scripting.repository.user=
+scripting.repository.password=
+```
+
+Example configuration file:
+
+```
+scripting.preamble=// declare dependencies\n\
+@file:DependsOn("com.github.holgerbrandl:kutils:0.12")\n\
+\n\
+// make sure to also support includes in here\n\
+// @file:Include("util.kt")\n\
+@file:Include("https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")\n\
+\n\
+\n\
+// define some important variables to be used throughout the dsl\n\
+val foo = "bar"
+
+scripting.kotlin.opts=-J-Xmx4g
+scripting.repository.url=https://repository.example
+scripting.repository.user=user
+scripting.repository.password=password
+```
 
 FAQ
 ---
@@ -562,20 +606,12 @@ is a valid Kotlin `kts` script. Plain and simple, no `main`, no `companion`, jus
 
 ### Does `kscript` also work for regular kotlin `.kt` source files with a `main` as entry point?
 
-Yes, (since v1.6) you can run kotlin source files through `kscript`. By default it will assume a top-level `main` method
+Yes, (since kscript v1.6) you can run kotlin source files through `kscript`. By default, it will assume a top-level `main` method
 as entry-point.
 
-However in case you're using a companion object to declare the entry point, you need to indicate this via the `//ENTRY`
+However, in case you're using a companion object to declare the entry point, you need to indicate this via the `//ENTRY`
 /`@file:Entry` directive:
 
-### Why does it fail to read my script file when using cygwin?
-
-In order to use cygwin you need to use windows paths to provide your scripts. You can map cygwin paths using `cygpath`.
-Example
-
-```bash
-kscript $(cygpath -w /cygdrive/z/some/path/my_script.kts)
-```
 
 ### What are performance and resource usage difference between scripting with kotlin and python?
 

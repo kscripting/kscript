@@ -22,7 +22,7 @@ class ConfigBuilder internal constructor() {
     var repositoryUser: String? = null
     var repositoryPassword: String? = null
 
-    //Java resolved env variables paths are always in native format; All paths should be stored in Config as native,
+    //Env variables paths read by Java are always in native format; All paths should be stored in Config as native,
     //and then converted to shell format as needed.
     private fun path(path: String) = OsPath.createOrThrow(OsType.native, path)
 
@@ -38,8 +38,8 @@ class ConfigBuilder internal constructor() {
         val kscriptDir = System.getenv("KSCRIPT_DIR")?.let { path(it) }
         val configFile =
             configFile ?: kscriptDir?.resolve("kscript.properties")
-            ?: resolveConfigsDir(osType).resolve("kscript.properties")
-        val cacheDir = cacheDir ?: kscriptDir?.resolve("cache") ?: resolveCachesPath(osType).resolve("kscript")
+            ?: resolveBaseConfigsDir(osType).resolve("kscript.properties")
+        val cacheDir = cacheDir ?: kscriptDir?.resolve("cache") ?: resolveBaseCachesPath(osType).resolve("kscript")
 
         val osConfig = OsConfig(
             osType,
@@ -88,14 +88,14 @@ class ConfigBuilder internal constructor() {
         ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
     )
 
-    private fun resolveConfigsDir(osType: OsType): OsPath = path(
+    private fun resolveBaseConfigsDir(osType: OsType): OsPath = path(
         when {
             osType.isWindowsLike() -> System.getenv("LOCALAPPDATA")!!
             else -> System.getenv("XDG_CONFIG_DIR") ?: "${System.getProperty("user.home")}/.config"
         }
     )
 
-    private fun resolveCachesPath(osType: OsType): OsPath = path(
+    private fun resolveBaseCachesPath(osType: OsType): OsPath = path(
         when {
             osType.isWindowsLike() -> System.getenv("TEMP")!!
             else -> System.getenv("XDG_CACHE_DIR") ?: "${System.getProperty("user.home")}/.cache"

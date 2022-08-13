@@ -12,7 +12,8 @@ Breaking changes
 Enhancements
 
 * Windows support and proper Cygwin and MSys support
-* Multiplatform tests for different OS-es on Github
+* File argument for specific OS should be in format of that OS (eg. Cygwin: kscript /cygdrive/c/file.kts)
+* Multiplatform tests for different OS-es using Github actions
 * Ability to use configuration file for kscript (thanks to [meztihn](https://github.com/meztihn)) 
 * kscript follows XDG Spec (Issue #323) (thanks to [meztihn](https://github.com/meztihn))
 * Packaging scripts works again (thanks to [Vsajip](https://github.com/vsajip))
@@ -25,7 +26,7 @@ Bugfixes
 * Fix for handling potentially duplicated file names in Idea projects
 * Fix for Idea runtime configuration
 
-## 4.0.2
+## 4.0.x (last 4.0.3)
 
 Released 2022-05-18
 
