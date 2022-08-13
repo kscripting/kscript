@@ -22,30 +22,24 @@ class ConfigBuilder internal constructor() {
     var repositoryUser: String? = null
     var repositoryPassword: String? = null
 
-    fun build(): Config {
-        //Java resolved env variables paths are always in native format; All paths should be stored in Config as native,
-        //and then converted as needed to shell format.
+    //Java resolved env variables paths are always in native format; All paths should be stored in Config as native,
+    //and then converted to shell format as needed.
+    private fun path(path: String) = OsPath.createOrThrow(OsType.native, path)
 
+    fun build(): Config {
         val osType = OsType.findOrThrow(requireNotNull(osType))
 
         val selfName = selfName ?: System.getenv("KSCRIPT_NAME") ?: "kscript"
         val intellijCommand = intellijCommand ?: System.getenv("KSCRIPT_COMMAND_IDEA") ?: "idea"
         val gradleCommand = gradleCommand ?: System.getenv("KSCRIPT_COMMAND_GRADLE") ?: "gradle"
 
-        val kotlinHome = kotlinHome
-            ?: (System.getenv("KOTLIN_HOME") ?: ShellUtils.guessKotlinHome(osType))?.let {
-                OsPath.createOrThrow(OsType.native, it)
-            }
-            ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
-
-        val homeDir = homeDir ?: OsPath.createOrThrow(OsType.native, System.getProperty("user.home"))
-        val kscriptDir = System.getenv("KSCRIPT_DIR")?.let { OsPath.createOrThrow(OsType.native, it) }
-        val configFile = configFile
-            ?: kscriptDir?.resolve("kscript.properties")
-            ?: osType.configsDir.resolve("kscript.properties")
-        val cacheDir = cacheDir
-            ?: kscriptDir?.resolve("cache")
-            ?: osType.cachesDir.resolve("kscript")
+        val kotlinHome = kotlinHome ?: resolveKotlinHome(osType)
+        val homeDir = homeDir ?: path(System.getProperty("user.home")!!)
+        val kscriptDir = System.getenv("KSCRIPT_DIR")?.let { path(it) }
+        val configFile =
+            configFile ?: kscriptDir?.resolve("kscript.properties")
+            ?: resolveConfigsDir(osType).resolve("kscript.properties")
+        val cacheDir = cacheDir ?: kscriptDir?.resolve("cache") ?: resolveCachesPath(osType).resolve("kscript")
 
         val osConfig = OsConfig(
             osType,
@@ -63,26 +57,20 @@ class ConfigBuilder internal constructor() {
                 load(configFile.toNativePath().reader())
             }
         }
-        val customPreamble = customPreamble
-            ?: System.getenv("KSCRIPT_PREAMBLE")
-            ?: properties.getProperty("scripting.preamble")
-            ?: ""
-        val providedKotlinOpts = providedKotlinOpts
-            ?: System.getenv("KSCRIPT_KOTLIN_OPTS")
-            ?: properties.getProperty("scripting.kotlin.opts")
-            ?: ""
-        val repositoryUrl = repositoryUrl
-            ?: System.getenv("KSCRIPT_REPOSITORY_URL")
-            ?: properties.getProperty("scripting.repository.url")
-            ?: ""
-        val repositoryUser = repositoryUser
-            ?: System.getenv("KSCRIPT_REPOSITORY_USER")
-            ?: properties.getProperty("scripting.repository.user")
-            ?: ""
-        val repositoryPassword = repositoryPassword
-            ?: System.getenv("KSCRIPT_REPOSITORY_PASSWORD")
-            ?: properties.getProperty("scripting.repository.password")
-            ?: ""
+        val customPreamble =
+            customPreamble ?: System.getenv("KSCRIPT_PREAMBLE") ?: properties.getProperty("scripting.preamble") ?: ""
+        val providedKotlinOpts =
+            providedKotlinOpts ?: System.getenv("KSCRIPT_KOTLIN_OPTS")
+            ?: properties.getProperty("scripting.kotlin.opts") ?: ""
+        val repositoryUrl =
+            repositoryUrl ?: System.getenv("KSCRIPT_REPOSITORY_URL")
+            ?: properties.getProperty("scripting.repository.url") ?: ""
+        val repositoryUser =
+            repositoryUser ?: System.getenv("KSCRIPT_REPOSITORY_USER")
+            ?: properties.getProperty("scripting.repository.user") ?: ""
+        val repositoryPassword =
+            repositoryPassword ?: System.getenv("KSCRIPT_REPOSITORY_PASSWORD")
+            ?: properties.getProperty("scripting.repository.password") ?: ""
 
         val scriptingConfig = ScriptingConfig(
             customPreamble,
@@ -95,19 +83,22 @@ class ConfigBuilder internal constructor() {
         return Config(osConfig, scriptingConfig)
     }
 
-    companion object {
-        private val OsType.configsDir
-            get() = when {
-                isWindowsLike() -> path(System.getenv("LOCALAPPDATA"))
-                else -> path(System.getenv("XDG_CONFIG_DIR") ?: "${System.getProperty("user.home")}/.config")
-            }
+    private fun resolveKotlinHome(osType: OsType): OsPath = path(
+        System.getenv("KOTLIN_HOME") ?: ShellUtils.guessKotlinHome(osType)
+        ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
+    )
 
-        private val OsType.cachesDir
-            get() = when {
-                isWindowsLike() -> path(System.getenv("TEMP"))
-                else -> path(System.getenv("XDG_CACHE_DIR") ?: "${System.getProperty("user.home")}/.cache")
-            }
+    private fun resolveConfigsDir(osType: OsType): OsPath = path(
+        when {
+            osType.isWindowsLike() -> System.getenv("LOCALAPPDATA")!!
+            else -> System.getenv("XDG_CONFIG_DIR") ?: "${System.getProperty("user.home")}/.config"
+        }
+    )
 
-        private fun OsType.path(path: String) = OsPath.createOrThrow(this, path)
-    }
+    private fun resolveCachesPath(osType: OsType): OsPath = path(
+        when {
+            osType.isWindowsLike() -> System.getenv("TEMP")!!
+            else -> System.getenv("XDG_CACHE_DIR") ?: "${System.getProperty("user.home")}/.cache"
+        }
+    )
 }
