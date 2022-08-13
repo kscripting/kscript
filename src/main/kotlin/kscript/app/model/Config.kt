@@ -27,7 +27,8 @@ data class OsConfig(
     val intellijCommand: String,
     val gradleCommand: String,
     val userHomeDir: OsPath,
-    val kscriptConfigDir: OsPath,
+    val kscriptConfigFile: OsPath,
+    val kscriptCacheDir: OsPath,
     val kotlinHomeDir: OsPath,
 ) {
     override fun toString(): String {
@@ -37,7 +38,7 @@ data class OsConfig(
                   |  intellijCommand:       $intellijCommand
                   |  gradleCommand:         $gradleCommand
                   |  userHomeDir:           $userHomeDir
-                  |  kscriptConfigDir:      $kscriptConfigDir
+                  |  kscriptConfigFile:     $kscriptConfigFile
                   |  kotlinHomeDir:         $kotlinHomeDir
                   |}
                """.trimMargin()

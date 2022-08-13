@@ -5,9 +5,14 @@ import kscript.app.model.Content
 import kscript.app.model.ScriptType
 import kscript.app.util.*
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.FileUtils
 import java.net.URI
 
 class Cache(private val cacheBasePath: OsPath) {
+    init {
+        cacheBasePath.createDirectories()
+    }
+
     fun getOrCreateIdeaProject(digest: String, creator: (OsPath) -> OsPath): OsPath {
         val path = cacheBasePath.resolve("idea_$digest")
 
@@ -98,5 +103,9 @@ class Cache(private val cacheBasePath: OsPath) {
         contentFile.writeText(dependencies.joinToString("\n") { it.toString() })
 
         return dependencies
+    }
+
+    fun clear() {
+        FileUtils.cleanDirectory(cacheBasePath.toNativeFile())
     }
 }

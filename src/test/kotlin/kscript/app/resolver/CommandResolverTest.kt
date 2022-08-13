@@ -102,7 +102,8 @@ class CommandResolverTest {
             "idea",
             "gradle",
             homeDir,
-            homeDir.resolve("./.kscript/"),
+            homeDir.resolve("./.config/"),
+            homeDir.resolve("./.cache/"),
             kotlinDir,
         )
 
