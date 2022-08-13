@@ -8,9 +8,9 @@ import assertk.assertions.isInstanceOf
 import kscript.app.model.Dependency
 import kscript.app.model.OsType
 import kscript.app.model.Repository
-import kscript.app.util.OsPath
-import kscript.app.util.leaf
-import kscript.app.util.toNativePath
+import kscript.app.shell.OsPath
+import kscript.app.shell.leaf
+import kscript.app.shell.toNativePath
 import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

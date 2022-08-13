@@ -3,10 +3,10 @@ package kscript.app.creator
 import kscript.app.code.Templates
 import kscript.app.model.Script
 import kscript.app.model.ScriptType
-import kscript.app.util.Executor
-import kscript.app.util.FileUtils
-import kscript.app.util.OsPath
-import kscript.app.util.writeText
+import kscript.app.shell.Executor
+import kscript.app.shell.FileUtils
+import kscript.app.shell.OsPath
+import kscript.app.shell.writeText
 
 data class JarArtifact(val path: OsPath, val execClassName: String)
 

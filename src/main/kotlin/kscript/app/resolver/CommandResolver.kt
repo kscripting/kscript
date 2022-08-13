@@ -5,8 +5,8 @@ import kscript.app.model.CompilerOpt
 import kscript.app.model.KotlinOpt
 import kscript.app.model.OsConfig
 import kscript.app.model.OsType
-import kscript.app.util.OsPath
-import kscript.app.util.toNativeOsPath
+import kscript.app.shell.OsPath
+import kscript.app.shell.toNativeOsPath
 
 class CommandResolver(private val osConfig: OsConfig) {
     private val classPathSeparator =

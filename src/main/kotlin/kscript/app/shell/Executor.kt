@@ -1,4 +1,4 @@
-package kscript.app.util
+package kscript.app.shell
 
 import kscript.app.creator.JarArtifact
 import kscript.app.model.CompilerOpt

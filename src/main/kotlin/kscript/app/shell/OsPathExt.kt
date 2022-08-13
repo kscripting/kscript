@@ -1,4 +1,4 @@
-package kscript.app.util
+package kscript.app.shell
 
 import kscript.app.model.OsType
 import java.io.File

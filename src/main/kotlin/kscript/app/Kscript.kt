@@ -4,8 +4,8 @@ import kscript.app.code.Templates
 import kscript.app.model.Config
 import kscript.app.util.Logger
 import kscript.app.util.Logger.errorMsg
-import kscript.app.util.ShellUtils.evalBash
-import kscript.app.util.ShellUtils.quit
+import kscript.app.shell.ShellUtils.evalBash
+import kscript.app.shell.ShellUtils.quit
 import kscript.app.util.VersionChecker
 import org.docopt.DocOptWrapper
 

@@ -5,7 +5,6 @@ import kscript.app.model.CompilerOpt
 import kscript.app.model.Dependency
 import kscript.app.model.Repository
 import kscript.app.model.Script
-import kscript.app.util.parent
 
 object GradleTemplates {
     fun createGradleIdeaScript(script: Script): String {

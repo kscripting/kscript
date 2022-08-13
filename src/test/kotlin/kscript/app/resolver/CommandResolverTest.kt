@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kscript.app.creator.JarArtifact
 import kscript.app.model.*
-import kscript.app.util.OsPath
+import kscript.app.shell.OsPath
 import org.junit.jupiter.api.Test
 
 class CommandResolverTest {

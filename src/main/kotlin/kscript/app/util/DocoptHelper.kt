@@ -1,8 +1,6 @@
 package org.docopt
 
-import kscript.app.util.Logger
-import kscript.app.util.Logger.errorMsg
-import kscript.app.util.ShellUtils.quit
+import kscript.app.shell.ShellUtils.quit
 import java.io.File
 
 /**

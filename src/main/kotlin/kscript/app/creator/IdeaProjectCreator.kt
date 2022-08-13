@@ -3,11 +3,11 @@ package kscript.app.creator
 import kscript.app.code.GradleTemplates
 import kscript.app.code.Templates
 import kscript.app.model.Script
-import kscript.app.util.FileUtils
-import kscript.app.util.FileUtils.resolveUniqueFilePath
+import kscript.app.shell.FileUtils
+import kscript.app.shell.FileUtils.resolveUniqueFilePath
 import kscript.app.util.Logger.devMsg
 import kscript.app.util.Logger.infoMsg
-import kscript.app.util.OsPath
+import kscript.app.shell.OsPath
 import java.net.URI
 
 class IdeaProjectCreator {

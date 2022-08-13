@@ -1,6 +1,7 @@
-package kscript.app.util
+package kscript.app.shell
 
 import kscript.app.model.ScriptType
+import kscript.app.util.Logger
 import java.io.IOException
 import java.nio.file.Files
 import kotlin.io.path.createDirectories

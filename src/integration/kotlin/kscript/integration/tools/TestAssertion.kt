@@ -1,6 +1,6 @@
 package kscript.integration.tools
 
-import kscript.app.util.ProcessResult
+import kscript.app.shell.ProcessResult
 import kscript.integration.tools.TestContext.runProcess
 
 object TestAssertion {

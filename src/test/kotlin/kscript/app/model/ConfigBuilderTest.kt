@@ -2,7 +2,7 @@ package kscript.app.model
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import kscript.app.util.OsPath
+import kscript.app.shell.OsPath
 import org.junit.jupiter.api.Test
 
 internal class ConfigBuilderTest {

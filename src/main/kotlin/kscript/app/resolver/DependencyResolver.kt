@@ -2,17 +2,13 @@ package kscript.app.resolver
 
 import kotlinx.coroutines.runBlocking
 import kscript.app.model.Dependency
-import kscript.app.model.OsConfig
 import kscript.app.model.Repository
 import kscript.app.util.Logger.devMsg
 import kscript.app.util.Logger.infoMsg
-import kscript.app.util.OsPath
-import kscript.app.util.extension
-import kscript.app.util.toOsPath
-import java.nio.file.Path
-import java.nio.file.Paths
+import kscript.app.shell.OsPath
+import kscript.app.shell.extension
+import kscript.app.shell.toOsPath
 import kotlin.collections.set
-import kotlin.io.path.extension
 import kotlin.script.experimental.api.valueOr
 import kotlin.script.experimental.dependencies.CompoundDependenciesResolver
 import kotlin.script.experimental.dependencies.FileSystemDependenciesResolver

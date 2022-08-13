@@ -1,6 +1,6 @@
-package kscript.app.util
+package kscript.app.shell
 
-import kscript.app.util.ShellUtils.whitespaceCharsToSymbols
+import kscript.app.shell.ShellUtils.whitespaceCharsToSymbols
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 

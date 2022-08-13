@@ -1,13 +1,13 @@
 package kscript.app
 
-import kscript.app.appdir.Cache
+import kscript.app.cache.Cache
 import kscript.app.code.Templates
 import kscript.app.creator.*
 import kscript.app.model.Config
 import kscript.app.model.ScriptType
 import kscript.app.parser.Parser
 import kscript.app.resolver.*
-import kscript.app.util.Executor
+import kscript.app.shell.Executor
 import kscript.app.util.Logger
 import kscript.app.util.Logger.info
 import kscript.app.util.Logger.infoMsg

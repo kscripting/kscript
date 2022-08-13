@@ -1,6 +1,6 @@
 package kscript.app.model
 
-import kscript.app.util.OsPath
+import kscript.app.shell.OsPath
 
 data class ScriptingConfig(
     val customPreamble: String,

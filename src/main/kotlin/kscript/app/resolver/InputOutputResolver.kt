@@ -1,9 +1,12 @@
 package kscript.app.resolver
 
-import kscript.app.appdir.Cache
+import kscript.app.cache.Cache
 import kscript.app.model.Content
 import kscript.app.model.OsConfig
 import kscript.app.model.OsType
+import kscript.app.shell.OsPath
+import kscript.app.shell.toNativeOsPath
+import kscript.app.shell.toNativePath
 import kscript.app.util.*
 import kscript.app.util.UriUtils.isUrl
 import java.io.File

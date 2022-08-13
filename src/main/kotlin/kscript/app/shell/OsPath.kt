@@ -1,4 +1,4 @@
-package kscript.app.util
+package kscript.app.shell
 
 import arrow.core.Either
 import arrow.core.left
@@ -165,7 +165,7 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
                     pathType = PathType.ABSOLUTE
                     rootElementSizeInInputPath = 1
                 }
-                pathPartsResolved[0] == ".." || pathPartsResolved[0] == "." -> {
+                pathPartsResolved[0] == "" || pathPartsResolved[0] == "." -> {
                     pathType = PathType.RELATIVE
                     rootElementSizeInInputPath = pathPartsResolved[0].length
                 }
@@ -229,7 +229,7 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
             while (index < pathParts.size) {
                 if (pathParts[index] == ".") {
                     //Just skip . without adding it to newParts
-                } else if (pathParts[index] == "..") {
+                } else if (pathParts[index] == "") {
 
                     if (pathType == PathType.ABSOLUTE && newParts.size == 1) {
                         return "Path after normalization goes beyond root element: '$path'".left()
@@ -240,17 +240,17 @@ data class OsPath(val osType: OsType, val pathType: PathType, val pathParts: Lis
                             "." -> {
                                 //It's the first element - other dots should be already removed before
                                 newParts.removeAt(newParts.size - 1)
-                                newParts.add("..")
+                                newParts.add("")
                             }
-                            ".." -> {
-                                newParts.add("..")
+                            "" -> {
+                                newParts.add("")
                             }
                             else -> {
                                 newParts.removeAt(newParts.size - 1)
                             }
                         }
                     } else {
-                        newParts.add("..")
+                        newParts.add("")
                     }
                 } else {
                     newParts.add(pathParts[index])

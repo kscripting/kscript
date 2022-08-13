@@ -1,6 +1,6 @@
 package kscript.integration.tools
 
-import kscript.app.util.ShellUtils.whitespaceCharsToSymbols
+import kscript.app.shell.ShellUtils.whitespaceCharsToSymbols
 import kscript.integration.tools.TestContext.nl
 import org.opentest4j.AssertionFailedError
 

@@ -4,7 +4,7 @@ import kscript.app.model.*
 import kscript.app.parser.LineParser.extractValues
 import kscript.app.util.ScriptUtils
 import kscript.app.util.UriUtils
-import kscript.app.util.leaf
+import kscript.app.shell.leaf
 import java.net.URI
 
 class ScriptResolver(

@@ -1,6 +1,9 @@
 package kscript.app.util
 
 import kscript.app.model.OsType
+import kscript.app.shell.FileUtils
+import kscript.app.shell.OsPath
+import kscript.app.shell.toNativeFile
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

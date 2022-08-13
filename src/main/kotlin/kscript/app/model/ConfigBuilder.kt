@@ -1,9 +1,9 @@
 package kscript.app.model
 
-import kscript.app.util.OsPath
-import kscript.app.util.ShellUtils
-import kscript.app.util.exists
-import kscript.app.util.toNativePath
+import kscript.app.shell.OsPath
+import kscript.app.shell.ShellUtils
+import kscript.app.shell.exists
+import kscript.app.shell.toNativePath
 import java.util.*
 import kotlin.io.path.reader
 

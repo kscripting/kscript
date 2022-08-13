@@ -1,9 +1,9 @@
-package kscript.app.appdir
+package kscript.app.cache
 
 import kscript.app.creator.JarArtifact
 import kscript.app.model.Content
 import kscript.app.model.ScriptType
-import kscript.app.util.*
+import kscript.app.shell.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import java.net.URI

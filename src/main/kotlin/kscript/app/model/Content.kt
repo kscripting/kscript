@@ -1,6 +1,6 @@
 package kscript.app.model
 
-import kscript.app.util.OsPath
+import kscript.app.shell.OsPath
 import java.net.URI
 
 data class Content(

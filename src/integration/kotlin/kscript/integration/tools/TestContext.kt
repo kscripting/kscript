@@ -1,7 +1,7 @@
 package kscript.integration.tools
 
 import kscript.app.model.OsType
-import kscript.app.util.*
+import kscript.app.shell.*
 
 object TestContext {
     private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))

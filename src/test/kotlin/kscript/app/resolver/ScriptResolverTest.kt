@@ -5,10 +5,10 @@ import assertk.assertions.endsWith
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.prop
-import kscript.app.appdir.Cache
+import kscript.app.cache.Cache
 import kscript.app.model.*
 import kscript.app.parser.Parser
-import kscript.app.util.OsPath
+import kscript.app.shell.OsPath
 import org.junit.jupiter.api.Test
 import java.io.File
 

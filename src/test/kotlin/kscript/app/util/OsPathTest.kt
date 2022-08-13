@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import kscript.app.model.OsType
 import kscript.app.model.PathType
+import kscript.app.shell.OsPath
 import org.junit.jupiter.api.Test
 
 class OsPathTest {
