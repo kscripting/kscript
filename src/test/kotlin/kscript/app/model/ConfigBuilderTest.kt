@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test
 internal class ConfigBuilderTest {
     @Test
     fun `Reads all properties of ScriptingConfig from given file`() {
-        val linux = OsType.LINUX
+        val currentNativeOsType = OsType.native
         val config = ConfigBuilder().apply {
-            osType = linux.osName
-            configFile = OsPath.createOrThrow(linux, "test", "resources", "config", "kscript.properties")
+            osType = currentNativeOsType.osName
+            configFile = OsPath.createOrThrow(currentNativeOsType, "test", "resources", "config", "kscript.properties")
         }.build()
 
         assertThat(config.scriptingConfig).isEqualTo(ScriptingConfig(
