@@ -38,8 +38,8 @@ class ConfigBuilder internal constructor() {
             }
             ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
 
-        val homeDir = homeDir ?: OsPath.createOrThrow(osType, System.getProperty("user.home"))
-        val kscriptDir = System.getenv("KSCRIPT_DIR")?.let { OsPath.createOrThrow(osType, it) }
+        val homeDir = homeDir ?: OsPath.createOrThrow(OsType.native, System.getProperty("user.home"))
+        val kscriptDir = System.getenv("KSCRIPT_DIR")?.let { OsPath.createOrThrow(OsType.native, it) }
         val configFile = configFile
             ?: kscriptDir?.resolve("kscript.properties")
             ?: osType.configsDir.resolve("kscript.properties")
