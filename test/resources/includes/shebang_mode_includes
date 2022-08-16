@@ -1,4 +1,4 @@
 #!/usr/bin/env kscript
 
-//INCLUDE rel_includes/include_1.kt
+@file:Include("rel_includes/include_1.kt")
 include_1()

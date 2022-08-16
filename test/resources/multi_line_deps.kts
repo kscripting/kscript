@@ -1,7 +1,7 @@
 #!/usr/bin/env kscript
 
-//DEPS  com.offbytwo:docopt:0.6.0.20150202
-//DEPS log4j:log4j:1.2.14
+@file:DependsOn("com.offbytwo:docopt:0.6.0.20150202")
+@file:DependsOn("log4j:log4j:1.2.14")
 
 import org.docopt.Docopt
 

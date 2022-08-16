@@ -11,6 +11,7 @@ import kscript.app.shell.Executor
 import kscript.app.util.Logger
 import kscript.app.util.Logger.info
 import kscript.app.util.Logger.infoMsg
+import kscript.app.util.Logger.warnMsg
 import org.docopt.DocOptWrapper
 import java.net.URI
 
@@ -60,6 +61,15 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         }
 
         val script = scriptResolver.resolve(scriptSource, preambles)
+
+        if (script.deprecated.isNotEmpty()) {
+            if (docopt.getBoolean("report")) {
+                info(DeprecatedInfoCreator().create(script.deprecated))
+            } else {
+                warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
+            }
+        }
+
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
             DependencyResolver(script.repositories).resolve(script.dependencies)
         }

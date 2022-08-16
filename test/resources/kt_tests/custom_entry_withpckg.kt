@@ -31,5 +31,4 @@ fun main(args: Array<String>) {
 }
 
 
-//ENTRY Foo
-
+@file:EntryPoint("Foo")

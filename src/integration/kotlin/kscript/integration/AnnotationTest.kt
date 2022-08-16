@@ -47,7 +47,7 @@ class AnnotationTest : TestBase {
             "kscript ${resolvePath("$projectDir/test/resources/custom_mvn_repo_annot.kts")}",
             0,
             "kscript with annotations rocks!\n",
-            startsWith("[kscript] Adding repository: Repository(id=imagej-releases, url=http://maven.imagej.net/content/repositories/releases, user=, password=)\n")
+            startsWith("[kscript] Adding repository: Repository(id=, url=http://maven.imagej.net/content/repositories/releases, user=, password=)\n")
         )
         verify(
             "kscript ${resolvePath("$projectDir/test/resources/illegal_depends_on_arg.kts")}",

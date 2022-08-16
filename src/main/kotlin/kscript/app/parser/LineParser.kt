@@ -5,7 +5,7 @@ import kscript.app.model.Deprecated
 
 @Suppress("UNUSED_PARAMETER")
 object LineParser {
-    private val annotationStartingWithCommentError = "Annotation starting with comment are deprecated:"
+    private const val deprecatedAnnotation = "Deprecated annotation:"
     private val sheBang = listOf(SheBang)
 
     fun parseSheBang(location: Location, line: Int, text: String): List<ScriptAnnotation> {
@@ -25,11 +25,15 @@ object LineParser {
                     Include(extractQuotedValueInParenthesis(it.substring(fileInclude.length)))
                 )
 
-                it.startsWith(include) -> listOf(
-                    Include(extractValue(it.substring(include.length))), Deprecated(
-                        location, line, "$annotationStartingWithCommentError\n$text"
+                it.startsWith(include) -> {
+                    val value = extractValue(it.substring(include.length))
+
+                    listOf(
+                        Include(value), createDeprecatedAnnotation(
+                            location, line, deprecatedAnnotation, text, "@file:Include(\"$value\")"
+                        )
                     )
-                )
+                }
 
                 else -> emptyList()
             }
@@ -49,18 +53,38 @@ object LineParser {
         val fileDependsOnMaven = "@file:DependsOnMaven"
         val depends = "//DEPS "
 
+        val deprecated: MutableList<Deprecated> = mutableListOf()
+
         text.trim().let { s ->
             val dependencies = when {
-                s.startsWith(fileDependsOnMaven) -> extractQuotedValuesInParenthesis(s.substring(fileDependsOnMaven.length))
-                s.startsWith(fileDependsOn) -> extractQuotedValuesInParenthesis(s.substring(fileDependsOn.length))
-                s.startsWith(depends) -> extractValues(s.substring(depends.length))
+                s.startsWith(fileDependsOnMaven) -> {
+                    extractQuotedValuesInParenthesis(s.substring(fileDependsOnMaven.length))
+                }
+
+                s.startsWith(fileDependsOn) -> {
+                    extractQuotedValuesInParenthesis(s.substring(fileDependsOn.length))
+                }
+
+                s.startsWith(depends) -> {
+                    val values = extractValues(s.substring(depends.length))
+                    deprecated.add(createDeprecatedAnnotation(location,
+                                                              line,
+                                                              deprecatedAnnotation,
+                                                              text,
+                                                              "@file:DependsOn(" + values.joinToString(",") { "\"$it\"" } + ")"))
+
+                    values
+                }
+
                 else -> emptyList()
             }
 
-            return dependencies.map {
+            val dependencyAnnotations = dependencies.map {
                 val validated = validateDependency(it)
                 Dependency(validated)
             }
+
+            return dependencyAnnotations + deprecated
         }
     }
 
@@ -74,7 +98,15 @@ object LineParser {
                     Entry(extractQuotedValueInParenthesis(it.substring(fileEntry.length)))
                 )
 
-                it.startsWith(entry) -> listOf(Entry(extractValue(it.substring(entry.length))))
+                it.startsWith(entry) -> {
+                    val value = extractValue(it.substring(entry.length))
+                    listOf(
+                        Entry(value), createDeprecatedAnnotation(
+                            location, line, deprecatedAnnotation, text, "@file:EntryPoint(\"$value\")"
+                        )
+                    )
+                }
+
                 else -> emptyList()
             }
         }
@@ -83,9 +115,10 @@ object LineParser {
     fun parseRepository(location: Location, line: Int, text: String): List<ScriptAnnotation> {
         //Format:
         // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/")
-        // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/", user="user", password="pass")
+        // @file:Repository("http://maven.imagej.net/content/repositories/releases/", user="user", password="pass")
 
         val fileMavenRepository = "@file:MavenRepository"
+        val fileRepository = "@file:Repository"
 
         text.trim().let {
             return when {
@@ -112,6 +145,45 @@ object LineParser {
                             namedArgs.getOrDefault("password", annotationParams.getOrNull(3) ?: "")
                         )
                     }
+
+                    var str = """"${repository.url}""""
+
+                    if (repository.user.isNotBlank()) {
+                        str += """, "${repository.user}""""
+                    }
+
+                    if (repository.password.isNotBlank()) {
+                        str += """, "${repository.password}""""
+                    }
+
+                    return listOf(
+                        repository, createDeprecatedAnnotation(
+                            location, line, deprecatedAnnotation, text, "@file:Repository($str)"
+                        )
+                    )
+                }
+
+                it.startsWith(fileRepository) -> {
+                    val value = it.substring(fileRepository.length).substringBeforeLast(")")
+
+                    val repository = value.split(",").map { it.trim(' ', '"', '(') }.let { annotationParams ->
+                        val keyValSep = "[ ]*=[ ]*\"".toRegex()
+
+                        val namedArgs = annotationParams.filter { it.contains(keyValSep) }.map { keyVal ->
+                            keyVal.split(keyValSep).map { it.trim(' ', '\"') }.let { it.first() to it.last() }
+                        }.toMap()
+
+                        if (annotationParams.isEmpty()) {
+                            throw ParseException("Missing required argument of annotation @file:Repository(url)")
+                        }
+
+                        Repository(
+                            namedArgs.getOrDefault("id", ""),
+                            namedArgs.getOrDefault("url", annotationParams[0]),
+                            namedArgs.getOrDefault("user", annotationParams.getOrNull(1) ?: ""),
+                            namedArgs.getOrDefault("password", annotationParams.getOrNull(2) ?: "")
+                        )
+                    }
                     return listOf(repository)
                 }
 
@@ -130,7 +202,15 @@ object LineParser {
                     KotlinOpt(it)
                 }
 
-                it.startsWith(kotlinOpts) -> extractValues(it.substring(kotlinOpts.length)).map { KotlinOpt(it) }
+                it.startsWith(kotlinOpts) -> {
+                    val values = extractValues(it.substring(kotlinOpts.length))
+                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(location,
+                                                                              line,
+                                                                              deprecatedAnnotation,
+                                                                              text,
+                                                                              values.joinToString { "@file:KotlinOpts(\"$it\")\n" })
+                }
+
                 else -> emptyList()
             }
         }
@@ -146,8 +226,13 @@ object LineParser {
                     CompilerOpt(it)
                 }
 
-                it.startsWith(compilerOpts) -> extractValues(it.substring(compilerOpts.length)).map {
-                    CompilerOpt(it)
+                it.startsWith(compilerOpts) -> {
+                    val values = extractValues(it.substring(compilerOpts.length))
+                    values.map { CompilerOpt(it) } + createDeprecatedAnnotation(location,
+                                                                                line,
+                                                                                deprecatedAnnotation,
+                                                                                text,
+                                                                                values.joinToString { "@file:CompilerOpts(\"$it\")\n" })
                 }
 
                 else -> emptyList()
@@ -225,4 +310,8 @@ object LineParser {
             return it.split(",(?=(?:[^']*'[^']*')*[^']*\$)".toRegex()).map(String::trim).filter(String::isNotBlank)
         }
     }
+
+    private fun createDeprecatedAnnotation(
+        location: Location, line: Int, introText: String, existing: String, replacement: String
+    ): Deprecated = Deprecated(location, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
 }

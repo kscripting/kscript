@@ -19,7 +19,7 @@ object Templates {
         |""".trimStart().trimMargin()
 
     val textProcessingPreamble = """
-        |//DEPS com.github.holgerbrandl:kscript-support-api:1.2.5
+        |@file:DependsOn("com.github.holgerbrandl:kscript-support-api:1.2.5")
         |
         |import kscript.text.*
         |val lines = resolveArgFile(args)
@@ -112,6 +112,7 @@ object Templates {
         | --idea                  Open script in temporary Intellij session
         | -s --silent             Suppress status logging
         | -d --development        Enable logging of exception stack trace and additional log messages
+        | --report                Prints script's deprecated features report
         | --package               Package script and dependencies into self-dependent binary
         | --add-bootstrap-header  Prepend bash header that installs kscript if necessary
         |

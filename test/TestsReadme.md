@@ -185,7 +185,7 @@ curl --request PUT -u admin:password -T $tmpZipDir/tmp.zip http://localhost:8081
 
 ```bash
 echo '
-@file:MavenRepository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
 @file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
 println("Hello, World!")

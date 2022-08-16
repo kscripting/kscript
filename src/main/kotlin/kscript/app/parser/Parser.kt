@@ -23,7 +23,7 @@ class Parser {
         val sections = mutableListOf<Section>()
 
         for (line in codeTextAsLines.withIndex()) {
-            val section = parseLine(location, line.index, line.value)
+            val section = parseLine(location, line.index + 1, line.value)
             sections += section
         }
         return sections
