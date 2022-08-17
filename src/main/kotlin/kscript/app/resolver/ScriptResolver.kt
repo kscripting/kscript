@@ -153,7 +153,7 @@ class ScriptResolver(
             resolutionContext.repositories,
             resolutionContext.kotlinOpts,
             resolutionContext.compilerOpts,
-            resolutionContext.deprecated,
+            resolutionContext.deprecatedItems,
             resolutionContext.scriptNodes,
             scriptNode,
             digest

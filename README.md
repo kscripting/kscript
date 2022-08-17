@@ -196,7 +196,7 @@ EOF
 
 ```{bash}
 kscript - <<"EOF"
-//DEPS com.offbytwo:docopt:0.6.0.20150202 log4j:log4j:1.2.14
+@file:DependsOn("com.offbytwo:docopt:0.6.0.20150202", "log4j:log4j:1.2.14")
 
 import org.docopt.Docopt
 val docopt = Docopt("Usage: jl <command> [options] [<joblist_file>]")
@@ -205,7 +205,7 @@ println("hello again")
 EOF
 ```
 
-* Finally (for sake of completeness), it also works with process substitution and for sure you can always provide
+* Finally, (for sake of completeness), it also works with process substitution and for sure you can always provide
   additional arguments (exposed as `args : Array<String>` within the script)
 
 ```{bash}
@@ -247,19 +247,19 @@ Script Configuration
 
 The following directives supported by `kscript` to configure scripts:
 
-* `//DEPS` to declare dependencies with gradle-style locators
-* `//KOTLIN_OPTS`  to configure the kotlin/java runtime environment
-* `//INCLUDE` to source kotlin files into the script
-* `//ENTRY` to declare the application entrypoint for kotlin `*.kt` applications
+* `@file:DependsOn` to declare dependencies with gradle-style locators
+* `@file:KotlinOpts`  to configure the kotlin/java runtime environment
+* `@file:Include` to source kotlin files into the script
+* `@file:EntryPoint` to declare the application entrypoint for kotlin `*.kt` applications
 
-### Declare dependencies with `//DEPS`
+### Declare dependencies with `@file:DependsOn`
 
 To specify dependencies simply use gradle-style locators. Here's an example
 using [docopt](https://github.com/docopt/docopt.java) and [log4j](http://logging.apache.org/log4j/2.x/)
 
 ```kotlin
 #!/usr/bin/env kscript
-//DEPS com.offbytwo:docopt:0.6.0.20150202,log4j:log4j:1.2.14
+@file:DependsOn("com.offbytwo:docopt:0.6.0.20150202", "log4j:log4j:1.2.14")
 
 import org.docopt.Docopt
 import java.util.*
@@ -282,23 +282,23 @@ println("Parsed script arguments are: \n" + doArgs)
 `kscript` will read dependencies from all lines in a script that start with `//DEPS` (if any). Multiple dependencies can
 be split by comma, space or semicolon.
 
-### Configure the runtime  with `//KOTLIN_OPTS`
+### Configure the runtime  with `@file:KotlinOpts`
 
-`kscript` allows to provide a `//KOTLIN_OPTS` directive followed by parameters passed on to `kotlin` similar to how
+`kscript` allows to provide a `@file:KotlinOpts` directive followed by parameters passed on to `kotlin` similar to how
 dependencies are defined:
 
 ```kotlin
 #!/usr/bin/env kscript
-//KOTLIN_OPTS -J-Xmx5g  -J-server
+@file:KotlinOpts("-J-Xmx5g", "-J-server")
 
 println("Hello from Kotlin with 5g of heap memory running in server mode!")
 ```
 
 Note: Similar to the runtime you can also tweak the compile step by providing `//COMPILER_OPTS`.
 
-### Ease prototyping with `//INCLUDE`
+### Ease prototyping with `@file:Include`
 
-`kscript` supports an `//INCLUDE` directive to directly include other source files without prior compilation. Absolute
+`kscript` supports an `@file:Include` directive to directly include other source files without prior compilation. Absolute
 and relative paths, as well as URLs are supported. Example:
 
 ```kotlin
@@ -309,12 +309,12 @@ fun Array<Double>.median(): Double {
 }
 ```
 
-Which can be now used using the `//INCLUDE` directive with
+Which can be now used using the `@file:Include` directive with
 
 ```kotlin
 #!/usr/bin/env kscript
 
-//INCLUDE utils.kt
+@file:Include("utils.kt")
 
 val robustMean = listOf(1.3, 42.3, 7.0).median()
 println(robustMean)
@@ -326,7 +326,7 @@ with `kscript --clear-cache`.
 
 For more examples see [here](test/resources/includes/include_variations.kts).
 
-### Use `//ENTRY` to run applications with `main` method
+### Use `@file:EntryPoint` to run applications with `main` method
 
 `kscript` also supports running regular Kotlin `kt` files.
 
@@ -335,7 +335,7 @@ Example: `./examples/Foo.kt`:
 ```kotlin
 package examples
 
-//ENTRY examples.Bar
+@file:EntryPoint("examples.Bar")
 
 class Bar {
     companion object {
@@ -349,45 +349,33 @@ class Bar {
 fun main(args: Array<String>) = println("main was called")
 ```
 
-To run top-level main instead we would use `//ENTRY examples.FooKt`
+To run top-level main instead we would use `@file:EntryPoint("examples.FooKt")`
 
 The latter is the default for `kt` files and could be omitted
 
-### Annotation driven script configuration
-
-Using annotations instead of comment directives to configure scripts is cleaner and allow for better tooling.
-
-```kotlin
-// annotation-driven script configuration
-@file:DependsOn("com.github.holgerbrandl:kutils:0.12")
-
-// comment directive
-//DEPS com.github.holgerbrandl:kutils:0.12
-```
-
-To do so `kscript` supports [annotations](https://github.com/holgerbrandl/kscript-annotations) to be used instead of
-comment directives:
+### Examples of annotation driven configuration
 
 ```kotlin
 #!/usr/bin/env kscript
 
 // Declare dependencies
-@file:DependsOn("com.github.holgerbrandl:kutils:0.12") @file:DependsOn(
+@file:DependsOn("com.github.holgerbrandl:kutils:0.12") 
+@file:DependsOn(
     "com.beust:klaxon:0.24",
     "com.github.kittinunf.fuel:fuel:2.3.1"
 )
 
 // To use a custom maven repository you can declare it with
-@file:MavenRepository("imagej-releases", "http://maven.imagej.net/content/repositories/releases")
+@file:Repository("http://maven.imagej.net/content/repositories/releases")
 
 // For compatibility with https://github.com/ligee/kotlin-jupyter kscript supports also
 @file:DependsOnMaven("net.clearvolume:cleargl:2.0.1")
 // Note that for compatibility reasons, only one locator argument is allowed for @DependsOnMaven
 
 // also protected artifact repositories are supported, see <https://github.com/holgerbrandl/kscript/blob/master/test/TestsReadme.md#manual-testing>
-// @file:MavenRepository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
+// @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
 // You can use environment variables for user and password when string surrounded by double {} brackets 
-// @file:MavenRepository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{ARTIFACTORY_USER}}", password="{{ARTIFACTORY_PASSWORD}}")
+// @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{ARTIFACTORY_USER}}", password="{{ARTIFACTORY_PASSWORD}}")
 // will be use 'ARTIFACTORY_USER' and 'ARTIFACTORY_PASSWORD' environment variables
 // if the value doesn't found in the script environment  will fail
 
@@ -395,7 +383,9 @@ comment directives:
 @file:Include("util.kt")
 
 // Define kotlin options
-@file:KotlinOpts("-J-Xmx5g") @file:KotlinOpts("-J-server") @file:CompilerOpts("-jvm-target 1.8")
+@file:KotlinOpts("-J-Xmx5g") 
+@file:KotlinOpts("-J-server") 
+@file:CompilerOpts("-jvm-target 1.8")
 
 // declare application entry point (applies on for kt-files)
 @file:EntryPoint("Foo.bar")
@@ -407,7 +397,7 @@ To enable the use of these annotations in Intellij, the user must add the follow
 dependencies:
 
 ```
-com.github.holgerbrandl:kscript-annotations:1.2
+com.github.holgerbrandl:kscript-annotations:1.4
 ```
 
 `kscript` will automatically detect an annotation-driven script, and if so will declare a dependency on this artifact
@@ -609,8 +599,7 @@ is a valid Kotlin `kts` script. Plain and simple, no `main`, no `companion`, jus
 Yes, (since kscript v1.6) you can run kotlin source files through `kscript`. By default, it will assume a top-level `main` method
 as entry-point.
 
-However, in case you're using a companion object to declare the entry point, you need to indicate this via the `//ENTRY`
-/`@file:Entry` directive:
+However, in case you're using a companion object to declare the entry point, you need to indicate this via the `@file:Entry`.
 
 
 ### What are performance and resource usage difference between scripting with kotlin and python?
@@ -638,7 +627,7 @@ see [jbang](https://github.com/maxandersen/jbang).
 
 ### Can I use custom artifact repositories?
 
-Yes, via the `@MavenRepository` annotation. See [annotations section](#annotation-driven-script-configuration)
+Yes, via the `@Repository` annotation. See [annotations section](#annotation-driven-script-configuration)
 or [custom_mvn_repo_annot](test/resources/custom_mvn_repo_annot.kts) for a complete example
 
 

@@ -62,9 +62,9 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
 
         val script = scriptResolver.resolve(scriptSource, preambles)
 
-        if (script.deprecated.isNotEmpty()) {
+        if (script.deprecatedItems.isNotEmpty()) {
             if (docopt.getBoolean("report")) {
-                info(DeprecatedInfoCreator().create(script.deprecated))
+                info(DeprecatedInfoCreator().create(script.deprecatedItems))
             } else {
                 warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
             }

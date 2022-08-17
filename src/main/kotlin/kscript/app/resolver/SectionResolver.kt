@@ -1,7 +1,6 @@
 package kscript.app.resolver
 
 import kscript.app.model.*
-import kscript.app.model.Deprecated
 import kscript.app.parser.Parser
 import kscript.app.util.UriUtils
 import java.net.URI
@@ -145,8 +144,8 @@ class SectionResolver(
                 resolvedScriptAnnotations += repository
             }
 
-            is Deprecated -> {
-                resolutionContext.deprecated.add(scriptAnnotation)
+            is DeprecatedItem -> {
+                resolutionContext.deprecatedItems.add(scriptAnnotation)
             }
         }
 

@@ -14,7 +14,7 @@ data class Script(
     val repositories: Set<Repository>,
     val kotlinOpts: Set<KotlinOpt>,
     val compilerOpts: Set<CompilerOpt>,
-    val deprecated: Set<Deprecated>,
+    val deprecatedItems: Set<DeprecatedItem>,
 
     val scriptNodes: Set<ScriptNode>,
     val rootNode: ScriptNode,

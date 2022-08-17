@@ -1,7 +1,6 @@
 package kscript.app.parser
 
 import kscript.app.model.*
-import kscript.app.model.Deprecated
 
 @Suppress("UNUSED_PARAMETER")
 object LineParser {
@@ -53,9 +52,9 @@ object LineParser {
         val fileDependsOnMaven = "@file:DependsOnMaven"
         val depends = "//DEPS "
 
-        val deprecated: MutableList<Deprecated> = mutableListOf()
-
         text.trim().let { s ->
+            val deprecatedItems: MutableList<DeprecatedItem> = mutableListOf()
+
             val dependencies = when {
                 s.startsWith(fileDependsOnMaven) -> {
                     extractQuotedValuesInParenthesis(s.substring(fileDependsOnMaven.length))
@@ -67,11 +66,11 @@ object LineParser {
 
                 s.startsWith(depends) -> {
                     val values = extractValues(s.substring(depends.length))
-                    deprecated.add(createDeprecatedAnnotation(location,
-                                                              line,
-                                                              deprecatedAnnotation,
-                                                              text,
-                                                              "@file:DependsOn(" + values.joinToString(",") { "\"$it\"" } + ")"))
+                    deprecatedItems.add(createDeprecatedAnnotation(location,
+                                                                   line,
+                                                                   deprecatedAnnotation,
+                                                                   text,
+                                                                   "@file:DependsOn(" + values.joinToString(", ") { "\"${it.trim()}\"" } + ")"))
 
                     values
                 }
@@ -84,7 +83,7 @@ object LineParser {
                 Dependency(validated)
             }
 
-            return dependencyAnnotations + deprecated
+            return dependencyAnnotations + deprecatedItems
         }
     }
 
@@ -149,11 +148,11 @@ object LineParser {
                     var str = """"${repository.url}""""
 
                     if (repository.user.isNotBlank()) {
-                        str += """, "${repository.user}""""
+                        str += """, user="${repository.user}""""
                     }
 
                     if (repository.password.isNotBlank()) {
-                        str += """, "${repository.password}""""
+                        str += """, password="${repository.password}""""
                     }
 
                     return listOf(
@@ -208,7 +207,7 @@ object LineParser {
                                                                               line,
                                                                               deprecatedAnnotation,
                                                                               text,
-                                                                              values.joinToString { "@file:KotlinOpts(\"$it\")\n" })
+                                                                              "@file:KotlinOpts(" + values.joinToString(", ") { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()
@@ -232,7 +231,7 @@ object LineParser {
                                                                                 line,
                                                                                 deprecatedAnnotation,
                                                                                 text,
-                                                                                values.joinToString { "@file:CompilerOpts(\"$it\")\n" })
+                                                                                "@file:CompilerOpts(" + values.joinToString(", ") { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()
@@ -313,5 +312,5 @@ object LineParser {
 
     private fun createDeprecatedAnnotation(
         location: Location, line: Int, introText: String, existing: String, replacement: String
-    ): Deprecated = Deprecated(location, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
+    ): DeprecatedItem = DeprecatedItem(location, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
 }

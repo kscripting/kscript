@@ -1,7 +1,6 @@
 package kscript.app.resolver
 
 import kscript.app.model.*
-import kscript.app.model.Deprecated
 import java.net.URI
 
 data class ResolutionContext(
@@ -20,5 +19,5 @@ data class ResolutionContext(
     val kotlinOpts: MutableSet<KotlinOpt> = mutableSetOf(),
     val compilerOpts: MutableSet<CompilerOpt> = mutableSetOf(),
     val importNames: MutableSet<ImportName> = mutableSetOf(),
-    val deprecated: MutableSet<Deprecated> = mutableSetOf(),
+    val deprecatedItems: MutableSet<DeprecatedItem> = mutableSetOf(),
 )

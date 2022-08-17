@@ -23,7 +23,7 @@ class GradleTemplatesTest {
             kotlinOpts = setOf(),
             compilerOpts = setOf(),
             scriptNodes = setOf(),
-            deprecated = setOf(),
+            deprecatedItems = setOf(),
             rootNode = ScriptNode(location, listOf()),
             digest = "w4r53453"
         )
@@ -71,7 +71,7 @@ class GradleTemplatesTest {
             kotlinOpts = setOf(KotlinOpt("-J-Xmx5g"), KotlinOpt("-J-server")),
             compilerOpts = setOf(CompilerOpt("-progressive"), CompilerOpt("-verbose"), CompilerOpt("-jvm-target 1.8")),
             scriptNodes = setOf(),
-            deprecated = setOf(),
+            deprecatedItems = setOf(),
             rootNode = ScriptNode(location, listOf()),
             digest = "w4r53453"
         )

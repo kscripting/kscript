@@ -1,16 +1,16 @@
 package kscript.app.creator
 
-import kscript.app.model.Deprecated
+import kscript.app.model.DeprecatedItem
 import kscript.app.model.Location
 import net.igsoft.tablevis.TableBuilder
 import net.igsoft.tablevis.printer.text.TextTablePrinter
 import net.igsoft.tablevis.style.text.BoxTextTableStyleSet
 
 class DeprecatedInfoCreator {
-    fun create(deprecated: Set<Deprecated>): String {
+    fun create(deprecatedItems: Set<DeprecatedItem>): String {
         val printer = TextTablePrinter()
 
-        val deprecatedList = deprecated.sortedWith(compareBy({ it.location.level }, { it.line }))
+        val deprecatedList = deprecatedItems.sortedWith(compareBy({ it.location.level }, { it.line }))
 
         val table = TableBuilder(BoxTextTableStyleSet()) {
             width = 160
