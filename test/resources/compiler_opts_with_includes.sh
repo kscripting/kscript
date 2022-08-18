@@ -3,7 +3,7 @@
 echo "fun foo() = 42" > $1/compiler_opts_with_includes_dep.kts
 
 cat <<"EOF" > $1/compiler_opts_with_includes_master.kt
-@file:CompilerOpts("-jvm-target 1.8")
+@file:CompilerOptions("-jvm-target 1.8")
 @file:Include("compiler_opts_with_includes_dep.kts")
 @file:DependsOnMaven("log4j:log4j:1.2.14")
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env kscript
-@file:KotlinOpts("-J-Xmx5g")
+@file:KotlinOptions("-J-Xmx5g")
 
 package foo
 

@@ -3,7 +3,7 @@
 @file:DependsOn("org.jetbrains.kotlin:kotlin-reflect:1.1.60")
 @file:DependsOn("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
 
-@file:CompilerOpts("-jvm-target 1.8")
+@file:CompilerOptions("-jvm-target 1.8")
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
