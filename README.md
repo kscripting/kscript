@@ -538,10 +538,10 @@ To keep some options stored permanently in configuration you can create kscript 
 KScript follows XDG directory standard, so the file should be created in:
 
 
-| OS          | PATH                                                                            |
-|-------------|---------------------------------------------------------------------------------|
-| **Windows** | %LOCALAPPDATA%\kscript.properties                                               |
-| **Posix**   | ${XDG_CONFIG_DIR}/kscript.properties or ${user.home}/.config/kscript.properties |
+| OS          | PATH                                                                              |
+|-------------|-----------------------------------------------------------------------------------|
+| **Windows** | %LOCALAPPDATA%\kscript.properties                                                 |
+| **Posix**   | $${XDG_CONFIG_DIR}/kscript.properties or $${user.home}/.config/kscript.properties |
 
 
 Content of kscript.properties file is a standard Java format, with following properties available:
