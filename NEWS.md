@@ -1,6 +1,6 @@
 # Changes
 
-## 4.1.0 - TO BE RELEASED
+## 4.1.0
 
 Breaking changes
 
@@ -19,7 +19,10 @@ Enhancements
 * Packaging scripts works again (thanks to [Vsajip](https://github.com/vsajip))
 * When creating IntelliJ project 'gradle' and 'idea' do not have to be in path
 * Integration tests rewritten from bash to JUnit
-* Deprecation of @MavenRepository -> replacement: @Repository which is a Kotlin standard
+* Replacements for (current annotations are deprecated):
+  * @MavenRepository -> @Repository
+  * @KotlinOpts -> @KotlinOptions
+  * @CompilerOpts -> @CompilerOptions
 * Deprecation of comment based annotations
 * Report for deprecated features (--report option)
 
