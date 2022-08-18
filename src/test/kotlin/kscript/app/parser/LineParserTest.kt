@@ -122,9 +122,9 @@ class LineParserTest {
     }
 
     @ParameterizedTest
-    @MethodSource("kotlinOpts")
+    @MethodSource("kotlinOptions")
     fun `Kotlin options parsing`(line: String, kotlinOpts: List<ScriptAnnotation>) {
-        println("KotlinOpts: '$line'")
+        println("KotlinOptions: '$line'")
         assertThat(parseKotlinOpts(location, 1, line)).containsExactlyInAnyOrder(*kotlinOpts.toTypedArray())
     }
 
@@ -271,7 +271,7 @@ class LineParserTest {
         }
 
         @JvmStatic
-        fun kotlinOpts(): Stream<Arguments> = Stream.of(
+        fun kotlinOptions(): Stream<Arguments> = Stream.of(
             Arguments.of(
                 "//KOTLIN_OPTS -foo, 3 ,'some file.txt'", listOf(
                     KotlinOpt("-foo"), KotlinOpt("3"), KotlinOpt("'some file.txt'"), DeprecatedItem(
@@ -284,12 +284,26 @@ class LineParserTest {
                             "test"
                         ),
                         line = 1,
-                        message = "Deprecated annotation:\n//KOTLIN_OPTS -foo, 3 ,'some file.txt'\nshould be replaced with:\n@file:KotlinOpts(\"-foo\", \"3\", \"'some file.txt'\")"
+                        message = "Deprecated annotation:\n//KOTLIN_OPTS -foo, 3 ,'some file.txt'\nshould be replaced with:\n@file:KotlinOptions(\"-foo\", \"3\", \"'some file.txt'\")"
                     )
                 )
             ),
             Arguments.of(
-                """@file:KotlinOpts("--bar") // some other crazy comment""", listOf(KotlinOpt("--bar"))
+                """@file:KotlinOpts("--bar") // some other crazy comment""", listOf(KotlinOpt("--bar"), DeprecatedItem(
+                    Location(
+                        0,
+                        ScriptSource.HTTP,
+                        ScriptType.KT,
+                        URI.create("http://example/test.kt"),
+                        URI.create("http://example/"),
+                        "test"
+                    ),
+                    line = 1,
+                    message = "Deprecated annotation:\n@file:KotlinOpts(\"--bar\") // some other crazy comment\nshould be replaced with:\n@file:KotlinOptions(\"--bar\")"
+                ))
+            ),
+            Arguments.of(
+                """@file:KotlinOptions("--bar") // some other crazy comment""", listOf(KotlinOpt("--bar"))
             ),
         )
 

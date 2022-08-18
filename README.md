@@ -13,7 +13,6 @@ In particular this wrapper around `kotlinc` adds
 
 * Compiled script caching (using md5 checksums)
 * Dependency declarations using gradle-style resource locators and automatic dependency resolution
-  with [jcabi-aether](https://github.com/jcabi/jcabi-aether)
 * More options to provide scripts including interpreter mode, reading from stdin, local files or URLs
 * Embedded configuration for Kotlin runtime options
 * Support library to ease the writing of Kotlin scriptlets
@@ -248,9 +247,10 @@ Script Configuration
 The following directives supported by `kscript` to configure scripts:
 
 * `@file:DependsOn` to declare dependencies with gradle-style locators
-* `@file:KotlinOpts`  to configure the kotlin/java runtime environment
 * `@file:Include` to source kotlin files into the script
 * `@file:EntryPoint` to declare the application entrypoint for kotlin `*.kt` applications
+* `@file:CompilerOptions` to configure the compilation options
+* `@file:KotlinOptions` to configure the kotlin/java runtime environment
 
 ### Declare dependencies with `@file:DependsOn`
 
@@ -282,14 +282,14 @@ println("Parsed script arguments are: \n" + doArgs)
 `kscript` will read dependencies from all lines in a script that start with `//DEPS` (if any). Multiple dependencies can
 be split by comma, space or semicolon.
 
-### Configure the runtime  with `@file:KotlinOpts`
+### Configure the runtime  with `@file:KotlinOptions`
 
-`kscript` allows to provide a `@file:KotlinOpts` directive followed by parameters passed on to `kotlin` similar to how
+`kscript` allows to provide a `@file:KotlinOptions` directive followed by parameters passed on to `kotlin` similar to how
 dependencies are defined:
 
 ```kotlin
 #!/usr/bin/env kscript
-@file:KotlinOpts("-J-Xmx5g", "-J-server")
+@file:KotlinOptions("-J-Xmx5g", "-J-server")
 
 println("Hello from Kotlin with 5g of heap memory running in server mode!")
 ```
@@ -383,9 +383,9 @@ The latter is the default for `kt` files and could be omitted
 @file:Include("util.kt")
 
 // Define kotlin options
-@file:KotlinOpts("-J-Xmx5g") 
-@file:KotlinOpts("-J-server") 
-@file:CompilerOpts("-jvm-target 1.8")
+@file:KotlinOptions("-J-Xmx5g") 
+@file:KotlinOptions("-J-server") 
+@file:CompilerOptions("-jvm-target 1.8")
 
 // declare application entry point (applies on for kt-files)
 @file:EntryPoint("Foo.bar")
@@ -506,7 +506,7 @@ kscript --package some_script.kts
 ```
 
 The created binary will contain a compiled copy of the script, as well as all declared dependencies (fatjar). Also
-runtime jvm parameters declared via `@file:KotlinOpts` are used to spin up the JVM.
+runtime jvm parameters declared via `@file:KotlinOptions` are used to spin up the JVM.
 
 Just `java` is required to run these binaries.
 

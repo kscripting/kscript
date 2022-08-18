@@ -192,13 +192,26 @@ object LineParser {
     }
 
     fun parseKotlinOpts(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+        val fileKotlinOptions = "@file:KotlinOptions"
         val fileKotlinOpts = "@file:KotlinOpts"
         val kotlinOpts = "//KOTLIN_OPTS "
 
         text.trim().let {
             return when {
-                it.startsWith(fileKotlinOpts) -> extractQuotedValuesInParenthesis(it.substring(fileKotlinOpts.length)).map {
+                it.startsWith(fileKotlinOptions) -> extractQuotedValuesInParenthesis(it.substring(fileKotlinOptions.length)).map {
                     KotlinOpt(it)
+                }
+
+                it.startsWith(fileKotlinOpts) -> {
+                    val values = extractQuotedValuesInParenthesis(it.substring(fileKotlinOpts.length))
+
+                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(location,
+                                                                              line,
+                                                                              deprecatedAnnotation,
+                                                                              text,
+                                                                              "@file:KotlinOptions(" + values.joinToString(
+                                                                                  ", "
+                                                                              ) { "\"$it\"" } + ")")
                 }
 
                 it.startsWith(kotlinOpts) -> {
@@ -207,7 +220,9 @@ object LineParser {
                                                                               line,
                                                                               deprecatedAnnotation,
                                                                               text,
-                                                                              "@file:KotlinOpts(" + values.joinToString(", ") { "\"$it\"" } + ")")
+                                                                              "@file:KotlinOptions(" + values.joinToString(
+                                                                                  ", "
+                                                                              ) { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()
@@ -216,13 +231,26 @@ object LineParser {
     }
 
     fun parseCompilerOpts(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+        val fileCompilerOptions = "@file:CompilerOptions"
         val fileCompilerOpts = "@file:CompilerOpts"
         val compilerOpts = "//COMPILER_OPTS "
 
         text.trim().let {
             return when {
-                it.startsWith(fileCompilerOpts) -> extractQuotedValuesInParenthesis(it.substring(fileCompilerOpts.length)).map {
+                it.startsWith(fileCompilerOptions) -> extractQuotedValuesInParenthesis(it.substring(fileCompilerOptions.length)).map {
                     CompilerOpt(it)
+                }
+
+                it.startsWith(fileCompilerOpts) -> {
+                    val values = extractQuotedValuesInParenthesis(it.substring(fileCompilerOpts.length))
+
+                    values.map { CompilerOpt(it) } + createDeprecatedAnnotation(location,
+                                                                                line,
+                                                                                deprecatedAnnotation,
+                                                                                text,
+                                                                                "@file:CompilerOptions(" + values.joinToString(
+                                                                                    ", "
+                                                                                ) { "\"$it\"" } + ")")
                 }
 
                 it.startsWith(compilerOpts) -> {
@@ -231,7 +259,9 @@ object LineParser {
                                                                                 line,
                                                                                 deprecatedAnnotation,
                                                                                 text,
-                                                                                "@file:CompilerOpts(" + values.joinToString(", ") { "\"$it\"" } + ")")
+                                                                                "@file:CompilerOptions(" + values.joinToString(
+                                                                                    ", "
+                                                                                ) { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()
