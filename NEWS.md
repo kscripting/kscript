@@ -19,10 +19,13 @@ Enhancements
 * Packaging scripts works again (thanks to [Vsajip](https://github.com/vsajip))
 * When creating IntelliJ project 'gradle' and 'idea' do not have to be in path
 * Integration tests rewritten from bash to JUnit
+* Deprecation of @MavenRepository -> replacement: @Repository which is a Kotlin standard
+* Deprecation of comment based annotations
+* Report for deprecated features (--report option)
 
 Bugfixes
 * Fix for dependency resolution
-* Fix creation of Gradle files and their indentation
+* Fix for creation of Gradle files and their indentation
 * Fix for handling potentially duplicated file names in Idea projects
 * Fix for Idea runtime configuration
 
