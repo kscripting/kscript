@@ -279,7 +279,7 @@ println("Hello from Kotlin!")
 println("Parsed script arguments are: \n" + doArgs)
 ```
 
-`kscript` will read dependencies from all lines in a script that start with `//DEPS` (if any). Multiple dependencies can
+`kscript` will read dependencies from all lines in a script that start with `@file:DependsOn` (if any). Multiple dependencies can
 be split by comma, space or semicolon.
 
 ### Configure the runtime  with `@file:KotlinOptions`
@@ -294,7 +294,7 @@ dependencies are defined:
 println("Hello from Kotlin with 5g of heap memory running in server mode!")
 ```
 
-Note: Similar to the runtime you can also tweak the compile step by providing `//COMPILER_OPTS`.
+Note: Similar to the runtime you can also tweak the compile step by providing `@file:CompilerOptions`.
 
 ### Ease prototyping with `@file:Include`
 
@@ -419,7 +419,7 @@ e.g. `import DependsOn`).
 * Define variable `val lines = kscript.text.resolveArgFile(args)` which returns an iterator over the lines in the first
   input argument of the script, or the standard input if no file arguments are provided to the script
 
-This allows to to replace `awk`ward constructs (or `sed` or`perl`) with _kotlinesque_ solutions such as
+This allows to replace `awk`ward constructs (or `sed` or`perl`) with _kotlinesque_ solutions such as
 
 ```bash
 cat some_file | kscript -t 'lines

@@ -1,6 +1,6 @@
 
 
-Hoe to build?
+How to build?
 
 ```bash
 gradle jar

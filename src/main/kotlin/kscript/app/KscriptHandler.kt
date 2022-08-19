@@ -95,10 +95,10 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             return
         }
 
-        // Even if we just need and support the //ENTRY directive in case of kt-class
+        // Even if we just need and support the @file:EntryPoint directive in case of kt-class
         // files, we extract it here to fail if it was used in kts files.
         if (script.entryPoint != null && script.location.scriptType == ScriptType.KTS) {
-            throw IllegalStateException("@Entry directive is just supported for kt class files")
+            throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
         }
 
         val jar = cache.getOrCreateJar(script.digest) { basePath ->

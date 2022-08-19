@@ -84,7 +84,7 @@ class Cache(private val cacheBasePath: OsPath) {
         val directory = cacheBasePath.resolve("dependencies_$digest")
         val contentFile = directory.resolve("dependencies.content")
 
-        if (directory.exists()) {
+        if (contentFile.exists()) {
             val dependencies =
                 contentFile.readText()
                     .lines()
