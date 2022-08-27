@@ -60,6 +60,7 @@ jobs:
           sdk uninstall kscript ${{ env.KSCRIPT_VERSION }}
 
       - name: Check brew for ${{ runner.os }}
+        if: matrix.variant == 'brew'
         shell: bash
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
