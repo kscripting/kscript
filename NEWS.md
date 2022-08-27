@@ -1,5 +1,12 @@
 # Changes
 
+## 4.2.0
+
+Enhancements
+
+* Change the way of checking latest kscript version (will simplify releases)
+
+
 ## 4.1.0
 
 Breaking changes
