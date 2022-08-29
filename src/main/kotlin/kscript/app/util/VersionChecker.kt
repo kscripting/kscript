@@ -8,7 +8,7 @@ object VersionChecker {
     /** Determine the latest version by checking GitHub repo and print info if newer version is available. */
     fun versionCheck(currentVersion: String) {
         //https://api.github.com/repos/kscripting/kscript/releases/latest
-        // "tag_name": "v4.1.1",
+        // "tag_name":"v4.1.1",
         val resolvedUrlText =
             UriUtils.resolveRedirects(URL("https://api.github.com/repos/kscripting/kscript/releases/latest")).readText()
         val latestKscriptVersion = resolvedUrlText.substringAfter("\"tag_name\":\"v").substringBefore("\"")
