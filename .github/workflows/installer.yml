@@ -22,6 +22,9 @@ jobs:
         include:
           - os: macos-12
             variant: brew
+#          - os: windows-2022
+#            variant: sdkman-cygwin, scoop-windows
+
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -47,6 +50,7 @@ jobs:
             cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
           fi
 
+      # for Windows by default it runs MSYS
       - name: Check SdkMan for ${{ runner.os }}
         if: matrix.variant == 'sdkman'
         shell: bash

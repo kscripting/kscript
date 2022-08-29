@@ -6,27 +6,20 @@ import java.util.*
 
 object VersionChecker {
     /** Determine the latest version by checking GitHub repo and print info if newer version is available. */
-    private val versionRegex = "(\\d+)(.\\d+)?(.\\d+)?".toRegex()
-
     fun versionCheck(currentVersion: String) {
-        //<title>Release v4.1.0 · kscripting/kscript · GitHub</title>
-        val resolvedUrl = UriUtils.resolveRedirects(URL("https://github.com/kscripting/kscript/releases/latest"))
-        val latestVersionMatch =
-            resolvedUrl.readText()
-                .lines()
-                .filter { it.contains("<title>") }
-                .map { versionRegex.find(it, 0) }
-                .getOrNull(0)
+        //https://api.github.com/repos/kscripting/kscript/releases/latest
+        // "tag_name": "v4.1.1",
+        val resolvedUrlText =
+            UriUtils.resolveRedirects(URL("https://api.github.com/repos/kscripting/kscript/releases/latest")).readText()
+        val latestKscriptVersion = resolvedUrlText.substringAfter("\"tag_name\":\"v").substringBefore("\"")
 
-        if (latestVersionMatch == null) {
+        if (latestKscriptVersion.isBlank()) {
             info("Could not find information about new version of kscript.")
             return
         }
 
-        val latestKscriptVersion = latestVersionMatch.groupValues[0]
-
         if (padVersion(latestKscriptVersion) > padVersion(currentVersion)) {
-            info("""A new version (v${latestKscriptVersion}) of kscript is available.""")
+            info("A new version (v${latestKscriptVersion}) of kscript is available.")
         }
     }
 
