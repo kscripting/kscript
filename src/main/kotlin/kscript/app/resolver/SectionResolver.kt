@@ -94,7 +94,7 @@ class SectionResolver(
             }
 
             is PackageName -> {
-                if (resolutionContext.packageName == null || (resolutionContext.packageName != null && resolutionContext.packageLevel > currentLevel)) {
+                if (resolutionContext.packageName == null || resolutionContext.packageLevel > currentLevel) {
                     resolutionContext.packageName = scriptAnnotation
                     resolutionContext.packageLevel = currentLevel
                 }
@@ -102,7 +102,7 @@ class SectionResolver(
             }
 
             is Entry -> {
-                if (resolutionContext.entryPoint == null || (resolutionContext.entryPoint != null && resolutionContext.entryLevel > currentLevel)) {
+                if (resolutionContext.entryPoint == null || resolutionContext.entryLevel > currentLevel) {
                     resolutionContext.entryPoint = scriptAnnotation
                     resolutionContext.entryLevel = currentLevel
                 }
