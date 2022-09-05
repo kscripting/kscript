@@ -1,5 +1,6 @@
 package kscript.integration
 
+import kscript.integration.tools.TestAssertion.any
 import kscript.integration.tools.TestAssertion.startsWith
 import kscript.integration.tools.TestAssertion.verify
 import kscript.integration.tools.TestContext.projectDir
@@ -83,7 +84,7 @@ class ScriptInputModesTest : TestBase {
             "kscript ${resolvePath("${projectDir}/test/resources/multi_line_deps.kts")}",
             0,
             "kscript is  cool!\n",
-            "[kscript] Resolving com.offbytwo:docopt:0.6.0.20150202...\n[kscript] Resolving log4j:log4j:1.2.14...\n"
+            any()
         )
     }
 

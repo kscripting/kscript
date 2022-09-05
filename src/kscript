@@ -46,14 +46,4 @@ fi
 ## expose the name of the script being run to the script itself
 export KSCRIPT_FILE="$1"
 
-## run it using command substitution to have just the user process once kscript is done
-COMMAND=$("${KOTLIN_BIN}kotlin" -classpath "${JAR_PATH}" kscript.app.KscriptKt "$OSTYPE" "$@")
-RESULT=$?
-
-if [ ! $RESULT -eq 0 ]; then
-    exit $RESULT
-fi
-
-if [ -n "$COMMAND" ]; then
-    eval "exec $COMMAND"
-fi
+"${KOTLIN_BIN}kotlin" -classpath "${JAR_PATH}" kscript.app.KscriptKt "$OSTYPE" "$@"
