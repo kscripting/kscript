@@ -1,7 +1,6 @@
 package kscript.app
 
-import kscript.app.KscriptHost.evalScript
-import kscript.app.KscriptHost.resolveCodeForNode
+import kscript.app.Utils.resolveCodeForNode
 import kscript.app.cache.Cache
 import kscript.app.code.Templates
 import kscript.app.creator.BootstrapCreator
@@ -16,9 +15,8 @@ import kscript.app.resolver.InputOutputResolver
 import kscript.app.resolver.ScriptResolver
 import kscript.app.resolver.SectionResolver
 import kscript.app.shell.Executor
-import kscript.app.shell.toNativeFile
+import kscript.app.shell.toOsPath
 import kscript.app.util.Logger
-import kscript.app.util.Logger.errorMsg
 import kscript.app.util.Logger.info
 import kscript.app.util.Logger.infoMsg
 import kscript.app.util.Logger.warnMsg
@@ -26,10 +24,7 @@ import org.docopt.DocOptWrapper
 import org.jetbrains.kotlinx.ki.shell.KotlinShell
 import java.net.URI
 import kotlin.io.path.toPath
-import kotlin.script.experimental.api.EvaluationResult
-import kotlin.script.experimental.api.ResultWithDiagnostics
-import kotlin.script.experimental.api.ScriptDiagnostic
-import kotlin.system.exitProcess
+import kotlin.script.experimental.api.valueOrThrow
 
 class KscriptHandler(private val config: Config, private val docopt: DocOptWrapper) {
 
@@ -41,7 +36,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             info(DebugInfoCreator().create(config, kscriptArgs, userArgs))
         }
 
-        val cache = Cache(config.osConfig.kscriptCacheDir)
+        val cache = Cache(config.osConfig.cacheDir)
 
         // optionally clear up the jar cache
         if (docopt.getBoolean("clear-cache")) {
@@ -118,6 +113,16 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
         }
 
+        val kscriptHost = KscriptHost(config.osConfig.cacheDir)
+
+        val scriptFile =
+            (script.rootNode.location.sourceUri
+                ?: script.rootNode.location.sourceContextUri.resolve("script.main.kts")).toPath().toOsPath()
+        val scriptCode = resolveCodeForNode(script.rootNode)
+
+        val compilationDiagnostics = kscriptHost.compile(config.osConfig.cacheDir, scriptFile, scriptCode)
+        kscriptHost.handleDiagnostics(compilationDiagnostics)
+
 //        val jar = cache.getOrCreateJar(script.digest) { basePath ->
 //            JarArtifactCreator(executor).create(basePath, script, resolvedDependencies)
 //        }
@@ -133,35 +138,8 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             return
         }
 
-        val scriptFile = (script.rootNode.location.sourceUri ?: script.rootNode.location.sourceContextUri.resolve("script.main.kts")).toPath().toFile()
-        val res: ResultWithDiagnostics<EvaluationResult> =
-            evalScript(
-                resolveCodeForNode(script.rootNode),
-                scriptFile,
-                userArgs,
-                cacheDir = config.osConfig.kscriptCacheDir.toNativeFile()
-            )
-
-        when (res) {
-            is ResultWithDiagnostics.Success -> {
-            }
-
-            is ResultWithDiagnostics.Failure -> {
-                errorMsg("Execution failed...")
-
-                res.reports.forEach {
-                    infoMsg(it.toString())
-
-                    if (it.severity > ScriptDiagnostic.Severity.DEBUG) {
-                        val stackTrace = if (it.exception == null) "" else it.exception!!.stackTraceToString()
-
-                        errorMsg(it.message + stackTrace)
-                    }
-                }
-
-                exitProcess(1)
-            }
-        }
+        val evaluationDiagnostics = kscriptHost.evaluate(userArgs, scriptFile, compilationDiagnostics.valueOrThrow())
+        kscriptHost.handleDiagnostics(evaluationDiagnostics)
 
         //executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
     }

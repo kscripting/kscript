@@ -1,11 +1,12 @@
 package kscript.app
 
 import kscript.app.code.Templates
-import kscript.app.model.Config
-import kscript.app.util.Logger
-import kscript.app.util.Logger.errorMsg
+import kscript.app.model.ConfigBuilder
+import kscript.app.model.OsType
 import kscript.app.shell.ShellUtils.evalBash
 import kscript.app.shell.ShellUtils.quit
+import kscript.app.util.Logger
+import kscript.app.util.Logger.errorMsg
 import kscript.app.util.VersionChecker
 import org.docopt.DocOptWrapper
 
@@ -22,7 +23,7 @@ const val KSCRIPT_VERSION = "4.1.8"
 
 fun main(args: Array<String>) {
     try {
-        val config = Config.builder().apply { osType = args[0] }.build()
+        val config = ConfigBuilder(OsType.findOrThrow(args[0]), System.getProperties(), System.getenv()).build()
         val remainingArgs = args.drop(1)
 
         // skip org.docopt for version and help to allow for lazy version-check

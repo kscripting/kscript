@@ -27,8 +27,8 @@ data class OsConfig(
     val intellijCommand: String,
     val gradleCommand: String,
     val userHomeDir: OsPath,
-    val kscriptConfigFile: OsPath,
-    val kscriptCacheDir: OsPath,
+    val configFile: OsPath,
+    val cacheDir: OsPath,
     val kotlinHomeDir: OsPath,
 ) {
     override fun toString(): String {
@@ -38,7 +38,7 @@ data class OsConfig(
                   |  intellijCommand:       $intellijCommand
                   |  gradleCommand:         $gradleCommand
                   |  userHomeDir:           $userHomeDir
-                  |  kscriptConfigFile:     $kscriptConfigFile
+                  |  configFile:            $configFile
                   |  kotlinHomeDir:         $kotlinHomeDir
                   |}
                """.trimMargin()
@@ -50,9 +50,5 @@ data class Config(val osConfig: OsConfig, val scriptingConfig: ScriptingConfig) 
         return """|$osConfig
                   |$scriptingConfig 
                """.trimMargin()
-    }
-
-    companion object {
-        fun builder() = ConfigBuilder()
     }
 }

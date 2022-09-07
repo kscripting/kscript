@@ -1,6 +1,5 @@
 package kscript.app.shell
 
-import kscript.app.creator.JarArtifact
 import kscript.app.model.CompilerOpt
 import kscript.app.model.KotlinOpt
 import kscript.app.model.OsConfig
@@ -10,28 +9,6 @@ import kscript.app.util.Logger.infoMsg
 import kscript.app.util.Logger.warnMsg
 
 class Executor(private val commandResolver: CommandResolver, private val osConfig: OsConfig) {
-    fun compileKotlin(jar: OsPath, dependencies: Set<OsPath>, filePaths: Set<OsPath>, compilerOpts: Set<CompilerOpt>) {
-        val command = commandResolver.compileKotlin(jar, dependencies, filePaths, compilerOpts)
-        devMsg("JAR compile command: $command")
-
-        val processResult = ShellUtils.evalBash(osConfig.osType, command)
-
-        devMsg("Script compilation result:\n$processResult")
-
-        if (processResult.exitCode != 0) {
-            throw IllegalStateException("Compilation of scriplet failed:\n$processResult")
-        }
-    }
-
-    fun executeKotlin(
-        jarArtifact: JarArtifact, dependencies: Set<OsPath>, userArgs: List<String>, kotlinOpts: Set<KotlinOpt>
-    ) {
-        val command = commandResolver.executeKotlin(jarArtifact, dependencies, userArgs, kotlinOpts)
-        devMsg("Kotlin execute command: $command")
-
-        println(command)
-    }
-
     fun runInteractiveRepl(dependencies: Set<OsPath>, compilerOpts: Set<CompilerOpt>, kotlinOpts: Set<KotlinOpt>) {
         infoMsg("Creating REPL")
         val command = commandResolver.interactiveKotlinRepl(dependencies, compilerOpts, kotlinOpts)

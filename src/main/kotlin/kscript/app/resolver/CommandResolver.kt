@@ -32,37 +32,6 @@ class CommandResolver(private val osConfig: OsConfig) {
     //uname --> CYGWIN_NT-10.0 or MINGW64_NT-10.0-19043
     //How to find if mingw/cyg/win (second part): https://stackoverflow.com/questions/40877323/quickly-find-if-java-was-launched-from-windows-cmd-or-cygwin-terminal
 
-    fun compileKotlin(
-        jar: OsPath, dependencies: Set<OsPath>, filePaths: Set<OsPath>, compilerOpts: Set<CompilerOpt>
-    ): String {
-        val compilerOptsStr = resolveCompilerOpts(compilerOpts)
-        val classpath = resolveClasspath(dependencies)
-        val jarFile = resolveJarFile(jar)
-        val files = resolveFiles(filePaths)
-        val kotlinc = resolveKotlinBinary("kotlinc")
-
-        return "$kotlinc $compilerOptsStr $classpath -d $jarFile $files"
-    }
-
-    fun executeKotlin(
-        jarArtifact: JarArtifact, dependencies: Set<OsPath>, userArgs: List<String>, kotlinOpts: Set<KotlinOpt>
-    ): String {
-        val kotlinOptsStr = resolveKotlinOpts(kotlinOpts)
-        val userArgsStr = resolveUserArgs(userArgs)
-        val scriptRuntime = osConfig.kotlinHomeDir.resolve("lib/kotlin-script-runtime.jar")
-
-        val dependenciesSet = buildSet {
-            addAll(dependencies)
-            add(jarArtifact.path)
-            add(scriptRuntime)
-        }
-
-        val classpath = resolveClasspath(dependenciesSet)
-        val kotlin = resolveKotlinBinary("kotlin")
-
-        return "$kotlin $kotlinOptsStr $classpath ${jarArtifact.execClassName} $userArgsStr"
-    }
-
     fun interactiveKotlinRepl(
         dependencies: Set<OsPath>, compilerOpts: Set<CompilerOpt>, kotlinOpts: Set<KotlinOpt>
     ): String {

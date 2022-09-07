@@ -3,7 +3,7 @@ package kscript.app.model
 import org.apache.commons.lang3.SystemUtils
 
 enum class OsType(val osName: String) {
-    LINUX("linux"), MACOS("darwin"), WINDOWS("windows"), CYGWIN("cygwin"), MSYS("msys"), FREEBSD("freebsd");
+    LINUX("linux"), MACOS("darwin"), WINDOWS("windows"), CYGWIN("cygwin"), MSYS("msys"), FREEBSD("freebsd"), OTHER("");
 
     fun isPosixLike() = (this == LINUX || this == MACOS || this == FREEBSD || this == CYGWIN || this == MSYS)
     fun isPosixHostedOnWindows() = (this == CYGWIN || this == MSYS)
