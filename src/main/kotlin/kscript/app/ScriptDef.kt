@@ -32,11 +32,9 @@ import kotlin.script.experimental.util.filterByAnnotationType
     fileExtension = ".kts",
     compilationConfiguration = MainKtsScriptDefinition::class,
     evaluationConfiguration = MainKtsEvaluationConfiguration::class,
-//    hostConfiguration = MainKtsHostConfiguration::class
 )
 abstract class MainKtsScript(val args: Array<String>)
 
-const val COMPILED_SCRIPTS_CACHE_DIR_ENV_VAR = "KOTLIN_MAIN_KTS_COMPILED_SCRIPTS_CACHE_DIR"
 const val COMPILED_SCRIPTS_CACHE_DIR_PROPERTY = "kotlin.main.kts.compiled.scripts.cache.dir"
 const val COMPILED_SCRIPTS_CACHE_VERSION = 1
 const val SCRIPT_FILE_LOCATION_DEFAULT_VARIABLE_NAME = "__FILE__"
@@ -71,29 +69,6 @@ object MainKtsEvaluationConfiguration : ScriptEvaluationConfiguration(
         refineConfigurationBeforeEvaluate(::configureConstructorArgsFromMainArgs)
     }
 )
-
-//class MainKtsHostConfiguration : ScriptingHostConfiguration(
-//    {
-//        jvm {
-//            val cacheExtSetting = System.getProperty(COMPILED_SCRIPTS_CACHE_DIR_PROPERTY)
-//                ?: System.getenv(COMPILED_SCRIPTS_CACHE_DIR_ENV_VAR)
-//            val cacheBaseDir = when {
-//                cacheExtSetting == null -> Directories(System.getProperties(), System.getenv()).cache
-//                    ?.takeIf { it.exists() && it.isDirectory }
-//                    ?.let { File(it, "main.kts.compiled.cache").apply { mkdir() } }
-//                cacheExtSetting.isBlank() -> null
-//                else -> File(cacheExtSetting)
-//            }?.takeIf { it.exists() && it.isDirectory }
-//
-//            if (cacheBaseDir != null)
-//                compilationCache(
-//                    CompiledScriptJarsCache { script, scriptCompilationConfiguration ->
-//                        File(cacheBaseDir, compiledScriptUniqueName(script, scriptCompilationConfiguration) + ".jar")
-//                    }
-//                )
-//        }
-//    }
-//)
 
 fun configureScriptFileLocationPathVariablesForEvaluation(context: ScriptEvaluationConfigurationRefinementContext): ResultWithDiagnostics<ScriptEvaluationConfiguration> {
     val compilationConfiguration = context.evaluationConfiguration[ScriptEvaluationConfiguration.compilationConfiguration]

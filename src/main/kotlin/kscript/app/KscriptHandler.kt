@@ -24,6 +24,8 @@ import org.docopt.DocOptWrapper
 import org.jetbrains.kotlinx.ki.shell.KotlinShell
 import java.net.URI
 import kotlin.io.path.toPath
+import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.api.scriptFileLocation
 import kotlin.script.experimental.api.valueOrThrow
 
 class KscriptHandler(private val config: Config, private val docopt: DocOptWrapper) {
@@ -138,7 +140,14 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             return
         }
 
-        val evaluationDiagnostics = kscriptHost.evaluate(userArgs, scriptFile, compilationDiagnostics.valueOrThrow())
+        val compiledScript = compilationDiagnostics.valueOrThrow()
+        println("compiledScript.sourceLocationId    : ${compiledScript.sourceLocationId}")
+        println("compiledScript.resultField         : ${compiledScript.resultField}")
+        println("compiledScript.otherScripts        : ${compiledScript.otherScripts}")
+        println("scriptFileLocation                 : ${compiledScript.compilationConfiguration[ScriptCompilationConfiguration.scriptFileLocation]}")
+        //KJvmCompiledScript
+
+        val evaluationDiagnostics = kscriptHost.evaluate(userArgs, scriptFile, compiledScript)
         kscriptHost.handleDiagnostics(evaluationDiagnostics)
 
         //executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
