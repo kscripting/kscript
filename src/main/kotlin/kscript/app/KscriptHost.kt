@@ -61,6 +61,8 @@ class KscriptHost(private val cacheDir: OsPath) {
                     }
                 }
 
+                println("scriptFileLocation (just before compile) :" + scriptCompilationConfiguration[ScriptCompilationConfiguration.scriptFileLocation])
+
                 compiler(script.toScriptSource(), scriptCompilationConfiguration)
             }
         }

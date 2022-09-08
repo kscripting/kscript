@@ -42,19 +42,23 @@ const val SCRIPT_FILE_LOCATION_DEFAULT_VARIABLE_NAME = "__FILE__"
 class MainKtsScriptDefinition : ScriptCompilationConfiguration(
     {
         defaultImports(DependsOn::class, Repository::class, Import::class, CompilerOptions::class, ScriptFileLocation::class)
+
         jvm {
 //            dependenciesFromClassContext(MainKtsScriptDefinition::class, "kotlin-main-kts", "kotlin-stdlib", "kotlin-reflect", wholeClasspath = true)
             dependenciesFromClassContext(MainKtsScriptDefinition::class, "kscript", wholeClasspath = true)
         }
+
         refineConfiguration {
             onAnnotations(DependsOn::class, Repository::class, Import::class, CompilerOptions::class, handler = MainKtsConfigurator())
             onAnnotations(ScriptFileLocation::class, handler = ScriptFileLocationCustomConfigurator())
-            beforeCompiling(::configureScriptFileLocationPathVariablesForCompilation)
+            //beforeCompiling(::configureScriptFileLocationPathVariablesForCompilation)
             beforeCompiling(::configureProvidedPropertiesFromJsr223Context)
         }
+
         ide {
             acceptedLocations(ScriptAcceptedLocation.Everywhere)
         }
+
         jsr223 {
             importAllBindings(true)
         }

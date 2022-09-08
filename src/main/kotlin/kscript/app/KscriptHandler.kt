@@ -115,12 +115,16 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
         }
 
+        println("scriptFileLocation (before compile)        : ${script.location.sourceUri}")
+        println("scriptContextLocation (before compile)     : ${script.location.sourceContextUri}")
+
         val kscriptHost = KscriptHost(config.osConfig.cacheDir)
 
         val scriptFile =
             (script.rootNode.location.sourceUri
                 ?: script.rootNode.location.sourceContextUri.resolve("script.main.kts")).toPath().toOsPath()
         val scriptCode = resolveCodeForNode(script.rootNode)
+
 
         val compilationDiagnostics = kscriptHost.compile(config.osConfig.cacheDir, scriptFile, scriptCode)
         kscriptHost.handleDiagnostics(compilationDiagnostics)
