@@ -1,11 +1,8 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
 package kscript.app
 
 import java.io.File
+import java.net.JarURLConnection
+import java.net.URL
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 import kotlin.script.dependencies.ScriptContents
@@ -45,7 +42,19 @@ class MainKtsScriptDefinition : ScriptCompilationConfiguration(
 
         jvm {
 //            dependenciesFromClassContext(MainKtsScriptDefinition::class, "kotlin-main-kts", "kotlin-stdlib", "kotlin-reflect", wholeClasspath = true)
-            dependenciesFromClassContext(MainKtsScriptDefinition::class, "kscript", wholeClasspath = true)
+//            dependenciesFromClassContext(MainKtsScriptDefinition::class, "kscript", wholeClasspath = true)
+
+            val keyResource = MainKtsScriptDefinition::class.java.name.replace('.', '/') + ".class"
+            val thisJarFile = MainKtsScriptDefinition::class.java.classLoader.getResource(keyResource)?.toContainingJarOrNull()
+            if (thisJarFile != null) {
+                dependenciesFromClassContext(
+                    MainKtsScriptDefinition::class,
+                    thisJarFile.name
+                )
+            } else {
+                dependenciesFromClassContext(MainKtsScriptDefinition::class, wholeClasspath = true)
+            }
+
         }
 
         refineConfiguration {
@@ -81,6 +90,8 @@ fun configureScriptFileLocationPathVariablesForEvaluation(context: ScriptEvaluat
         ?: return context.evaluationConfiguration.asSuccess()
     val scriptFileLocationVariable = compilationConfiguration[ScriptCompilationConfiguration.scriptFileLocationVariable]
         ?: return context.evaluationConfiguration.asSuccess()
+
+    println("scriptFileLocation before evaluation: ${scriptFileLocation.absolutePath}")
 
     val res = context.evaluationConfiguration.with {
         providedProperties.put(mapOf(scriptFileLocationVariable to scriptFileLocation))
@@ -221,3 +232,20 @@ fun compiledScriptUniqueName(script: SourceCode, scriptCompilationConfiguration:
 private fun ByteArray.toHexString(): String = joinToString("", transform = { "%02x".format(it) })
 
 private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES).also { it.putInt(this) }.array()
+
+internal fun URL.toContainingJarOrNull(): File? =
+    if (protocol == "jar") {
+        (openConnection() as? JarURLConnection)?.jarFileURL?.toFileOrNull()
+    } else null
+
+internal fun URL.toFileOrNull() =
+    try {
+        File(toURI())
+    } catch (e: IllegalArgumentException) {
+        null
+    } catch (e: java.net.URISyntaxException) {
+        null
+    } ?: run {
+        if (protocol != "file") null
+        else File(file)
+    }
