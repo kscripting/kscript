@@ -8,7 +8,7 @@ import java.io.File
  */
 
 /** Simple Kotlin facade for org.org.docopt.Docopt.Docopt(java.lang.String) .*/
-class DocOptWrapper(args: Iterable<String>, private val usage: String) {
+class DocOptWrapper(args: Iterable<String>, usage: String) {
 
     val parsedArgs = try {
         Docopt(usage).withExit(false).parse(args.toList())

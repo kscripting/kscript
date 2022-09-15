@@ -1,7 +1,6 @@
 package kscript.app.creator
 
 import kscript.app.model.Config
-import kscript.app.util.Logger.devMsg
 import net.igsoft.tablevis.TableBuilder
 import net.igsoft.tablevis.printer.text.TextTablePrinter
 import net.igsoft.tablevis.style.text.BoxTextTableStyleSet
