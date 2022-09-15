@@ -44,7 +44,6 @@ class KscriptHost(private val cacheDir: OsPath) {
 
     fun compile(cacheDir: OsPath, scriptLocation: OsPath, script: String): ResultWithDiagnostics<CompiledScript> =
         withMainKtsCacheDir(cacheDir) {
-            runInCoroutineContext {
                 val scriptCompilationConfiguration = createJvmCompilationConfigurationFromTemplate<MainKtsScript>(baseHostConfiguration) {
                     refineConfiguration {
                         beforeCompiling {//TODO: duplicated code from ScriptDef
@@ -63,6 +62,7 @@ class KscriptHost(private val cacheDir: OsPath) {
 
                 println("scriptFileLocation (just before compile) :" + scriptCompilationConfiguration[ScriptCompilationConfiguration.scriptFileLocation])
 
+            runInCoroutineContext {
                 compiler(script.toScriptSource(), scriptCompilationConfiguration)
             }
         }
