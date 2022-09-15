@@ -35,13 +35,11 @@ class ConfigBuilder(
     private fun String?.nullIfBlank() = if (this.isNullOrBlank()) null else this
 
     fun build(): Config {
-        val userHomeDir: OsPath =
-            userHomeDir ?: systemProperties.getPropertyOrNull("user.home")?.toNativeOsPath()
-            ?: throw IllegalStateException("Undefined 'user.home' property")
+        val userHomeDir: OsPath = userHomeDir ?: systemProperties.getPropertyOrNull("user.home")?.toNativeOsPath()
+        ?: throw IllegalStateException("Undefined 'user.home' property")
 
-        val tempDir: OsPath =
-            tempDir ?: systemProperties.getPropertyOrNull("java.io.tmpdir")?.toNativeOsPath()
-            ?: throw IllegalStateException("Undefined 'java.io.tmpdir' property")
+        val tempDir: OsPath = tempDir ?: systemProperties.getPropertyOrNull("java.io.tmpdir")?.toNativeOsPath()
+        ?: throw IllegalStateException("Undefined 'java.io.tmpdir' property")
 
         val selfName: String = selfName ?: environment.getEnvVariableOrNull("KSCRIPT_NAME") ?: "kscript"
 
@@ -56,7 +54,6 @@ class ConfigBuilder(
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toNativeOsPath()
                 ?: userHomeDir.resolve(".config")
-
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Application Support")
             else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toNativeOsPath()
                 ?: userHomeDir.resolve(".config")
@@ -89,26 +86,22 @@ class ConfigBuilder(
             }
         }
 
-        val customPreamble =
-            customPreamble ?: environment.getEnvVariableOrNull("KSCRIPT_PREAMBLE")
-            ?: configProperties.getPropertyOrNull("scripting.preamble") ?: ""
+        val customPreamble = customPreamble ?: environment.getEnvVariableOrNull("KSCRIPT_PREAMBLE")
+        ?: configProperties.getPropertyOrNull("scripting.preamble") ?: ""
 
-        val providedKotlinOpts =
-            providedKotlinOpts ?: environment.getEnvVariableOrNull("KSCRIPT_KOTLIN_OPTS")
-            ?: configProperties.getPropertyOrNull("scripting.kotlin.opts") ?: ""
+        val providedKotlinOpts = providedKotlinOpts ?: environment.getEnvVariableOrNull("KSCRIPT_KOTLIN_OPTS")
+        ?: configProperties.getPropertyOrNull("scripting.kotlin.opts") ?: ""
 
-        val repositoryUrl =
-            repositoryUrl ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_URL") ?: configProperties.getPropertyOrNull(
-                "scripting.repository.url"
-            ) ?: ""
+        val repositoryUrl = repositoryUrl ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_URL")
+        ?: configProperties.getPropertyOrNull(
+            "scripting.repository.url"
+        ) ?: ""
 
-        val repositoryUser =
-            repositoryUser ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_USER")
-            ?: configProperties.getPropertyOrNull("scripting.repository.user") ?: ""
+        val repositoryUser = repositoryUser ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_USER")
+        ?: configProperties.getPropertyOrNull("scripting.repository.user") ?: ""
 
-        val repositoryPassword =
-            repositoryPassword ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_PASSWORD")
-            ?: configProperties.getPropertyOrNull("scripting.repository.password") ?: ""
+        val repositoryPassword = repositoryPassword ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_PASSWORD")
+        ?: configProperties.getPropertyOrNull("scripting.repository.password") ?: ""
 
         val scriptingConfig = ScriptingConfig(
             customPreamble,
