@@ -8,7 +8,7 @@ fi
 
 tmpfile=$(mktemp).kts
 
-#echo '@file:Include("https://git.io/fAJ5h")' >> $tmpfile
+#echo '@file:Import("https://git.io/fAJ5h")' >> $tmpfile
 echo '
 @file:DependsOn("org.apache.hadoop:hadoop-common:2.7.0")
 

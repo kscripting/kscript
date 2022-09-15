@@ -15,21 +15,31 @@ object LineParser {
     }
 
     fun parseInclude(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+        val fileImport = "@file:Import"
         val fileInclude = "@file:Include"
         val include = "//INCLUDE "
 
         text.trim().let {
             return when {
-                it.startsWith(fileInclude) -> listOf(
-                    Include(extractQuotedValueInParenthesis(it.substring(fileInclude.length)))
-                )
+                it.startsWith(fileImport) -> {
+                    val value = extractQuotedValueInParenthesis(it.substring(fileImport.length))
+                    listOf(Include(value))
+                }
+
+                it.startsWith(fileInclude) -> {
+                    val value = extractQuotedValueInParenthesis(it.substring(fileInclude.length))
+
+                    listOf(Include(value), createDeprecatedAnnotation(
+                        location, line, deprecatedAnnotation, text, "@file:Import(\"$value\")"
+                    ))
+                }
 
                 it.startsWith(include) -> {
                     val value = extractValue(it.substring(include.length))
 
                     listOf(
                         Include(value), createDeprecatedAnnotation(
-                            location, line, deprecatedAnnotation, text, "@file:Include(\"$value\")"
+                            location, line, deprecatedAnnotation, text, "@file:Import(\"$value\")"
                         )
                     )
                 }
@@ -67,10 +77,10 @@ object LineParser {
                 s.startsWith(depends) -> {
                     val values = extractValues(s.substring(depends.length))
                     deprecatedItems.add(createDeprecatedAnnotation(location,
-                                                                   line,
-                                                                   deprecatedAnnotation,
-                                                                   text,
-                                                                   "@file:DependsOn(" + values.joinToString(", ") { "\"${it.trim()}\"" } + ")"))
+                        line,
+                        deprecatedAnnotation,
+                        text,
+                        "@file:DependsOn(" + values.joinToString(", ") { "\"${it.trim()}\"" } + ")"))
 
                     values
                 }
@@ -206,23 +216,23 @@ object LineParser {
                     val values = extractQuotedValuesInParenthesis(it.substring(fileKotlinOpts.length))
 
                     values.map { KotlinOpt(it) } + createDeprecatedAnnotation(location,
-                                                                              line,
-                                                                              deprecatedAnnotation,
-                                                                              text,
-                                                                              "@file:KotlinOptions(" + values.joinToString(
-                                                                                  ", "
-                                                                              ) { "\"$it\"" } + ")")
+                        line,
+                        deprecatedAnnotation,
+                        text,
+                        "@file:KotlinOptions(" + values.joinToString(
+                            ", "
+                        ) { "\"$it\"" } + ")")
                 }
 
                 it.startsWith(kotlinOpts) -> {
                     val values = extractValues(it.substring(kotlinOpts.length))
                     values.map { KotlinOpt(it) } + createDeprecatedAnnotation(location,
-                                                                              line,
-                                                                              deprecatedAnnotation,
-                                                                              text,
-                                                                              "@file:KotlinOptions(" + values.joinToString(
-                                                                                  ", "
-                                                                              ) { "\"$it\"" } + ")")
+                        line,
+                        deprecatedAnnotation,
+                        text,
+                        "@file:KotlinOptions(" + values.joinToString(
+                            ", "
+                        ) { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()
@@ -245,23 +255,23 @@ object LineParser {
                     val values = extractQuotedValuesInParenthesis(it.substring(fileCompilerOpts.length))
 
                     values.map { CompilerOpt(it) } + createDeprecatedAnnotation(location,
-                                                                                line,
-                                                                                deprecatedAnnotation,
-                                                                                text,
-                                                                                "@file:CompilerOptions(" + values.joinToString(
-                                                                                    ", "
-                                                                                ) { "\"$it\"" } + ")")
+                        line,
+                        deprecatedAnnotation,
+                        text,
+                        "@file:CompilerOptions(" + values.joinToString(
+                            ", "
+                        ) { "\"$it\"" } + ")")
                 }
 
                 it.startsWith(compilerOpts) -> {
                     val values = extractValues(it.substring(compilerOpts.length))
                     values.map { CompilerOpt(it) } + createDeprecatedAnnotation(location,
-                                                                                line,
-                                                                                deprecatedAnnotation,
-                                                                                text,
-                                                                                "@file:CompilerOptions(" + values.joinToString(
-                                                                                    ", "
-                                                                                ) { "\"$it\"" } + ")")
+                        line,
+                        deprecatedAnnotation,
+                        text,
+                        "@file:CompilerOptions(" + values.joinToString(
+                            ", "
+                        ) { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()

@@ -247,7 +247,7 @@ Script Configuration
 The following directives supported by `kscript` to configure scripts:
 
 * `@file:DependsOn` to declare dependencies with gradle-style locators
-* `@file:Include` to source kotlin files into the script
+* `@file:Import` to source kotlin files into the script
 * `@file:EntryPoint` to declare the application entrypoint for kotlin `*.kt` applications
 * `@file:CompilerOptions` to configure the compilation options
 * `@file:KotlinOptions` to configure the kotlin/java runtime environment
@@ -296,9 +296,9 @@ println("Hello from Kotlin with 5g of heap memory running in server mode!")
 
 Note: Similar to the runtime you can also tweak the compile step by providing `@file:CompilerOptions`.
 
-### Ease prototyping with `@file:Include`
+### Ease prototyping with `@file:Import`
 
-`kscript` supports an `@file:Include` directive to directly include other source files without prior compilation. Absolute
+`kscript` supports an `@file:Import` directive to directly include other source files without prior compilation. Absolute
 and relative paths, as well as URLs are supported. Example:
 
 ```kotlin
@@ -309,12 +309,12 @@ fun Array<Double>.median(): Double {
 }
 ```
 
-Which can be now used using the `@file:Include` directive with
+Which can be now used using the `@file:Import` directive with
 
 ```kotlin
 #!/usr/bin/env kscript
 
-@file:Include("utils.kt")
+@file:Import("utils.kt")
 
 val robustMean = listOf(1.3, 42.3, 7.0).median()
 println(robustMean)
@@ -380,7 +380,7 @@ The latter is the default for `kt` files and could be omitted
 // if the value doesn't found in the script environment  will fail
 
 // Include helper scripts without deployment or prior compilation
-@file:Include("util.kt")
+@file:Import("util.kt")
 
 // Define kotlin options
 @file:KotlinOptions("-J-Xmx5g") 
@@ -561,8 +561,8 @@ scripting.preamble=// declare dependencies\n\
 @file:DependsOn("com.github.holgerbrandl:kutils:0.12")\n\
 \n\
 // make sure to also support includes in here\n\
-// @file:Include("util.kt")\n\
-@file:Include("https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")\n\
+// @file:Import("util.kt")\n\
+@file:Import("https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")\n\
 \n\
 \n\
 // define some important variables to be used throughout the dsl\n\
@@ -627,7 +627,7 @@ see [jbang](https://github.com/maxandersen/jbang).
 
 ### Can I use custom artifact repositories?
 
-Yes, via the `@Repository` annotation. See [annotations section](#annotation-driven-script-configuration)
+Yes, via the `@Repository` annotation. See [annotations section](#script-configuration)
 or [custom_mvn_repo_annot](test/resources/custom_mvn_repo_annot.kts) for a complete example
 
 

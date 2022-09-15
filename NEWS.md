@@ -7,6 +7,7 @@ Enhancements
 * Change the way of checking latest kscript version (will simplify releases)
 * Improved ConfigBuilder implementation
 * Updated Gradle and dependencies
+* Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting 
 
 
 ## 4.1.0

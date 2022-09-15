@@ -32,8 +32,8 @@ internal class ConfigBuilderTest {
                 @file:DependsOn("com.github.holgerbrandl:kutils:0.12")
                 
                 // make sure to also support includes in here
-                // @file:Include("util.kt")
-                @file:Include("https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")
+                // @file:Import("util.kt")
+                @file:Import("https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")
                 
                 
                 // define some important variables to be used throughout the dsl

@@ -138,7 +138,7 @@ class MyTests {
 You can run this test like usual, either from the IDE (by right clicking on the function or class and selecting "run") or from the command line (with `./gradlew test`).
 
 ### Caveats
-- These tests can go in either .kts files or the .kt files that your script depend on via `@file:Include`. However, tests in a `.kts` file can only be run from the command line
+- These tests can go in either .kts files or the .kt files that your script depend on via `@file:Import`. However, tests in a `.kts` file can only be run from the command line
 - If you encounter any Gradle build errors such as "Duplicate JVM class name" then try cleaning the project first - `./gradlew clean test`
 - Kscript does not differentiate test dependencies, so any test code or test imports in your script will be included when creating a packaged binary with `--package`
 
