@@ -25,7 +25,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
             info(DebugInfoCreator().create(config, kscriptArgs, userArgs))
         }
 
-        val cache = Cache(config.osConfig.kscriptCacheDir)
+        val cache = Cache(config.osConfig.cacheDir)
 
         // optionally clear up the jar cache
         if (docopt.getBoolean("clear-cache")) {

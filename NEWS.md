@@ -1,5 +1,14 @@
 # Changes
 
+## 4.2.0
+
+Enhancements
+
+* Change the way of checking latest kscript version (will simplify releases)
+* Improved ConfigBuilder implementation
+* Updated Gradle and dependencies
+
+
 ## 4.1.0
 
 Breaking changes

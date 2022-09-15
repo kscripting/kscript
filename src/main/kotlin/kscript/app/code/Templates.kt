@@ -117,9 +117,9 @@ object Templates {
         | --add-bootstrap-header  Prepend bash header that installs kscript if necessary
         |
         |
-        |Copyright : 2022 Holger Brandl
+        |Copyright : 2022 Holger Brandl, Marcin Kuszczak
         |License   : MIT
         |Version   : v${version}
-        |Website   : https://github.com/holgerbrandl/kscript
+        |Website   : https://github.com/kscripting/kscript
         |""".trimMargin().trim()
 }

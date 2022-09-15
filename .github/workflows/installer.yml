@@ -6,7 +6,7 @@ on:
       kscript_version:
         description: 'KScript version to test'
         required: true
-        default: '4.0.2'
+        default: '4.1.1'
 
 jobs:
   build:
@@ -15,22 +15,31 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-10.15
+          - macos-12
           - windows-2022
+        variant:
+          - sdkman
+        include:
+          - os: macos-12
+            variant: brew
+#          - os: windows-2022
+#            variant: sdkman-cygwin, scoop-windows
+
+
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 60
+
     env:
       KSCRIPT_VERSION: ${{ github.event.inputs.kscript_version }}
 
     steps:
-      - uses: actions/checkout@v2
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '11'
       - uses: fwilhe2/setup-kotlin@main
         with:
-          version: 1.6.21
+          version: 1.7.10
 
       - name: Prerequisites for ${{ runner.os }}
         shell: bash
@@ -41,36 +50,25 @@ jobs:
             cp /c/msys64/usr/bin/bash.exe /c/Windows/System32/bash.exe
           fi
 
-      - name: Install sdkman
+      # for Windows by default it runs MSYS
+      - name: Check SdkMan for ${{ runner.os }}
+        if: matrix.variant == 'sdkman'
         shell: bash
         run: |
           bash -c "curl -s "https://get.sdkman.io" | bash"
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-      - name: Test installers for ${{ runner.os }}
-        shell: bash
-        run: |
-          echo "Bash path: $(which bash)"
           
-          # sdkman
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
           sdk install kscript ${{ env.KSCRIPT_VERSION }}
           kscript --help
           kscript -d "println(1+1)"
           sdk uninstall kscript ${{ env.KSCRIPT_VERSION }}
-          
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            true  
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-            true
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            # brew
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            brew install holgerbrandl/tap/kscript
-            kscript --help
-            kscript -d "println(1+1)"
-            brew uninstall holgerbrandl/tap/kscript
-          else
-            echo "Unknown OS"
-            exit 1
-          fi
+
+      - name: Check brew for ${{ runner.os }}
+        if: matrix.variant == 'brew'
+        shell: bash
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install holgerbrandl/tap/kscript
+          kscript --help
+          kscript -d "println(1+1)"
+          brew uninstall holgerbrandl/tap/kscript

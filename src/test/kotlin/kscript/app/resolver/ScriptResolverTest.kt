@@ -11,11 +11,19 @@ import kscript.app.parser.Parser
 import kscript.app.shell.OsPath
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.util.*
 
 class ScriptResolverTest {
+    private val currentNativeOsType = OsType.native
+    private val testProperties = Properties()
+    private val testEnv = mutableMapOf<String, String>()
+
     private val testHome = OsPath.createOrThrow(OsType.native, "build/tmp/script_resolver_test")
-    private val config =
-        Config.builder().apply { osType = OsType.native.osName; homeDir = testHome.resolve("home") }.build()
+    private val config = ConfigBuilder(currentNativeOsType, testProperties, testEnv).apply {
+        tempDir = testHome.resolve("temp")
+        userHomeDir = testHome.resolve("home")
+        kotlinHomeDir = testHome.resolve("kotlin")
+    }.build()
 
     private val cache = Cache(testHome.resolve("cache"))
     private val inputOutputResolver = InputOutputResolver(config.osConfig, cache)

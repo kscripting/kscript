@@ -3,15 +3,27 @@ package kscript.app.model
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kscript.app.shell.OsPath
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.*
 
 internal class ConfigBuilderTest {
+    private val currentNativeOsType = OsType.native
+    private val systemProperties = Properties()
+    private val systemEnvironment = mutableMapOf<String, String>()
+
+    @BeforeEach
+    fun setUp() {
+        systemProperties.put("user.home", "/home/vagrant")
+        systemProperties.put("java.io.tmpdir", "/home/vagrant/tmp")
+    }
+
     @Test
     fun `Reads all properties of ScriptingConfig from given file`() {
-        val currentNativeOsType = OsType.native
-        val config = ConfigBuilder().apply {
-            osType = currentNativeOsType.osName
+
+        val config = ConfigBuilder(currentNativeOsType, systemProperties, systemEnvironment).apply {
             configFile = OsPath.createOrThrow(currentNativeOsType, "test", "resources", "config", "kscript.properties")
+            kotlinHomeDir = OsPath.createOrThrow(currentNativeOsType, ".")
         }.build()
 
         assertThat(config.scriptingConfig).isEqualTo(ScriptingConfig(

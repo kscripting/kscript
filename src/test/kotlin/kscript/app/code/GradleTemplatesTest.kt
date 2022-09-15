@@ -33,7 +33,7 @@ class GradleTemplatesTest {
         assertThat(scriptText).isEqualTo(
             """
             |plugins {
-            |    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+            |    id("org.jetbrains.kotlin.jvm") version "1.7.10"
             |}
             |
             |repositories {
@@ -44,7 +44,7 @@ class GradleTemplatesTest {
             |
             |dependencies {
             |    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.21")
+            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
             |    implementation("com.github.holgerbrandl:kscript-annotations:1.4")
             |}
             |
@@ -81,7 +81,7 @@ class GradleTemplatesTest {
         assertThat(scriptText).isEqualTo(
             """
             |plugins {
-            |    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+            |    id("org.jetbrains.kotlin.jvm") version "1.7.10"
             |}
             |
             |repositories {
@@ -105,7 +105,7 @@ class GradleTemplatesTest {
             |
             |dependencies {
             |    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.6.21")
+            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
             |    implementation("com.github.holgerbrandl:kscript-annotations:1.4")
             |}
             |
