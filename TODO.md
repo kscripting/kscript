@@ -2,7 +2,6 @@
 
 * New Github organization 'kscripting'
 * Release kscript to Maven Central
-* Get rid of kscript-annotations (needed only by Idea project)
 * Change a way of executing .kts files (investigate if we can get rid of reflections)
 * do not use shadow jar for kscript distribution
   * switched to java executor; it works a bit faster because of that

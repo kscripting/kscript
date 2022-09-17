@@ -2,9 +2,9 @@
 setlocal
 
 for /f "tokens=* USEBACKQ" %%o in (`where kscript.bat`) do set ABS_KSCRIPT_PATH=%%o
-set JAR_PATH=%ABS_KSCRIPT_PATH:~0,-4%.jar
+set JAR_PATH=%ABS_KSCRIPT_PATH:~0,-16%\lib\*
 
-set COMMAND=kotlin -classpath %JAR_PATH% kscript.app.KscriptKt windows %*
+set COMMAND=java -classpath %JAR_PATH% io.github.kscripting.kscript.KscriptKt windows %*
 
 set STDOUT=
 set ERRORLEVEL=

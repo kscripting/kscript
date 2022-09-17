@@ -31,7 +31,7 @@ fi
 export KSCRIPT_FILE="$1"
 
 ## run it using command substitution to have just the user process once kscript is done
-COMMAND=$("java" -classpath "$JAR_PATH/*" kscript.app.KscriptKt "$OSTYPE" "$@")
+COMMAND=$("java" -classpath "$JAR_PATH/*" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "$@")
 RESULT=$?
 
 if [ ! $RESULT -eq 0 ]; then
