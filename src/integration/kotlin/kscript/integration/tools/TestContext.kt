@@ -8,7 +8,7 @@ object TestContext {
     private val nativeType = if (osType.isPosixHostedOnWindows()) OsType.WINDOWS else osType
 
     private val projectPath: OsPath = OsPath.createOrThrow(nativeType, System.getProperty("projectPath"))
-    private val execPath: OsPath = projectPath.resolve("build/libs")
+    private val execPath: OsPath = projectPath.resolve("build/kscript/bin")
     private val testPath: OsPath = projectPath.resolve("build/tmp/test")
     private val pathEnvName = if (osType.isWindowsLike()) "Path" else "PATH"
     private val systemPath: String = System.getenv()[pathEnvName]!!
