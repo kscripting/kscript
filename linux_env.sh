@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_DIR=$(realpath "$SCRIPT_DIR")
-KSCRIPT_EXEC_DIR="$PROJECT_DIR/build/libs"
+KSCRIPT_EXEC_DIR="$PROJECT_DIR/build/kscript/bin"
 KSCRIPT_TEST_DIR="$PROJECT_DIR/build/tmp/test"
 
 mkdir -p $KSCRIPT_EXEC_DIR

@@ -360,10 +360,7 @@ The latter is the default for `kt` files and could be omitted
 
 // Declare dependencies
 @file:DependsOn("com.github.holgerbrandl:kutils:0.12") 
-@file:DependsOn(
-    "com.beust:klaxon:0.24",
-    "com.github.kittinunf.fuel:fuel:2.3.1"
-)
+@file:DependsOn("com.beust:klaxon:0.24", "com.github.kittinunf.fuel:fuel:2.3.1")
 
 // To use a custom maven repository you can declare it with
 @file:Repository("http://maven.imagej.net/content/repositories/releases")
@@ -397,7 +394,7 @@ To enable the use of these annotations in Intellij, the user must add the follow
 dependencies:
 
 ```
-com.github.holgerbrandl:kscript-annotations:1.4
+io.github.kscripting:kscript-annotations:1.5
 ```
 
 `kscript` will automatically detect an annotation-driven script, and if so will declare a dependency on this artifact

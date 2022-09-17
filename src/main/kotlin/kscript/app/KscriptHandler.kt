@@ -15,6 +15,7 @@ import kscript.app.util.Logger.warnMsg
 import org.docopt.DocOptWrapper
 import java.net.URI
 
+//TODO: replace DocOptWrapper with map
 class KscriptHandler(private val config: Config, private val docopt: DocOptWrapper) {
 
     fun handle(kscriptArgs: List<String>, userArgs: List<String>) {

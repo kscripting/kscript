@@ -5,19 +5,25 @@ import kscript.app.code.Templates
 import kscript.app.model.Script
 import kscript.app.shell.FileUtils
 import kscript.app.shell.FileUtils.resolveUniqueFilePath
+import kscript.app.shell.OsPath
 import kscript.app.util.Logger.devMsg
 import kscript.app.util.Logger.infoMsg
-import kscript.app.shell.OsPath
 import java.net.URI
 
 class IdeaProjectCreator {
-    fun create(basePath: OsPath, script: Script, userArgs: List<String>, uriLocalPathProvider: (URI) -> OsPath): OsPath {
+    fun create(
+        basePath: OsPath,
+        script: Script,
+        userArgs: List<String>,
+        uriLocalPathProvider: (URI) -> OsPath
+    ): OsPath {
         infoMsg("Setting up idea project...")
         val srcPath = basePath.resolve("src/")
 
         for (scriptNode in script.scriptNodes) {
             val sourceUri = scriptNode.location.sourceUri
-            val filePath = resolveUniqueFilePath(srcPath, scriptNode.location.scriptName, scriptNode.location.scriptType)
+            val filePath =
+                resolveUniqueFilePath(srcPath, scriptNode.location.scriptName, scriptNode.location.scriptType)
 
             if (sourceUri == null) {
                 FileUtils.createFile(filePath, scriptNode.sections.joinToString("\n") { it.code })
@@ -31,7 +37,11 @@ class IdeaProjectCreator {
 
         FileUtils.createFile(
             basePath.resolve(".idea/runConfigurations/Main.xml"),
-            Templates.createRunConfig(script.rootNode.location.scriptName, script.rootNode.location.scriptType, userArgs)
+            Templates.createRunConfig(
+                script.rootNode.location.scriptName,
+                script.rootNode.location.scriptType,
+                userArgs
+            )
         )
 
         FileUtils.createFile(

@@ -19,27 +19,11 @@ resolve_symlink() (
 
 ABS_KSCRIPT_PATH=$(resolve_symlink $(absolute_path $0))
 
-JAR_PATH=$(dirname "$ABS_KSCRIPT_PATH")/kscript.jar
-
-## prefer KOTLIN_HOME instead of PATH to resolve `kotlin` location (see #145)
-if [[ -z "$KOTLIN_HOME" ]]; then
-  KOTLIN_BIN=""
-
-  # see discussion on https://github.com/holgerbrandl/kscript/issues/15
-  REGEXP="-Dkotlin\.home=([^ ]*)"
-  GUESS_KOTLIN_HOME=$(KOTLIN_RUNNER=1 JAVACMD=echo kotlinc)
-
-  if [[ $GUESS_KOTLIN_HOME =~ $REGEXP ]]; then
-    KOTLIN_BIN="${BASH_REMATCH[1]}/bin/"
-  fi
-else
-  KOTLIN_BIN="$KOTLIN_HOME/bin/"
-fi
+JAR_PATH=$(dirname $(dirname "$ABS_KSCRIPT_PATH"))/lib
 
 # OSTYPE can be: linux*, freebsd, darwin*, cygwin, msys
 if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
   JAR_PATH=$(cygpath -w "${JAR_PATH}")
-  KOTLIN_BIN=$(cygpath "${KOTLIN_BIN}")
   true
 fi
 
@@ -47,7 +31,7 @@ fi
 export KSCRIPT_FILE="$1"
 
 ## run it using command substitution to have just the user process once kscript is done
-COMMAND=$("${KOTLIN_BIN}kotlin" -classpath "${JAR_PATH}" kscript.app.KscriptKt "$OSTYPE" "$@")
+COMMAND=$("java" -classpath "$JAR_PATH/*" kscript.app.KscriptKt "$OSTYPE" "$@")
 RESULT=$?
 
 if [ ! $RESULT -eq 0 ]; then
