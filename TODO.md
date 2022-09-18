@@ -12,6 +12,7 @@
 * Deprecate old annotations 
 * Fix the bug on ArchLinux
 * Version of kscript should be set by Gradle 
+* Local jars path (ticket)
 
 
 

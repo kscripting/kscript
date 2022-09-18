@@ -45,7 +45,7 @@ class GradleTemplatesTest {
             |dependencies {
             |    implementation("org.jetbrains.kotlin:kotlin-stdlib")
             |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
-            |    implementation("io.github.kscripting:kscript-annotations:1.5")
+            |    implementation("io.github.kscripting:kscript-annotations:1.5.0")
             |}
             |
             |sourceSets.getByName("main").java.srcDirs("src")
@@ -109,7 +109,7 @@ class GradleTemplatesTest {
             |dependencies {
             |    implementation("org.jetbrains.kotlin:kotlin-stdlib")
             |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.10")
-            |    implementation("io.github.kscripting:kscript-annotations:1.5")
+            |    implementation("io.github.kscripting:kscript-annotations:1.5.0")
             |}
             |
             |sourceSets.getByName("main").java.srcDirs("src")
