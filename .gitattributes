@@ -1,14 +1,7 @@
-# https://techblog.dorogin.com/case-of-windows-line-ending-in-bash-script-7236f056abe
-* text=auto
-*.sh text eol=lf
+* text eol=lf
+
 *.bat text eol=crlf
 
-
-# Use linux file endings for kts scripts because some of them contain shebangs and are thus partially interpreted by bash
-*.kts text eol=lf
-
-
-# also use linux style file endings for bash scripts without sh extension
-kscript text eol=lf
-gradlew text eol=lf
-mydsl text eol=lf
+*.png binary
+*.jpg binary
+*.jar binary
