@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.7.10"
     application
     id("com.adarshr.test-logger") version "3.2.0"
+    id("com.github.gmazzo.buildconfig") version "3.1.0"
     `maven-publish`
     signing
 }
@@ -15,16 +16,26 @@ repositories {
 group = "io.github.kscripting"
 version = "4.2.0"
 
+buildConfig {
+    packageName(project.group.toString() + "." + project.name)
+    useKotlinOutput()
+
+    buildConfigField("String", "APP_NAME", "\"${project.name}\"")
+    buildConfigField("String", "APP_VERSION", provider { "\"${project.version}\"" })
+    buildConfigField("String", "KOTLIN_VERSION", provider { "\"${kotlinVersion}\"" })
+}
+
 sourceSets {
     create("integration") {
-//        test {  //With that idea can understand that 'integration' is test source set and do not complain about test
+//        test {  //With that idea can understand that 'integration' is a test source set and do not complain about test
 //        names starting with upper case, but it doesn't compile correctly with it
-        java.srcDir("$projectDir/src/integration/kotlin")
-        resources.srcDir("$projectDir/src/integration/resources")
-        compileClasspath += main.get().output + test.get().output
-        runtimeClasspath += main.get().output + test.get().output
+            java.srcDir("$projectDir/src/integration/kotlin")
+            resources.srcDir("$projectDir/src/integration/resources")
+            compileClasspath += main.get().output + test.get().output
+            runtimeClasspath += main.get().output + test.get().output
+
+//        }
     }
-//    }
 }
 
 configurations {

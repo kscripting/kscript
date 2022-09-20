@@ -5,10 +5,10 @@ import io.github.kscripting.kscript.model.ConfigBuilder
 import io.github.kscripting.kscript.shell.OsType
 import io.github.kscripting.kscript.shell.ShellUtils.evalBash
 import io.github.kscripting.kscript.shell.ShellUtils.quit
-import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.errorMsg
+import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.VersionChecker
-import org.docopt.DocOptWrapper
+import org.docopt.DocoptParser
 
 /**
  * A kscript - Scripting enhancements for Kotlin
@@ -19,7 +19,6 @@ import org.docopt.DocOptWrapper
  * @author Marcin Kuszczak
  */
 
-const val KSCRIPT_VERSION = "4.1.8"
 
 fun main(args: Array<String>) {
     try {
@@ -27,14 +26,14 @@ fun main(args: Array<String>) {
         val remainingArgs = args.drop(1)
 
         // skip org.docopt for version and help to allow for lazy version-check
-        val usage = Templates.createUsageOptions(config.osConfig.selfName, KSCRIPT_VERSION)
+        val usage = Templates.createUsageOptions(config.osConfig.selfName, BuildConfig.APP_VERSION)
 
         if (remainingArgs.size == 1 && listOf("--help", "-h", "--version", "-v").contains(remainingArgs[0])) {
-            Logger.info(usage)
-            VersionChecker.versionCheck(KSCRIPT_VERSION)
+            info(usage)
+            VersionChecker.versionCheck(BuildConfig.APP_VERSION)
             val systemInfo = evalBash(config.osConfig.osType, "kotlin -version").stdout.split('(')
-            Logger.info("Kotlin    : " + systemInfo[0].removePrefix("Kotlin version").trim())
-            Logger.info("Java      : " + systemInfo[1].split('-', ')')[0].trim())
+            info("Kotlin    : " + systemInfo[0].removePrefix("Kotlin version").trim())
+            info("Java      : " + systemInfo[1].split('-', ')')[0].trim())
             return
         }
 
@@ -42,9 +41,8 @@ fun main(args: Array<String>) {
         val userArgs = remainingArgs.dropWhile { it.startsWith("-") && it != "-" }.drop(1)
         val kscriptArgs = remainingArgs.take(remainingArgs.size - userArgs.size)
 
-        val docopt = DocOptWrapper(kscriptArgs, usage)
-
-        KscriptHandler(config, docopt).handle(kscriptArgs, userArgs)
+        KscriptHandler(config, DocoptParser.parse(kscriptArgs, usage))
+            .handle(kscriptArgs, userArgs)
     } catch (e: Exception) {
         errorMsg(e)
         quit(1)

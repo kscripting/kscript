@@ -3,9 +3,6 @@ build/
 target/
 out/
 
-# Cache of project
-.gradletasknamecache
-
 *.iml
 .idea
 

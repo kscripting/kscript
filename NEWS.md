@@ -4,11 +4,16 @@
 
 Enhancements
 
+* New Github organization 'kscripting'
+* Change the name of kscript package to io.github.kscripting:kscript
+* Deprecate old annotations (in kscript-annotations library)
 * Change the way of checking latest kscript version (will simplify releases)
 * Improved ConfigBuilder implementation
 * Updated Gradle and dependencies
-* Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting 
-
+* Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting
+* Get rid of docopt handler from KscriptHandler (helps with using kscript as library)
+* Changed the way of creating distribution package - not it is handled by Gradle
+* Version of kscript is set by Gradle (generated BuildConfig)
 
 ## 4.1.0
 

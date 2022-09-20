@@ -12,15 +12,12 @@ import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
-import org.docopt.DocOptWrapper
 import java.net.URI
 
-//TODO: replace DocOptWrapper with map
-class KscriptHandler(private val config: Config, private val docopt: DocOptWrapper) {
-
+class KscriptHandler(private val config: Config, private val options: Map<String, String>) {
     fun handle(kscriptArgs: List<String>, userArgs: List<String>) {
-        Logger.silentMode = docopt.getBoolean("silent")
-        Logger.devMode = docopt.getBoolean("development")
+        Logger.silentMode = options.getBoolean("silent")
+        Logger.devMode = options.getBoolean("development")
 
         if (Logger.devMode) {
             info(DebugInfoCreator().create(config, kscriptArgs, userArgs))
@@ -29,19 +26,19 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         val cache = Cache(config.osConfig.cacheDir)
 
         // optionally clear up the jar cache
-        if (docopt.getBoolean("clear-cache")) {
+        if (options.getBoolean("clear-cache")) {
             info("Cleaning up cache...")
             cache.clear()
             return
         }
 
-        val scriptSource = docopt.getString("script")
+        val scriptSource = options.getString("script")
 
         if (scriptSource.isBlank()) {
             return
         }
 
-        val enableSupportApi = docopt.getBoolean("text")
+        val enableSupportApi = options.getBoolean("text")
 
         val preambles = buildList {
             if (enableSupportApi) {
@@ -55,7 +52,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         val sectionResolver = SectionResolver(inputOutputResolver, Parser(), config.scriptingConfig)
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, config.scriptingConfig)
 
-        if (docopt.getBoolean("add-bootstrap-header")) {
+        if (options.getBoolean("add-bootstrap-header")) {
             val script = scriptResolver.resolve(scriptSource, maxResolutionLevel = 0)
             BootstrapCreator().create(script)
             return
@@ -64,7 +61,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         val script = scriptResolver.resolve(scriptSource, preambles)
 
         if (script.deprecatedItems.isNotEmpty()) {
-            if (docopt.getBoolean("report")) {
+            if (options.getBoolean("report")) {
                 info(DeprecatedInfoCreator().create(script.deprecatedItems))
             } else {
                 warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
@@ -77,7 +74,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         val executor = Executor(CommandResolver(config.osConfig), config.osConfig)
 
         //  Create temporary dev environment
-        if (docopt.getBoolean("idea")) {
+        if (options.getBoolean("idea")) {
             val path = cache.getOrCreateIdeaProject(script.digest) { basePath ->
                 val uriLocalPathProvider = { uri: URI -> inputOutputResolver.resolveContent(uri).localPath }
                 IdeaProjectCreator().create(basePath, script, userArgs, uriLocalPathProvider)
@@ -91,7 +88,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         }
 
         //  Optionally enter interactive mode
-        if (docopt.getBoolean("interactive")) {
+        if (options.getBoolean("interactive")) {
             executor.runInteractiveRepl(resolvedDependencies, script.compilerOpts, script.kotlinOpts)
             return
         }
@@ -107,7 +104,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
         }
 
         //if requested try to package the into a standalone binary
-        if (docopt.getBoolean("package")) {
+        if (options.getBoolean("package")) {
             val path = cache.getOrCreatePackage(script.digest, script.location.scriptName) { basePath, packagePath ->
                 PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
             }
@@ -119,4 +116,7 @@ class KscriptHandler(private val config: Config, private val docopt: DocOptWrapp
 
         executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
     }
+
+    private fun Map<String, String>.getBoolean(key: String): Boolean = getValue(key).toBoolean()
+    private fun Map<String, String>.getString(key: String): String = getValue(key)
 }
