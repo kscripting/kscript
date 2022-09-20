@@ -95,7 +95,7 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         // Even if we just need and support the @file:EntryPoint directive in case of kt-class
         // files, we extract it here to fail if it was used in kts files.
-        if (script.entryPoint != null && script.location.scriptType == ScriptType.KTS) {
+        if (script.entryPoint != null && script.scriptLocation.scriptType == ScriptType.KTS) {
             throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
         }
 
@@ -105,11 +105,11 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         //if requested try to package the into a standalone binary
         if (options.getBoolean("package")) {
-            val path = cache.getOrCreatePackage(script.digest, script.location.scriptName) { basePath, packagePath ->
+            val path = cache.getOrCreatePackage(script.digest, script.scriptLocation.scriptName) { basePath, packagePath ->
                 PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
             }
 
-            infoMsg("Packaged script '${script.location.scriptName}' available at path:")
+            infoMsg("Packaged script '${script.scriptLocation.scriptName}' available at path:")
             infoMsg(path.convert(config.osConfig.osType).stringPath())
             return
         }

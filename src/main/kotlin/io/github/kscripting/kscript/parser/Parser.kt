@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.parser
 
 import io.github.kscripting.kscript.model.Code
-import io.github.kscripting.kscript.model.Location
+import io.github.kscripting.kscript.model.ScriptLocation
 import io.github.kscripting.kscript.model.Section
 
 class Parser {
@@ -17,21 +17,21 @@ class Parser {
         LineParser::parsePackage,
     )
 
-    fun parse(location: Location, string: String): List<Section> {
+    fun parse(scriptLocation: ScriptLocation, string: String): List<Section> {
         val codeTextAsLines = string.lines()
 
         val sections = mutableListOf<Section>()
 
         for (line in codeTextAsLines.withIndex()) {
-            val section = parseLine(location, line.index + 1, line.value)
+            val section = parseLine(scriptLocation, line.index + 1, line.value)
             sections += section
         }
         return sections
     }
 
-    private fun parseLine(location: Location, line: Int, text: String): Section {
+    private fun parseLine(scriptLocation: ScriptLocation, line: Int, text: String): Section {
         for (parser in annotationParsers) {
-            val parsedAnnotations = parser(location, line, text)
+            val parsedAnnotations = parser(scriptLocation, line, text)
 
             if (parsedAnnotations.isNotEmpty()) {
                 return Section(text, parsedAnnotations)

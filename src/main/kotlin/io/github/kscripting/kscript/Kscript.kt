@@ -19,7 +19,6 @@ import org.docopt.DocoptParser
  * @author Marcin Kuszczak
  */
 
-
 fun main(args: Array<String>) {
     try {
         val config = ConfigBuilder(OsType.findOrThrow(args[0]), System.getProperties(), System.getenv()).build()

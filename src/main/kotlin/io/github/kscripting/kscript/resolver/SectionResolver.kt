@@ -11,13 +11,13 @@ class SectionResolver(
     private val scriptingConfig: ScriptingConfig
 ) {
     fun resolve(
-        location: Location,
+        scriptLocation: ScriptLocation,
         scriptText: String,
         allowLocalReferences: Boolean,
         maxResolutionLevel: Int,
         resolutionContext: ResolutionContext
     ): List<Section> {
-        val sections = parser.parse(location, scriptText)
+        val sections = parser.parse(scriptLocation, scriptText)
         val resultingSections = mutableListOf<Section>()
 
         for (section in sections) {
@@ -26,9 +26,9 @@ class SectionResolver(
             for (annotation in section.scriptAnnotations) {
                 resultingScriptAnnotations += resolveAnnotation(
                     annotation,
-                    location.sourceContextUri,
+                    scriptLocation.sourceContextUri,
                     allowLocalReferences,
-                    location.level,
+                    scriptLocation.level,
                     maxResolutionLevel,
                     resolutionContext
                 )
@@ -71,19 +71,19 @@ class SectionResolver(
 
                     val content = inputOutputResolver.resolveContent(uri)
 
-                    val location = Location(
+                    val scriptLocation = ScriptLocation(
                         currentLevel + 1, scriptSource, content.scriptType, uri, content.contextUri, content.fileName
                     )
 
                     val newSections = resolve(
-                        location,
+                        scriptLocation,
                         content.text,
                         allowLocalReferences && scriptSource == ScriptSource.FILE,
                         maxResolutionLevel,
                         resolutionContext
                     )
 
-                    val scriptNode = ScriptNode(location, newSections)
+                    val scriptNode = ScriptNode(scriptLocation, newSections)
 
                     resolutionContext.scriptNodes.add(scriptNode)
                     resolvedScriptAnnotations += scriptNode

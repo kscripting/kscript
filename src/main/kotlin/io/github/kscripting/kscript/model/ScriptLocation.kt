@@ -2,7 +2,7 @@ package io.github.kscripting.kscript.model
 
 import java.net.URI
 
-data class Location(
+data class ScriptLocation(
     val level: Int,
     val scriptSource: ScriptSource,
     val scriptType: ScriptType,

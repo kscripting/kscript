@@ -7,14 +7,14 @@ object LineParser {
     private const val deprecatedAnnotation = "Deprecated annotation:"
     private val sheBang = listOf(SheBang)
 
-    fun parseSheBang(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseSheBang(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         if (text.startsWith("#!/")) {
             return sheBang
         }
         return emptyList()
     }
 
-    fun parseInclude(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseInclude(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val fileImport = "@file:Import"
         val fileInclude = "@file:Include"
         val include = "//INCLUDE "
@@ -31,7 +31,7 @@ object LineParser {
 
                     listOf(
                         Include(value), createDeprecatedAnnotation(
-                            location, line, deprecatedAnnotation, text, "@file:Import(\"$value\")"
+                            scriptLocation, line, deprecatedAnnotation, text, "@file:Import(\"$value\")"
                         )
                     )
                 }
@@ -41,7 +41,7 @@ object LineParser {
 
                     listOf(
                         Include(value), createDeprecatedAnnotation(
-                            location, line, deprecatedAnnotation, text, "@file:Import(\"$value\")"
+                            scriptLocation, line, deprecatedAnnotation, text, "@file:Import(\"$value\")"
                         )
                     )
                 }
@@ -59,7 +59,7 @@ object LineParser {
         return dependency
     }
 
-    fun parseDependency(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseDependency(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val fileDependsOn = "@file:DependsOn"
         val fileDependsOnMaven = "@file:DependsOnMaven"
         val depends = "//DEPS "
@@ -78,7 +78,7 @@ object LineParser {
 
                 s.startsWith(depends) -> {
                     val values = extractValues(s.substring(depends.length))
-                    deprecatedItems.add(createDeprecatedAnnotation(location,
+                    deprecatedItems.add(createDeprecatedAnnotation(scriptLocation,
                         line,
                         deprecatedAnnotation,
                         text,
@@ -99,7 +99,7 @@ object LineParser {
         }
     }
 
-    fun parseEntry(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseEntry(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val fileEntry = "@file:EntryPoint"
         val entry = "//ENTRY "
 
@@ -113,7 +113,7 @@ object LineParser {
                     val value = extractValue(it.substring(entry.length))
                     listOf(
                         Entry(value), createDeprecatedAnnotation(
-                            location, line, deprecatedAnnotation, text, "@file:EntryPoint(\"$value\")"
+                            scriptLocation, line, deprecatedAnnotation, text, "@file:EntryPoint(\"$value\")"
                         )
                     )
                 }
@@ -123,7 +123,7 @@ object LineParser {
         }
     }
 
-    fun parseRepository(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseRepository(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         //Format:
         // @file:MavenRepository("imagej", "http://maven.imagej.net/content/repositories/releases/")
         // @file:Repository("http://maven.imagej.net/content/repositories/releases/", user="user", password="pass")
@@ -169,7 +169,7 @@ object LineParser {
 
                     return listOf(
                         repository, createDeprecatedAnnotation(
-                            location, line, deprecatedAnnotation, text, "@file:Repository($str)"
+                            scriptLocation, line, deprecatedAnnotation, text, "@file:Repository($str)"
                         )
                     )
                 }
@@ -203,7 +203,7 @@ object LineParser {
         }
     }
 
-    fun parseKotlinOpts(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseKotlinOpts(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val fileKotlinOptions = "@file:KotlinOptions"
         val fileKotlinOpts = "@file:KotlinOpts"
         val kotlinOpts = "//KOTLIN_OPTS "
@@ -217,7 +217,7 @@ object LineParser {
                 it.startsWith(fileKotlinOpts) -> {
                     val values = extractQuotedValuesInParenthesis(it.substring(fileKotlinOpts.length))
 
-                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(location,
+                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(scriptLocation,
                         line,
                         deprecatedAnnotation,
                         text,
@@ -228,7 +228,7 @@ object LineParser {
 
                 it.startsWith(kotlinOpts) -> {
                     val values = extractValues(it.substring(kotlinOpts.length))
-                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(location,
+                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(scriptLocation,
                         line,
                         deprecatedAnnotation,
                         text,
@@ -242,7 +242,7 @@ object LineParser {
         }
     }
 
-    fun parseCompilerOpts(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseCompilerOpts(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val fileCompilerOptions = "@file:CompilerOptions"
         val fileCompilerOpts = "@file:CompilerOpts"
         val compilerOpts = "//COMPILER_OPTS "
@@ -256,7 +256,7 @@ object LineParser {
                 it.startsWith(fileCompilerOpts) -> {
                     val values = extractQuotedValuesInParenthesis(it.substring(fileCompilerOpts.length))
 
-                    values.map { CompilerOpt(it) } + createDeprecatedAnnotation(location,
+                    values.map { CompilerOpt(it) } + createDeprecatedAnnotation(scriptLocation,
                         line,
                         deprecatedAnnotation,
                         text,
@@ -267,7 +267,7 @@ object LineParser {
 
                 it.startsWith(compilerOpts) -> {
                     val values = extractValues(it.substring(compilerOpts.length))
-                    values.map { CompilerOpt(it) } + createDeprecatedAnnotation(location,
+                    values.map { CompilerOpt(it) } + createDeprecatedAnnotation(scriptLocation,
                         line,
                         deprecatedAnnotation,
                         text,
@@ -281,7 +281,7 @@ object LineParser {
         }
     }
 
-    fun parsePackage(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parsePackage(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val packagePrefix = "package "
 
         text.trim().let {
@@ -292,7 +292,7 @@ object LineParser {
         }
     }
 
-    fun parseImport(location: Location, line: Int, text: String): List<ScriptAnnotation> {
+    fun parseImport(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         val importPrefix = "import "
 
         text.trim().let {
@@ -353,6 +353,6 @@ object LineParser {
     }
 
     private fun createDeprecatedAnnotation(
-        location: Location, line: Int, introText: String, existing: String, replacement: String
-    ): DeprecatedItem = DeprecatedItem(location, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
+        scriptLocation: ScriptLocation, line: Int, introText: String, existing: String, replacement: String
+    ): DeprecatedItem = DeprecatedItem(scriptLocation, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
 }

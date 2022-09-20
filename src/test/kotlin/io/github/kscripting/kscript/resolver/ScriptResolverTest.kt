@@ -43,14 +43,14 @@ class ScriptResolverTest {
 
         println("""'${script.resolvedCode}'""")
 
-        assertThat(script.location).apply {
-            prop(Location::scriptSource).isEqualTo(ScriptSource.FILE)
-            prop(Location::scriptType).isEqualTo(ScriptType.KTS)
-            prop(Location::sourceUri).transform { it.toString() }
+        assertThat(script.scriptLocation).apply {
+            prop(ScriptLocation::scriptSource).isEqualTo(ScriptSource.FILE)
+            prop(ScriptLocation::scriptType).isEqualTo(ScriptType.KTS)
+            prop(ScriptLocation::sourceUri).transform { it.toString() }
                 .endsWith("/test/resources/consolidate_includes/template.kts")
-            prop(Location::sourceContextUri).transform { it.toString() }
+            prop(ScriptLocation::sourceContextUri).transform { it.toString() }
                 .endsWith("/test/resources/consolidate_includes/")
-            prop(Location::scriptName).isEqualTo("template")
+            prop(ScriptLocation::scriptName).isEqualTo("template")
         }
 
         assertThat(script).apply {
@@ -93,13 +93,13 @@ class ScriptResolverTest {
 
         println("""'${script.resolvedCode}'""")
 
-        assertThat(script.location).apply {
-            prop(Location::scriptSource).isEqualTo(ScriptSource.FILE)
-            prop(Location::scriptType).isEqualTo(ScriptType.KTS)
-            prop(Location::sourceUri).transform { it.toString() }
+        assertThat(script.scriptLocation).apply {
+            prop(ScriptLocation::scriptSource).isEqualTo(ScriptSource.FILE)
+            prop(ScriptLocation::scriptType).isEqualTo(ScriptType.KTS)
+            prop(ScriptLocation::sourceUri).transform { it.toString() }
                 .endsWith("/test/resources/includes/include_variations.kts")
-            prop(Location::sourceContextUri).transform { it.toString() }.endsWith("/test/resources/includes/")
-            prop(Location::scriptName).isEqualTo("include_variations")
+            prop(ScriptLocation::sourceContextUri).transform { it.toString() }.endsWith("/test/resources/includes/")
+            prop(ScriptLocation::scriptName).isEqualTo("include_variations")
         }
 
         assertThat(script).apply {
@@ -138,14 +138,14 @@ class ScriptResolverTest {
 
         println("""'${script.resolvedCode}'""")
 
-        assertThat(script.location).apply {
-            prop(Location::scriptSource).isEqualTo(ScriptSource.FILE)
-            prop(Location::scriptType).isEqualTo(ScriptType.KTS)
-            prop(Location::sourceUri).transform { it.toString() }
+        assertThat(script.scriptLocation).apply {
+            prop(ScriptLocation::scriptSource).isEqualTo(ScriptSource.FILE)
+            prop(ScriptLocation::scriptType).isEqualTo(ScriptType.KTS)
+            prop(ScriptLocation::sourceUri).transform { it.toString() }
                 .endsWith("/test/resources/includes/dup_include/dup_include.kts")
-            prop(Location::sourceContextUri).transform { it.toString() }
+            prop(ScriptLocation::sourceContextUri).transform { it.toString() }
                 .endsWith("/test/resources/includes/dup_include/")
-            prop(Location::scriptName).isEqualTo("dup_include")
+            prop(ScriptLocation::scriptName).isEqualTo("dup_include")
         }
 
         assertThat(script).apply {

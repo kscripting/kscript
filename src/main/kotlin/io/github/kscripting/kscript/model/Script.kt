@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.model
 
 data class Script(
-    val location: Location,
+    val scriptLocation: ScriptLocation,
 
     val resolvedCode: String,
 

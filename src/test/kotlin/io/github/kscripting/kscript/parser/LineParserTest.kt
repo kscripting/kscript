@@ -22,11 +22,15 @@ class LineParserTest {
     fun `Import parsing`() {
         assertThat(
             parseImport(
-                location, 1, "import com.script.test1"
+                scriptLocation, 1, "import com.script.test1"
             )
         ).containsExactlyInAnyOrder(ImportName("com.script.test1"))
 
-        assertThat(parseImport(location, 1, "      import com.script.test2            ")).containsExactlyInAnyOrder(
+        assertThat(
+            parseImport(
+                scriptLocation, 1, "      import com.script.test2            "
+            )
+        ).containsExactlyInAnyOrder(
             ImportName("com.script.test2")
         )
     }
@@ -52,7 +56,7 @@ class LineParserTest {
             if (line.trimStart().startsWith("//")) {
                 val expectedList = list.joinToString(", ") { "\"${it.trim()}\"" }
                 expectedAnnotations = expectedAnnotations + DeprecatedItem(
-                    location,
+                    scriptLocation,
                     1,
                     "Deprecated annotation:\n$line\nshould be replaced with:\n@file:DependsOn($expectedList)"
                 )
@@ -60,7 +64,7 @@ class LineParserTest {
 
             assertThat(
                 parseDependency(
-                    location, 1, line
+                    scriptLocation, 1, line
                 )
             ).containsExactlyInAnyOrder(*expectedAnnotations.toTypedArray())
         }
@@ -78,7 +82,7 @@ class LineParserTest {
             "      @file:DependsOnMaven($listWithQuotes)    ",
         )) {
             println("Case: '$line'")
-            assertThat(parseDependency(location, 1, line)).containsExactlyInAnyOrder(*list.map { Dependency(it) }
+            assertThat(parseDependency(scriptLocation, 1, line)).containsExactlyInAnyOrder(*list.map { Dependency(it) }
                 .toTypedArray())
         }
     }
@@ -98,7 +102,7 @@ class LineParserTest {
             "    //DEPS $listWithoutQuotes",
         )) {
             println("Case: '$line'")
-            assertThat { parseDependency(location, 1, line) }.isFailure().messageContains(message)
+            assertThat { parseDependency(scriptLocation, 1, line) }.isFailure().messageContains(message)
         }
     }
 
@@ -106,7 +110,7 @@ class LineParserTest {
     fun `Dependency parsing - invalid quoting`() {
         assertThat {
             parseDependency(
-                location,
+                scriptLocation,
                 1,
                 "@file:DependsOn(\"com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0\") //Comment"
             )
@@ -118,14 +122,14 @@ class LineParserTest {
     @MethodSource("repositories")
     fun `Repository parsing`(line: String, annotations: List<ScriptAnnotation>) {
         println("Repository: '$line'")
-        assertThat(parseRepository(location, 1, line)).containsExactlyInAnyOrder(*annotations.toTypedArray())
+        assertThat(parseRepository(scriptLocation, 1, line)).containsExactlyInAnyOrder(*annotations.toTypedArray())
     }
 
     @ParameterizedTest
     @MethodSource("kotlinOptions")
     fun `Kotlin options parsing`(line: String, kotlinOpts: List<ScriptAnnotation>) {
         println("KotlinOptions: '$line'")
-        assertThat(parseKotlinOpts(location, 1, line)).containsExactlyInAnyOrder(*kotlinOpts.toTypedArray())
+        assertThat(parseKotlinOpts(scriptLocation, 1, line)).containsExactlyInAnyOrder(*kotlinOpts.toTypedArray())
     }
 
     @ParameterizedTest
@@ -137,17 +141,20 @@ class LineParserTest {
 
         if (line.trimStart().startsWith("//")) {
             expectedAnnotations = expectedAnnotations + DeprecatedItem(
-                location, 1, "Deprecated annotation:\n$line\nshould be replaced with:\n@file:EntryPoint(\"$entry\")"
+                scriptLocation,
+                1,
+                "Deprecated annotation:\n$line\nshould be replaced with:\n@file:EntryPoint(\"$entry\")"
             )
         }
 
-        assertThat(parseEntry(location, 1, line)).containsExactlyInAnyOrder(*expectedAnnotations.toTypedArray())
+        assertThat(parseEntry(scriptLocation, 1, line)).containsExactlyInAnyOrder(*expectedAnnotations.toTypedArray())
     }
 
     companion object {
         @JvmStatic
-        private val location =
-            Location(0, ScriptSource.HTTP, ScriptType.KT, URI("http://example/test.kt"), URI("http://example/"), "test")
+        private val scriptLocation = ScriptLocation(
+            0, ScriptSource.HTTP, ScriptType.KT, URI("http://example/test.kt"), URI("http://example/"), "test"
+        )
 
         @JvmStatic
         fun staticDependencies(): Stream<Arguments> = Stream.of(
@@ -181,7 +188,7 @@ class LineParserTest {
         @JvmStatic
         fun createDeprecatedAnnotation(line: String, expectedContent: String): DeprecatedItem {
             return DeprecatedItem(
-                location,
+                scriptLocation,
                 1,
                 "Deprecated annotation:\n$line\nshould be replaced with:\n@file:Repository($expectedContent)"
             )
@@ -275,7 +282,7 @@ class LineParserTest {
             Arguments.of(
                 "//KOTLIN_OPTS -foo, 3 ,'some file.txt'", listOf(
                     KotlinOpt("-foo"), KotlinOpt("3"), KotlinOpt("'some file.txt'"), DeprecatedItem(
-                        Location(
+                        ScriptLocation(
                             0,
                             ScriptSource.HTTP,
                             ScriptType.KT,
@@ -291,7 +298,7 @@ class LineParserTest {
             Arguments.of(
                 """@file:KotlinOpts("--bar") // some other crazy comment""", listOf(
                     KotlinOpt("--bar"), DeprecatedItem(
-                        Location(
+                        ScriptLocation(
                             0,
                             ScriptSource.HTTP,
                             ScriptType.KT,

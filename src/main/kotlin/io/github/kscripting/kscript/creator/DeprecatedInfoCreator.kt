@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.creator
 
 import io.github.kscripting.kscript.model.DeprecatedItem
-import io.github.kscripting.kscript.model.Location
+import io.github.kscripting.kscript.model.ScriptLocation
 import net.igsoft.tablevis.TableBuilder
 import net.igsoft.tablevis.printer.text.TextTablePrinter
 import net.igsoft.tablevis.style.text.BoxTextTableStyleSet
@@ -10,7 +10,7 @@ class DeprecatedInfoCreator {
     fun create(deprecatedItems: Set<DeprecatedItem>): String {
         val printer = TextTablePrinter()
 
-        val deprecatedList = deprecatedItems.sortedWith(compareBy({ it.location.level }, { it.line }))
+        val deprecatedList = deprecatedItems.sortedWith(compareBy({ it.scriptLocation.level }, { it.line }))
 
         val table = TableBuilder(BoxTextTableStyleSet()) {
             width = 160
@@ -28,7 +28,7 @@ class DeprecatedInfoCreator {
             for (deprecatedItem in deprecatedList) {
 
                 row {
-                    cell { id("c1"); value = formatLocation(deprecatedItem.location) }
+                    cell { id("c1"); value = formatLocation(deprecatedItem.scriptLocation) }
                     cell { id("c2"); value = deprecatedItem.line }
                     cell { id("c3"); value = deprecatedItem.message }
                 }
@@ -42,7 +42,7 @@ class DeprecatedInfoCreator {
         return printer.print(table)
     }
 
-    private fun formatLocation(location: Location): String {
-        return location.sourceUri.toString()
+    private fun formatLocation(scriptLocation: ScriptLocation): String {
+        return scriptLocation.sourceUri.toString()
     }
 }

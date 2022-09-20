@@ -47,7 +47,7 @@ object GradleTemplates {
         ) + script.dependencies
 
         val capsuleApp = jarArtifact.execClassName
-        val baseName = script.location.scriptName
+        val baseName = script.scriptLocation.scriptName
 
         return """
             |import java.io.*

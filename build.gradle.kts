@@ -89,8 +89,6 @@ tasks.test {
     useJUnitPlatform()
 }
 
-val launcherClassName: String = "kscript.app.KscriptKt"
-
 dependencies {
     implementation("com.offbytwo:docopt:0.6.0.20150202")
 
@@ -160,7 +158,7 @@ val packageKscriptDistribution by tasks.register<Zip>("packageKscriptDistributio
 }
 
 application {
-    mainClass.set(launcherClassName)
+    mainClass.set(project.group.toString() + ".KscriptKt")
 }
 
 val jar: Task by tasks.getting {
