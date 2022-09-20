@@ -3,7 +3,7 @@ package io.github.kscripting.kscript.creator
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
 import io.github.kscripting.kscript.model.ScriptSource
-import io.github.kscripting.kscript.util.Logger
+import io.github.kscripting.kscript.util.Logger.infoMsg
 import java.io.File
 
 class BootstrapCreator {
@@ -25,6 +25,6 @@ class BootstrapCreator {
         }
 
         File(script.scriptLocation.sourceUri!!).writeText((bootstrapHeader + scriptLines).joinToString("\n"))
-        Logger.infoMsg("${script.scriptLocation.sourceUri} updated")
+        infoMsg("${script.scriptLocation.sourceUri} updated")
     }
 }

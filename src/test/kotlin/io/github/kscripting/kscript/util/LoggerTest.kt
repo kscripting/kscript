@@ -3,6 +3,7 @@ package io.github.kscripting.kscript.util
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
+import io.github.kscripting.kscript.util.Logger.errorMsg
 import org.junit.jupiter.api.Test
 
 class LoggerTest {
@@ -13,14 +14,14 @@ class LoggerTest {
     fun `test error message for exception`() {
         Logger.devMode = false
         Logger.silentMode = false
-        assertThat(Logger.errorMsg(exception1)).isEqualTo("[kscript] [ERROR] Test message\n[kscript] [ERROR] Second line")
+        assertThat(errorMsg(exception1)).isEqualTo("[kscript] [ERROR] Test message\n[kscript] [ERROR] Second line")
     }
 
     @Test
     fun `test stacktrace for exception`() {
         Logger.devMode = true
         Logger.silentMode = false
-        assertThat(Logger.errorMsg(exception2)).startsWith(
+        assertThat(errorMsg(exception2)).startsWith(
             """ |[kscript] [ERROR] This is some sophisticated exception message.
                 |[kscript] [ERROR] 
                 |[kscript] [ERROR] java.lang.IllegalStateException: This is some sophisticated exception message.

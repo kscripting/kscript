@@ -1,5 +1,6 @@
 package io.github.kscripting.kscript.integration
 
+import io.github.kscripting.kscript.integration.tools.TestAssertion.any
 import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
 import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
@@ -109,9 +110,11 @@ class ScriptInputModesTest : TestBase {
         verify(
             "kscript https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/url_test.kts",
             0,
-            "I came from the internet\n"
+            "I came from the internet\n",
+            any()
         )
-        verify("kscript https://git.io/fxHBv", 0, "main was called\n", "[kscript] Resolving log4j:log4j:1.2.14...\n")
+//        verify("kscript https://git.io/fxHBv", 0, "main was called\n", "[kscript] Resolving log4j:log4j:1.2.14...\n")
+        verify("kscript https://git.io/fxHBv", 0, "main was called\n", any())
     }
 
     @Test
