@@ -1,6 +1,10 @@
 package io.github.kscripting.kscript.model
 
-import io.github.kscripting.kscript.shell.*
+import io.github.kscripting.kscript.shell.ShellUtils
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.exists
+import io.github.kscripting.shell.model.toNativePath
 import java.util.*
 import kotlin.io.path.reader
 
@@ -51,6 +55,7 @@ class ConfigBuilder(
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toNativeOsPath()
                 ?: userHomeDir.resolve(".config")
+
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Application Support")
             else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toNativeOsPath()
                 ?: userHomeDir.resolve(".config")

@@ -2,8 +2,8 @@ package io.github.kscripting.kscript.creator
 
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
-import io.github.kscripting.kscript.model.ScriptSource
 import io.github.kscripting.kscript.util.Logger.infoMsg
+import io.github.kscripting.shell.model.*
 import java.io.File
 
 class BootstrapCreator {

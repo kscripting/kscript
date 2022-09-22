@@ -4,9 +4,9 @@ import io.github.kscripting.kscript.creator.JarArtifact
 import io.github.kscripting.kscript.model.CompilerOpt
 import io.github.kscripting.kscript.model.KotlinOpt
 import io.github.kscripting.kscript.model.OsConfig
-import io.github.kscripting.kscript.shell.OsType
-import io.github.kscripting.kscript.shell.OsPath
-import io.github.kscripting.kscript.shell.toNativeOsPath
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.toNativeOsPath
 
 class CommandResolver(private val osConfig: OsConfig) {
     private val classPathSeparator =

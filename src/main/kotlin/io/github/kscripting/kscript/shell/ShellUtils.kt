@@ -1,28 +1,43 @@
 package io.github.kscripting.kscript.shell
 
-import kotlin.system.exitProcess
+import io.github.kscripting.shell.ShellExecutor
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.readText
+import io.github.kscripting.shell.process.EnvAdjuster
 
 object ShellUtils {
+    fun which(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): List<String> = ShellExecutor.eval(
+        osType, "${if (osType == OsType.WINDOWS) "where" else "which"} $command", null, envAdjuster
+    ).stdout.trim().lines()
 
-    fun evalBash(
-        osType: OsType, cmd: String, workingDirectory: OsPath? = null, environment: Map<String, String> = emptyMap()
-    ): ProcessResult {
-        //NOTE: cmd is an argument to shell (bash/cmd), so it should stay not split by whitespace as a single string
-
-        if (osType == OsType.WINDOWS) {
-            return ProcessRunner.runProcess("cmd", "/c", cmd, wd = workingDirectory, env = environment)
-        }
-
-        return ProcessRunner.runProcess("bash", "-c", cmd, wd = workingDirectory, env = environment)
+    fun isInPath(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): Boolean {
+        val paths = which(osType, command, envAdjuster)
+        return paths.isNotEmpty() && paths[0].isNotBlank()
     }
 
-    fun commandPaths(osType: OsType, cmd: String, environment: Map<String, String> = emptyMap()): List<String> =
-        evalBash(osType, "${if (osType == OsType.WINDOWS) "where" else "which"} $cmd", null, environment).stdout.trim()
-            .lines()
+    fun environmentAdjuster(environment: MutableMap<String, String>) {
+        // see https://youtrack.jetbrains.com/issue/KT-20785
+        // on Windows also other env variables (like KOTLIN_OPTS) interfere with executed command, so they have to be cleaned
 
-    fun isCommandInPath(osType: OsType, cmd: String, environment: Map<String, String> = emptyMap()): Boolean {
-        val paths = commandPaths(osType, cmd, environment)
-        return paths.isNotEmpty() && paths[0].isNotBlank()
+        //NOTE: It would be better to prepare minimal env only with environment variables that are required,
+        //but it means that we should track, what are default env variables in different OSes
+
+        //Env variables set by Unix scripts (from kscript and Kotlin)
+        environment.remove("KOTLIN_RUNNER")
+
+        //Env variables set by Windows scripts (from kscript and Kotlin)
+        environment.remove("_KOTLIN_RUNNER")
+        environment.remove("KOTLIN_OPTS")
+        environment.remove("JAVA_OPTS")
+        environment.remove("_version")
+        environment.remove("_KOTLIN_HOME")
+        environment.remove("_BIN_DIR")
+        environment.remove("_KOTLIN_COMPILER")
+        environment.remove("JAR_PATH")
+        environment.remove("COMMAND")
+        environment.remove("_java_major_version")
+        environment.remove("ABS_KSCRIPT_PATH")
     }
 
     // see discussion on https://github.com/holgerbrandl/kscript/issues/15
@@ -34,7 +49,7 @@ object ShellUtils {
     }
 
     fun guessPosixKotlinHome(osType: OsType): String? {
-        val kotlinHome = evalBash(osType, "KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
+        val kotlinHome = ShellExecutor.eval(osType, "KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
             "kotlin.home=([^\\s]*)".toRegex().find(this)?.groups?.get(1)?.value
         } ?: return null
 
@@ -46,7 +61,7 @@ object ShellUtils {
     }
 
     fun guessWindowsKotlinHome(osType: OsType): String? {
-        val whereKotlinOutput = commandPaths(osType, "kotlinc.bat")
+        val whereKotlinOutput = which(osType, "kotlinc.bat")
 
         //Default case - Kotlin is installed manually and added to path
         whereKotlinOutput.forEach {
@@ -77,10 +92,4 @@ object ShellUtils {
 
         return null
     }
-
-    fun quit(status: Int): Nothing {
-        exitProcess(status)
-    }
-
-    fun whitespaceCharsToSymbols(string: String): String = string.replace("\\", "[bs]").lines().joinToString("[nl]")
 }

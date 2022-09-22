@@ -1,7 +1,11 @@
 package io.github.kscripting.kscript.util
 
-import io.github.kscripting.kscript.model.*
+import io.github.kscripting.kscript.model.Code
+import io.github.kscripting.kscript.model.ImportName
+import io.github.kscripting.kscript.model.PackageName
+import io.github.kscripting.kscript.model.ScriptNode
 import io.github.kscripting.kscript.resolver.ResolutionContext
+import io.github.kscripting.shell.model.ScriptType
 import org.apache.commons.codec.digest.DigestUtils
 import java.net.URI
 

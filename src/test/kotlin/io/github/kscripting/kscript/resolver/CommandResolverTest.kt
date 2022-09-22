@@ -4,8 +4,8 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import io.github.kscripting.kscript.creator.JarArtifact
 import io.github.kscripting.kscript.model.*
-import io.github.kscripting.kscript.shell.OsPath
-import io.github.kscripting.kscript.shell.OsType
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
 import org.junit.jupiter.api.Test
 
 class CommandResolverTest {

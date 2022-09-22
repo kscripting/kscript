@@ -3,13 +3,13 @@ package io.github.kscripting.kscript.resolver
 import io.github.kscripting.kscript.cache.Cache
 import io.github.kscripting.kscript.model.Content
 import io.github.kscripting.kscript.model.OsConfig
-import io.github.kscripting.kscript.shell.OsType
-import io.github.kscripting.kscript.shell.OsPath
-import io.github.kscripting.kscript.shell.toNativeOsPath
-import io.github.kscripting.kscript.shell.toNativePath
 import io.github.kscripting.kscript.util.ScriptUtils
 import io.github.kscripting.kscript.util.UriUtils
 import io.github.kscripting.kscript.util.UriUtils.isUrl
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.toNativeOsPath
+import io.github.kscripting.shell.model.toNativePath
 import java.io.File
 import java.io.FileInputStream
 import java.net.URI

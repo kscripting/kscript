@@ -4,7 +4,7 @@
 
 package org.docopt
 
-import io.github.kscripting.kscript.shell.ShellUtils.quit
+import kotlin.system.exitProcess
 
 object DocoptParser {
     fun parse(args: Iterable<String>, usage: String): Map<String, String> {
@@ -20,7 +20,7 @@ object DocoptParser {
                 System.err.println(usage)
             }
 
-            quit(e.exitCode)
+            exitProcess(e.exitCode)
         }
 
         return parsedArgs.map {

@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.shell
 
-import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.kscript.util.Logger.warnMsg
+import io.github.kscripting.shell.model.*
 import java.io.IOException
 import java.nio.file.Files
 import kotlin.io.path.createDirectories

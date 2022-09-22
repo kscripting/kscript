@@ -1,5 +1,8 @@
 package io.github.kscripting.kscript.shell
 
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.toNativeFile
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

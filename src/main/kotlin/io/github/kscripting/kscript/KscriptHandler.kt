@@ -4,7 +4,6 @@ import io.github.kscripting.kscript.cache.Cache
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.creator.*
 import io.github.kscripting.kscript.model.Config
-import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.kscript.parser.Parser
 import io.github.kscripting.kscript.resolver.*
 import io.github.kscripting.kscript.shell.Executor
@@ -12,6 +11,7 @@ import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
+import io.github.kscripting.shell.model.*
 import java.net.URI
 
 class KscriptHandler(private val config: Config, private val options: Map<String, String>) {
@@ -105,9 +105,10 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         //if requested try to package the into a standalone binary
         if (options.getBoolean("package")) {
-            val path = cache.getOrCreatePackage(script.digest, script.scriptLocation.scriptName) { basePath, packagePath ->
-                PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
-            }
+            val path =
+                cache.getOrCreatePackage(script.digest, script.scriptLocation.scriptName) { basePath, packagePath ->
+                    PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
+                }
 
             infoMsg("Packaged script '${script.scriptLocation.scriptName}' available at path:")
             infoMsg(path.convert(config.osConfig.osType).stringPath())

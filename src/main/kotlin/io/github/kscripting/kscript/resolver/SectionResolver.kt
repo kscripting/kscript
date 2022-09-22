@@ -3,6 +3,8 @@ package io.github.kscripting.kscript.resolver
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.Parser
 import io.github.kscripting.kscript.util.UriUtils
+import io.github.kscripting.shell.model.ScriptLocation
+import io.github.kscripting.shell.model.ScriptSource
 import java.net.URI
 
 class SectionResolver(

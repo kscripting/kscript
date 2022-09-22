@@ -2,9 +2,9 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.LineParser.extractValues
-import io.github.kscripting.kscript.shell.leaf
 import io.github.kscripting.kscript.util.ScriptUtils
 import io.github.kscripting.kscript.util.UriUtils
+import io.github.kscripting.shell.model.*
 import java.net.URI
 
 class ScriptResolver(
@@ -48,7 +48,14 @@ class ScriptResolver(
             val scriptText = ScriptUtils.prependPreambles(preambles, content.text)
 
             val scriptLocation =
-                ScriptLocation(0, ScriptSource.HTTP, content.scriptType, content.uri, content.contextUri, content.fileName)
+                ScriptLocation(
+                    0,
+                    ScriptSource.HTTP,
+                    content.scriptType,
+                    content.uri,
+                    content.contextUri,
+                    content.fileName
+                )
 
             return createScript(
                 scriptLocation, scriptText, false, maxResolutionLevel
@@ -111,7 +118,14 @@ class ScriptResolver(
         val scriptType = ScriptUtils.resolveScriptType(scriptText)
 
         val scriptLocation =
-            ScriptLocation(0, ScriptSource.PARAMETER, scriptType, null, inputOutputResolver.resolveCurrentDir(), scripletName)
+            ScriptLocation(
+                0,
+                ScriptSource.PARAMETER,
+                scriptType,
+                null,
+                inputOutputResolver.resolveCurrentDir(),
+                scripletName
+            )
 
         return createScript(
             scriptLocation,
@@ -126,7 +140,13 @@ class ScriptResolver(
     ): Script {
         val resolutionContext = ResolutionContext()
         val sections =
-            sectionResolver.resolve(scriptLocation, scriptText, allowLocalReferences, maxResolutionLevel, resolutionContext)
+            sectionResolver.resolve(
+                scriptLocation,
+                scriptText,
+                allowLocalReferences,
+                maxResolutionLevel,
+                resolutionContext
+            )
 
         val scriptNode = ScriptNode(scriptLocation, sections)
         resolutionContext.scriptNodes.add(scriptNode)

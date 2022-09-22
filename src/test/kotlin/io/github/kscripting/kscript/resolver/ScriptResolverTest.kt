@@ -8,8 +8,7 @@ import assertk.assertions.prop
 import io.github.kscripting.kscript.cache.Cache
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.Parser
-import io.github.kscripting.kscript.shell.OsPath
-import io.github.kscripting.kscript.shell.OsType
+import io.github.kscripting.shell.model.*
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*

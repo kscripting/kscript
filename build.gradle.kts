@@ -11,6 +11,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 group = "io.github.kscripting"
@@ -36,6 +37,10 @@ sourceSets {
 
 //        }
     }
+}
+
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
 }
 
 configurations {
@@ -90,6 +95,7 @@ tasks.test {
 }
 
 dependencies {
+    //implementation(fileTree("libs"))
     implementation("com.offbytwo:docopt:0.6.0.20150202")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
@@ -107,6 +113,8 @@ dependencies {
 
     implementation("net.igsoft:tablevis:0.6.0")
     implementation("io.arrow-kt:arrow-core:1.1.2")
+
+    implementation("io.github.kscripting:shell:0.5.0-SNAPSHOT")
 
     implementation("org.slf4j:slf4j-nop:2.0.0")
 

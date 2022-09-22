@@ -6,11 +6,11 @@ import assertk.assertions.exists
 import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import io.github.kscripting.kscript.model.Dependency
-import io.github.kscripting.kscript.shell.OsType
 import io.github.kscripting.kscript.model.Repository
-import io.github.kscripting.kscript.shell.OsPath
-import io.github.kscripting.kscript.shell.leaf
-import io.github.kscripting.kscript.shell.toNativePath
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.leaf
+import io.github.kscripting.shell.model.toNativePath
 import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

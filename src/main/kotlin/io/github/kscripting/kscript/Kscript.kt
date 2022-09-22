@@ -2,13 +2,13 @@ package io.github.kscripting.kscript
 
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.ConfigBuilder
-import io.github.kscripting.kscript.shell.OsType
-import io.github.kscripting.kscript.shell.ShellUtils.evalBash
-import io.github.kscripting.kscript.shell.ShellUtils.quit
 import io.github.kscripting.kscript.util.Logger.errorMsg
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.VersionChecker
+import io.github.kscripting.shell.ShellExecutor
+import io.github.kscripting.shell.model.OsType
 import org.docopt.DocoptParser
+import kotlin.system.exitProcess
 
 /**
  * A kscript - Scripting enhancements for Kotlin
@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
         if (remainingArgs.size == 1 && listOf("--help", "-h", "--version", "-v").contains(remainingArgs[0])) {
             info(usage)
             VersionChecker.versionCheck(BuildConfig.APP_VERSION)
-            val systemInfo = evalBash(config.osConfig.osType, "kotlin -version").stdout.split('(')
+            val systemInfo = ShellExecutor.eval(config.osConfig.osType, "kotlin -version").stdout.split('(')
             info("Kotlin    : " + systemInfo[0].removePrefix("Kotlin version").trim())
             info("Java      : " + systemInfo[1].split('-', ')')[0].trim())
             return
@@ -44,6 +44,6 @@ fun main(args: Array<String>) {
             .handle(kscriptArgs, userArgs)
     } catch (e: Exception) {
         errorMsg(e)
-        quit(1)
+        exitProcess(1)
     }
 }

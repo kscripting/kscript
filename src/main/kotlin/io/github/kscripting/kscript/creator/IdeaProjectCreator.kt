@@ -5,9 +5,9 @@ import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
 import io.github.kscripting.kscript.shell.FileUtils
 import io.github.kscripting.kscript.shell.FileUtils.resolveUniqueFilePath
-import io.github.kscripting.kscript.shell.OsPath
 import io.github.kscripting.kscript.util.Logger.devMsg
 import io.github.kscripting.kscript.util.Logger.infoMsg
+import io.github.kscripting.shell.model.OsPath
 import java.net.URI
 
 class IdeaProjectCreator {
@@ -23,7 +23,11 @@ class IdeaProjectCreator {
         for (scriptNode in script.scriptNodes) {
             val sourceUri = scriptNode.scriptLocation.sourceUri
             val filePath =
-                resolveUniqueFilePath(srcPath, scriptNode.scriptLocation.scriptName, scriptNode.scriptLocation.scriptType)
+                resolveUniqueFilePath(
+                    srcPath,
+                    scriptNode.scriptLocation.scriptName,
+                    scriptNode.scriptLocation.scriptType
+                )
 
             if (sourceUri == null) {
                 FileUtils.createFile(filePath, scriptNode.sections.joinToString("\n") { it.code })

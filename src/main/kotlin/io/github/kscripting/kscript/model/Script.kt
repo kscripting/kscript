@@ -1,5 +1,7 @@
 package io.github.kscripting.kscript.model
 
+import io.github.kscripting.shell.model.ScriptLocation
+
 data class Script(
     val scriptLocation: ScriptLocation,
 

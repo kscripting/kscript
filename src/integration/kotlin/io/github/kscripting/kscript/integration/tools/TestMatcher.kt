@@ -1,7 +1,6 @@
 package io.github.kscripting.kscript.integration.tools
 
 import io.github.kscripting.kscript.integration.tools.TestContext.nl
-import io.github.kscripting.kscript.shell.ShellUtils.whitespaceCharsToSymbols
 import org.opentest4j.AssertionFailedError
 
 abstract class TestMatcher<T>(protected val expectedValue: T, private val expressionName: String) {
@@ -46,3 +45,5 @@ class Contains(private val expectedString: String, private val ignoreCase: Boole
 }
 
 private fun normalize(string: String) = string.replace("\n", nl)
+
+private fun whitespaceCharsToSymbols(string: String): String = string.replace("\\", "[bs]").lines().joinToString("[nl]")

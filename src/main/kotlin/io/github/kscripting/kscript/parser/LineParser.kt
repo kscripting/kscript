@@ -1,6 +1,7 @@
 package io.github.kscripting.kscript.parser
 
 import io.github.kscripting.kscript.model.*
+import io.github.kscripting.shell.model.ScriptLocation
 
 @Suppress("UNUSED_PARAMETER")
 object LineParser {
@@ -354,5 +355,6 @@ object LineParser {
 
     private fun createDeprecatedAnnotation(
         scriptLocation: ScriptLocation, line: Int, introText: String, existing: String, replacement: String
-    ): DeprecatedItem = DeprecatedItem(scriptLocation, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
+    ): DeprecatedItem =
+        DeprecatedItem(scriptLocation, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
 }

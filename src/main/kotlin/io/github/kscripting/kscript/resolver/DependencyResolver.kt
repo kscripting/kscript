@@ -2,11 +2,11 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.Dependency
 import io.github.kscripting.kscript.model.Repository
-import io.github.kscripting.kscript.shell.OsPath
-import io.github.kscripting.kscript.shell.extension
-import io.github.kscripting.kscript.shell.toOsPath
 import io.github.kscripting.kscript.util.Logger.devMsg
 import io.github.kscripting.kscript.util.Logger.infoMsg
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.extension
+import io.github.kscripting.shell.model.toOsPath
 import kotlinx.coroutines.runBlocking
 import kotlin.collections.set
 import kotlin.script.experimental.api.valueOr
