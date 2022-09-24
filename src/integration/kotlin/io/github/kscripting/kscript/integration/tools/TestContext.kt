@@ -1,6 +1,8 @@
 package io.github.kscripting.kscript.integration.tools
 
-import io.github.kscripting.kscript.shell.*
+import io.github.kscripting.kscript.shell.ShellUtils.which
+import io.github.kscripting.shell.ShellExecutor
+import io.github.kscripting.shell.model.*
 
 object TestContext {
     private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
@@ -14,7 +16,6 @@ object TestContext {
 
     private val pathSeparator: String = if (osType.isWindowsLike() || osType.isPosixHostedOnWindows()) ";" else ":"
     private val envPath: String = "${execPath.convert(osType)}$pathSeparator$systemPath"
-    private val envMap = mapOf(pathEnvName to envPath)
 
     val nl: String = System.getProperty("line.separator")
     val projectDir: String = projectPath.convert(osType).stringPath()
@@ -42,7 +43,7 @@ object TestContext {
             else -> command
         }
 
-        val result = ShellUtils.evalBash(osType, newCommand, null, envMap)
+        val result = ShellExecutor.eval(osType, newCommand, null, ::adjustEnv)
 
         println(result)
         return result
@@ -65,15 +66,19 @@ object TestContext {
     }
 
     fun printPaths() {
-        val kscriptPath = ShellUtils.commandPaths(osType, "kscript", envMap)
+        val kscriptPath = which(osType, "kscript", ::adjustEnv)
         println("kscript path: $kscriptPath")
-        val kotlincPath = ShellUtils.commandPaths(osType, "kotlinc", envMap)
+        val kotlincPath = which(osType, "kotlinc", ::adjustEnv)
         println("kotlinc path: $kotlincPath")
     }
 
     fun clearCache() {
         print("Clearing kscript cache... ")
-        ShellUtils.evalBash(osType, "kscript --clear-cache", null, envMap)
+        ShellExecutor.eval(osType, "kscript --clear-cache", null, ::adjustEnv)
         println("done.")
+    }
+
+    private fun adjustEnv(map: MutableMap<String, String>) {
+        map[pathEnvName] = envPath
     }
 }

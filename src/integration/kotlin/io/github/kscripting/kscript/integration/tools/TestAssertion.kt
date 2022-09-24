@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.integration.tools
 
 import io.github.kscripting.kscript.integration.tools.TestContext.runProcess
-import io.github.kscripting.kscript.shell.ProcessResult
+import io.github.kscripting.shell.model.ProcessResult
 
 object TestAssertion {
     fun <T : Any> geq(value: T) = GenericEquals(value)

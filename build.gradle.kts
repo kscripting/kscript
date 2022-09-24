@@ -34,11 +34,12 @@ sourceSets {
     create("integration") {
 //        test {  //With that idea can understand that 'integration' is a test source set and do not complain about test
 //        names starting with upper case, but it doesn't compile correctly with it
-            java.srcDir("$projectDir/src/integration/kotlin")
-            resources.srcDir("$projectDir/src/integration/resources")
-            compileClasspath += main.get().output + test.get().output
-            runtimeClasspath += main.get().output + test.get().output
-
+        java {
+            srcDir("$projectDir/src/integration/kotlin")
+        }
+        resources.srcDir("$projectDir/src/integration/resources")
+        compileClasspath += main.get().output + test.get().output
+        runtimeClasspath += main.get().output + test.get().output
 //        }
     }
 }
@@ -49,7 +50,14 @@ configurations.all {
 }
 
 configurations {
-    get("integrationImplementation").apply { extendsFrom(get("testImplementation")) }
+    get("integrationImplementation").extendsFrom(get("testImplementation"))
+    get("integrationRuntimeOnly").extendsFrom(get("testRuntimeOnly"))
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
