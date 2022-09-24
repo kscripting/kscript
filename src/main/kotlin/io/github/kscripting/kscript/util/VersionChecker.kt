@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.util
 
-import com.mashape.unirest.http.Unirest
 import io.github.kscripting.kscript.util.Logger.info
+import kong.unirest.Unirest
 import java.util.*
 
 
@@ -13,6 +13,8 @@ object VersionChecker {
 
         val body = Unirest.get("https://api.github.com/repos/kscripting/kscript/releases/latest")
             .header("Accept", "application/vnd.github+json").asString().body
+
+        Unirest.shutDown()
 
         val latestKscriptVersion = body.substringAfter("\"tag_name\":\"v").substringBefore("\"")
 
