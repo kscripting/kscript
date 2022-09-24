@@ -1,17 +1,20 @@
 package io.github.kscripting.kscript.util
 
+import com.mashape.unirest.http.Unirest
 import io.github.kscripting.kscript.util.Logger.info
-import java.net.URL
 import java.util.*
+
 
 object VersionChecker {
     /** Determine the latest version by checking GitHub repo and print info if newer version is available. */
     fun versionCheck(currentVersion: String) {
         //https://api.github.com/repos/kscripting/kscript/releases/latest
         // "tag_name":"v4.1.1",
-        val resolvedUrlText =
-            UriUtils.resolveRedirects(URL("https://api.github.com/repos/kscripting/kscript/releases/latest")).readText()
-        val latestKscriptVersion = resolvedUrlText.substringAfter("\"tag_name\":\"v").substringBefore("\"")
+
+        val body = Unirest.get("https://api.github.com/repos/kscripting/kscript/releases/latest")
+            .header("Accept", "application/vnd.github+json").asString().body
+
+        val latestKscriptVersion = body.substringAfter("\"tag_name\":\"v").substringBefore("\"")
 
         if (latestKscriptVersion.isBlank()) {
             info("Could not find information about new version of kscript.")

@@ -129,6 +129,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.11.0")
     implementation("commons-codec:commons-codec:1.15")
+    implementation("com.mashape.unirest:unirest-java:1.4.9")
 
     implementation("net.igsoft:tablevis:0.6.0")
     implementation("io.arrow-kt:arrow-core:1.1.2")
