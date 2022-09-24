@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.integration
 
+import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
-import io.github.kscripting.kscript.integration.tools.TestContext
 import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
 import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
 import org.junit.jupiter.api.Tag
@@ -24,6 +24,11 @@ class ResolverTest : TestBase {
             log4jCached.deleteRecursively()
         }
 
-        verify("kscript ${resolvePath("$projectDir/test/resources/depends_on_annot.kts")}", 0, "", "")
+        verify(
+            "kscript ${resolvePath("$projectDir/test/resources/depends_on_annot.kts")}",
+            0,
+            "kscript with annotations rocks!\n",
+            startsWith("[kscript] Resolving log4j:log4j:1.2.14")
+        )
     }
 }
