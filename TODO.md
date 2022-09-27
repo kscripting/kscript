@@ -10,6 +10,7 @@
 * Fix the bug on ArchLinux
 * Local jars path (ticket)
 * Onboard on brew
+* In-process execution of Kotlin (?)
 
 
 * New package for Windows e.g. scoop

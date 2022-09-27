@@ -1,5 +1,6 @@
 package io.github.kscripting.kscript.integration.tools
 
+import io.github.kscripting.kscript.shell.ShellUtils
 import io.github.kscripting.kscript.shell.ShellUtils.which
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.*
@@ -80,5 +81,6 @@ object TestContext {
 
     private fun adjustEnv(map: MutableMap<String, String>) {
         map[pathEnvName] = envPath
+        ShellUtils.environmentAdjuster(map)
     }
 }

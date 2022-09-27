@@ -24,7 +24,7 @@ object DocoptParser {
         }
 
         return parsedArgs.map {
-            it.key.removePrefix("--").replace("[<>]".toRegex(), "") to it.value.toString()
+            it.key.removePrefix("--").replace("[<>]".toRegex(), "") to (it.value?.toString() ?: "")
         }.toMap()
     }
 }

@@ -10,6 +10,13 @@ import org.junit.jupiter.api.Test
 
 class MiscTest : TestBase {
     @Test
+    @Tag("posix")
+    @Tag("windows")
+    fun `Clearing cache test`() {
+        verify("kscript --clear-cache", 0, "", "Cleaning up cache...\n")
+    }
+
+    @Test
     @Tag("linux")
     @Tag("macos")
     @Tag("msys")
