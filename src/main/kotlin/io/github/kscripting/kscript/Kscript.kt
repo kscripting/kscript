@@ -21,7 +21,10 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     try {
-        val config = ConfigBuilder(OsType.findOrThrow(args[0]), System.getProperties(), System.getenv()).build()
+        val config = ConfigBuilder(
+            OsType.findOrThrow(args[0]), System.getProperties(), System.getenv()
+        ).build()
+
         val remainingArgs = args.drop(1)
 
         // skip org.docopt for version and help to allow for lazy version-check
@@ -40,8 +43,7 @@ fun main(args: Array<String>) {
         val userArgs = remainingArgs.dropWhile { it.startsWith("-") && it != "-" }.drop(1)
         val kscriptArgs = remainingArgs.take(remainingArgs.size - userArgs.size)
 
-        KscriptHandler(config, DocoptParser.parse(kscriptArgs, usage))
-            .handle(kscriptArgs, userArgs)
+        KscriptHandler(config, DocoptParser.parse(kscriptArgs, usage)).handle(kscriptArgs, userArgs)
     } catch (e: Exception) {
         errorMsg(e)
         exitProcess(1)

@@ -1,6 +1,5 @@
 package io.github.kscripting.kscript.model
 
-import io.github.kscripting.kscript.shell.ShellUtils
 import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.OsType
 import io.github.kscripting.shell.model.exists
@@ -10,15 +9,17 @@ import kotlin.io.path.reader
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ConfigBuilder(
-    private val osType: OsType, private val systemProperties: Properties, private val environment: Map<String, String?>
+    private val osType: OsType,
+    private val systemProperties: Properties,
+    private val environment: Map<String, String?>
 ) {
     var userHomeDir: OsPath? = null
     var tempDir: OsPath? = null
     var selfName: String? = null
     var kscriptDir: OsPath? = null
+    var kotlinHomeDir: OsPath? = null
     var cacheDir: OsPath? = null
     var configFile: OsPath? = null
-    var kotlinHomeDir: OsPath? = null
     var intellijCommand: String? = null
     var gradleCommand: String? = null
     var customPreamble: String? = null
@@ -62,8 +63,8 @@ class ConfigBuilder(
         }.resolve("kscript", "kscript.properties")
 
         val kotlinHomeDir: OsPath =
-            kotlinHomeDir ?: (environment.getEnvVariableOrNull("KOTLIN_HOME") ?: ShellUtils.guessKotlinHome(osType)
-            ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")).toNativeOsPath()
+            kotlinHomeDir ?: (systemProperties.getPropertyOrNull("kotlin.home")
+                ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")).toNativeOsPath()
 
         val intellijCommand: String =
             intellijCommand ?: environment.getEnvVariableOrNull("KSCRIPT_COMMAND_IDEA") ?: "idea"

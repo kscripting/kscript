@@ -43,6 +43,7 @@ KOTLIN_HOME=${KOTLIN_HOME:=$(dirname $(dirname $(resolveSymlinks $(resolveAbsolu
 # OSTYPE can be: linux*, freebsd, darwin*, cygwin, msys
 if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
   KSCRIPT_LIB=$(cygpath -w "${KSCRIPT_LIB}")
+  KOTLIN_HOME=$(cygpath -w "${KOTLIN_HOME}")
   true
 fi
 
@@ -87,9 +88,10 @@ if [[ $java_version < 13 ]]; then
 fi
 
 java_args=("${java_args[@]}" "-Dkotlin.home=${KOTLIN_HOME}")
+class_path="$KSCRIPT_LIB/*"
 
 ## run it using command substitution to have just the user process once kscript is done
-COMMAND=$("${JAVACMD:=java}" $JAVA_OPTS "${java_args[@]}" -classpath "$KSCRIPT_LIB/*" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${kotlin_args[@]}")
+COMMAND=$("${JAVACMD:=java}" $JAVA_OPTS "${java_args[@]}" -classpath "$class_path" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${kotlin_args[@]}")
 RESULT=$?
 
 if [ ! $RESULT -eq 0 ]; then
