@@ -114,7 +114,7 @@ tasks.test {
 }
 
 dependencies {
-    //implementation(fileTree("libs"))
+    //compileOnly(fileTree("libs"))
     implementation("com.offbytwo:docopt:0.6.0.20150202")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
