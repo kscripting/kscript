@@ -1,14 +1,14 @@
-package io.github.kscripting.kscript.shell
+package io.github.kscripting.kscript.util
 
 import io.github.kscripting.kscript.creator.JarArtifact
 import io.github.kscripting.kscript.model.CompilerOpt
 import io.github.kscripting.kscript.model.KotlinOpt
 import io.github.kscripting.kscript.model.OsConfig
 import io.github.kscripting.kscript.resolver.CommandResolver
-import io.github.kscripting.kscript.shell.ShellUtils.isInPath
 import io.github.kscripting.kscript.util.Logger.devMsg
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
+import io.github.kscripting.kscript.util.ShellUtils.isInPath
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.OsPath
 
@@ -35,15 +35,15 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         println(command)
     }
 
-    fun runInteractiveRepl(dependencies: Set<OsPath>, compilerOpts: Set<CompilerOpt>, kotlinOpts: Set<KotlinOpt>) {
+    fun runInteractiveRepl(jarArtifact: JarArtifact, dependencies: Set<OsPath>, compilerOpts: Set<CompilerOpt>, kotlinOpts: Set<KotlinOpt>) {
         infoMsg("Creating REPL")
-        val command = commandResolver.interactiveKotlinRepl(dependencies, compilerOpts, kotlinOpts)
+        val command = commandResolver.interactiveKotlinRepl(dependencies + setOf(jarArtifact.path), compilerOpts, kotlinOpts)
         devMsg("REPL Kotlin command: $command")
 
         println(command)
     }
 
-    fun runIdea(projectPath: OsPath) {
+    fun runGradleInIdeaProject(projectPath: OsPath) {
         if (isInPath(osConfig.osType, osConfig.gradleCommand)) {
             // Create gradle wrapper
             ShellExecutor.eval(osConfig.osType, "gradle wrapper", workingDirectory = projectPath)

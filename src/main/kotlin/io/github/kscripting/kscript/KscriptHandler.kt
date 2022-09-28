@@ -11,7 +11,7 @@ import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
-import io.github.kscripting.shell.model.*
+import io.github.kscripting.shell.model.ScriptType
 import java.net.URI
 
 class KscriptHandler(private val config: Config, private val options: Map<String, String>) {
@@ -71,7 +71,7 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
             DependencyResolver(script.repositories).resolve(script.dependencies)
         }
-        val executor = Executor(config.osConfig)
+        val executor = Executor(CommandResolver(config.osConfig), config.osConfig)
 
         //  Create temporary dev environment
         if (options.getBoolean("idea")) {
@@ -97,7 +97,7 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         //  Optionally enter interactive mode
         if (options.getBoolean("interactive")) {
-            executor.runInteractiveRepl(jar, resolvedDependencies, script.kotlinOpts)
+            executor.runInteractiveRepl(jar, resolvedDependencies, script.compilerOpts, script.kotlinOpts)
             return
         }
 

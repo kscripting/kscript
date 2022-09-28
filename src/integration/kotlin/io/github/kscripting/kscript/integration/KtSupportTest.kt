@@ -43,6 +43,6 @@ class KtSupportTest : TestBase {
     @Test
     @Tag("posix")
     fun `Also make sure that kts in package can be run via kscript`() {
-        verify(resolvePath("$projectDir/test/resources/script_in_pckg.kts"), 0, "I live in a package!\n")
+        verify(resolvePath("$projectDir/test/resources/script_in_pckg.kts"), 0, "I live in a package!\n", any())
     }
 }
