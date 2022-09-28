@@ -143,8 +143,6 @@ class CommandResolver(private val osConfig: OsConfig) {
     private fun resolveQuotedPath(osPath: OsPath): String = osPath.toNativeOsPath().stringPath()
 
     private fun resolveKotlinBinary(binary: String): String {
-        return osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
-            .convert(osConfig.osType)
-            .stringPath()
+        return if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary
     }
 }

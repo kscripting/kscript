@@ -52,17 +52,17 @@ export KSCRIPT_FILE="$1"
 
 [ -n "$JAVA_OPTS" ] || JAVA_OPTS="-Xmx256M -Xms32M"
 
-declare -a java_args
-declare -a kotlin_args
+declare -a JAVA_ARGS
+declare -a KOTLIN_ARGS
 
 while [ $# -gt 0 ]; do
   case "$1" in
     -D*)
-      java_args=("${java_args[@]}" "$1")
+      JAVA_ARGS=("${JAVA_ARGS[@]}" "$1")
       shift
       ;;
     -J*)
-      java_args=("${java_args[@]}" "${1:2}")
+      JAVA_ARGS=("${JAVA_ARGS[@]}" "${1:2}")
       if [ "x${1:2}" = "x" ]; then
         echo "error: empty -J argument"
         exit 1
@@ -70,28 +70,31 @@ while [ $# -gt 0 ]; do
       shift
       ;;
     *)
-      kotlin_args=("${kotlin_args[@]}" "$1")
+      KOTLIN_ARGS=("${KOTLIN_ARGS[@]}" "$1")
       shift
       ;;
   esac
 done
 
 # Additional Java args
-java_version="$(findJavaVersion)"
-if [[ $java_version -ge 9 ]]; then
+JAVA_VERSION="$(findJavaVersion)"
+if [[ $JAVA_VERSION -ge 9 ]]; then
   # Workaround the illegal reflective access warning from ReflectionUtil to ResourceBundle.setParent, see IDEA-248785.
-  java_args=("${java_args[@]}" "--add-opens" "java.base/java.util=ALL-UNNAMED")
+  JAVA_ARGS=("${JAVA_ARGS[@]}" "--add-opens" "java.base/java.util=ALL-UNNAMED")
 fi
 
-if [[ $java_version < 13 ]]; then
-  java_args=("${java_args[@]}" "-noverify")
+if [[ $JAVA_VERSION < 13 ]]; then
+  JAVA_ARGS=("${JAVA_ARGS[@]}" "-noverify")
 fi
 
-java_args=("${java_args[@]}" "-Dkotlin.home=${KOTLIN_HOME}")
-class_path="$KSCRIPT_LIB/*"
+JAVA_ARGS=("${JAVA_ARGS[@]}" "-Dkotlin.home=${KOTLIN_HOME}")
+# Kotlin compilation / running dependencies
+CLASS_PATH="$KOTLIN_HOME/lib/kotlin-runner.jar:$KOTLIN_HOME/lib/kotlin-preloader.jar:$KOTLIN_HOME/lib/kotlin-compiler.jar:$KOTLIN_HOME/lib/kotlin-script-runtime.jar"
+# KScript dependencies itself
+CLASS_PATH="$CLASS_PATH:$KSCRIPT_LIB/*"
 
 ## run it using command substitution to have just the user process once kscript is done
-COMMAND=$("${JAVACMD:=java}" $JAVA_OPTS "${java_args[@]}" -classpath "$class_path" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${kotlin_args[@]}")
+COMMAND=$("${JAVACMD:=java}" $JAVA_OPTS "${JAVA_ARGS[@]}" -classpath "$CLASS_PATH" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${KOTLIN_ARGS[@]}")
 RESULT=$?
 
 if [ ! $RESULT -eq 0 ]; then
