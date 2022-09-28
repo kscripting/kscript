@@ -210,17 +210,9 @@ object LineParser {
         val kotlinOpts = "//KOTLIN_OPTS "
 
         text.trim().let {
-            val replacementText = "respective kscript command line parameters; KotlinOptions are now ignored during execution"
-
             return when {
-                it.startsWith(fileKotlinOptions) -> {
-                    val values = extractQuotedValuesInParenthesis(it.substring(fileKotlinOptions.length))
-
-                    values.map { KotlinOpt(it) } + createDeprecatedAnnotation(scriptLocation,
-                        line,
-                        deprecatedAnnotation,
-                        text,
-                        replacementText)
+                it.startsWith(fileKotlinOptions) -> extractQuotedValuesInParenthesis(it.substring(fileKotlinOptions.length)).map {
+                    KotlinOpt(it)
                 }
 
                 it.startsWith(fileKotlinOpts) -> {
@@ -230,7 +222,9 @@ object LineParser {
                         line,
                         deprecatedAnnotation,
                         text,
-                        replacementText)
+                        "@file:KotlinOptions(" + values.joinToString(
+                            ", "
+                        ) { "\"$it\"" } + ")")
                 }
 
                 it.startsWith(kotlinOpts) -> {
@@ -239,7 +233,9 @@ object LineParser {
                         line,
                         deprecatedAnnotation,
                         text,
-                        replacementText)
+                        "@file:KotlinOptions(" + values.joinToString(
+                            ", "
+                        ) { "\"$it\"" } + ")")
                 }
 
                 else -> emptyList()
