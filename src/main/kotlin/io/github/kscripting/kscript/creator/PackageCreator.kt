@@ -3,8 +3,8 @@ package io.github.kscripting.kscript.creator
 import io.github.kscripting.kscript.code.GradleTemplates
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
-import io.github.kscripting.kscript.shell.Executor
-import io.github.kscripting.kscript.shell.FileUtils
+import io.github.kscripting.kscript.util.Executor
+import io.github.kscripting.kscript.util.FileUtils
 import io.github.kscripting.shell.model.toNativeFile
 import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.kscript.util.Logger.infoMsg

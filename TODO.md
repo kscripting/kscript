@@ -11,6 +11,7 @@
 * Local jars path (ticket)
 * Onboard on brew
 * In-process execution of Kotlin (?)
+* Deprecate KotlinOptions
 
 
 * New package for Windows e.g. scoop

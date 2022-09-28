@@ -3,14 +3,16 @@ package io.github.kscripting.kscript.creator
 import io.github.kscripting.kscript.code.GradleTemplates
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
-import io.github.kscripting.kscript.shell.FileUtils
-import io.github.kscripting.kscript.shell.FileUtils.resolveUniqueFilePath
+import io.github.kscripting.kscript.util.Executor
+import io.github.kscripting.kscript.util.FileUtils
+import io.github.kscripting.kscript.util.FileUtils.resolveUniqueFilePath
 import io.github.kscripting.kscript.util.Logger.devMsg
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.shell.model.OsPath
 import java.net.URI
 
-class IdeaProjectCreator {
+class IdeaProjectCreator(private val executor: Executor) {
+
     fun create(
         basePath: OsPath,
         script: Script,
@@ -51,6 +53,8 @@ class IdeaProjectCreator {
         FileUtils.createFile(
             basePath.resolve("build.gradle.kts"), GradleTemplates.createGradleIdeaScript(script)
         )
+
+        executor.runGradleInIdeaProject(basePath)
 
         return basePath
     }

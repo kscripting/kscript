@@ -71,7 +71,7 @@ class AnnotationTest : TestBase {
             "kscript ${resolvePath("$projectDir/test/resources/depends_on_klaxon.kts")}",
             0,
             "Successfully resolved klaxon\n",
-            "[kscript] Resolving com.beust:klaxon:5.5...\n"
+            startsWith("[kscript] Resolving com.beust:klaxon:5.5...\n")
         )
     }
 }

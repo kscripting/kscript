@@ -1,4 +1,4 @@
-package io.github.kscripting.kscript.shell
+package io.github.kscripting.kscript.util
 
 import io.github.kscripting.kscript.util.Logger.warnMsg
 import io.github.kscripting.shell.model.*

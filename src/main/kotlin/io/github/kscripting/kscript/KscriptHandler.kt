@@ -6,7 +6,7 @@ import io.github.kscripting.kscript.creator.*
 import io.github.kscripting.kscript.model.Config
 import io.github.kscripting.kscript.parser.Parser
 import io.github.kscripting.kscript.resolver.*
-import io.github.kscripting.kscript.shell.Executor
+import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
@@ -71,25 +71,17 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
             DependencyResolver(script.repositories).resolve(script.dependencies)
         }
-        val executor = Executor(CommandResolver(config.osConfig), config.osConfig)
+        val executor = Executor(config.osConfig)
 
         //  Create temporary dev environment
         if (options.getBoolean("idea")) {
             val path = cache.getOrCreateIdeaProject(script.digest) { basePath ->
                 val uriLocalPathProvider = { uri: URI -> inputOutputResolver.resolveContent(uri).localPath }
-                IdeaProjectCreator().create(basePath, script, userArgs, uriLocalPathProvider)
+                IdeaProjectCreator(executor).create(basePath, script, userArgs, uriLocalPathProvider)
             }
 
             infoMsg("Idea project available at:")
             infoMsg(path.convert(config.osConfig.osType).stringPath())
-
-            executor.runIdea(path)
-            return
-        }
-
-        //  Optionally enter interactive mode
-        if (options.getBoolean("interactive")) {
-            executor.runInteractiveRepl(resolvedDependencies, script.compilerOpts, script.kotlinOpts)
             return
         }
 
@@ -101,6 +93,12 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         val jar = cache.getOrCreateJar(script.digest) { basePath ->
             JarArtifactCreator(executor).create(basePath, script, resolvedDependencies)
+        }
+
+        //  Optionally enter interactive mode
+        if (options.getBoolean("interactive")) {
+            executor.runInteractiveRepl(jar, resolvedDependencies, script.kotlinOpts)
+            return
         }
 
         //if requested try to package the into a standalone binary

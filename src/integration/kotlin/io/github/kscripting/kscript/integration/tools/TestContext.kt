@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.integration.tools
 
-import io.github.kscripting.kscript.shell.ShellUtils
-import io.github.kscripting.kscript.shell.ShellUtils.which
+import io.github.kscripting.kscript.util.ShellUtils
+import io.github.kscripting.kscript.util.ShellUtils.which
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.*
 

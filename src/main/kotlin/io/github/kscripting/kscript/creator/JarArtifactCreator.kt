@@ -2,8 +2,8 @@ package io.github.kscripting.kscript.creator
 
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
-import io.github.kscripting.kscript.shell.Executor
-import io.github.kscripting.kscript.shell.FileUtils
+import io.github.kscripting.kscript.util.Executor
+import io.github.kscripting.kscript.util.FileUtils
 import io.github.kscripting.shell.model.*
 
 data class JarArtifact(val path: OsPath, val execClassName: String)
