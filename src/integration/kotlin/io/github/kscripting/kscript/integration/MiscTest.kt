@@ -70,10 +70,11 @@ class MiscTest : TestBase {
 
     @Test
     @Tag("posix")
+    //TODO: @Tag("windows") - kscript on Windows doesn't return correctly error code ()
     fun `Ensure that compilation errors are not cached #349`() {
         //first run (not yet cached)
-        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("[kscript] [ERROR] Compilation of scriplet failed:"))
+        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
         //real test
-        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("[kscript] [ERROR] Compilation of scriplet failed:"))
+        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
     }
 }

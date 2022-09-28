@@ -1,7 +1,6 @@
 package io.github.kscripting.kscript.integration
 
 import io.github.kscripting.kscript.integration.tools.TestAssertion.any
-import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
 import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
 import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
@@ -115,14 +114,6 @@ class ScriptInputModesTest : TestBase {
         )
 //        verify("kscript https://git.io/fxHBv", 0, "main was called\n", "[kscript] Resolving log4j:log4j:1.2.14...\n")
         verify("kscript https://git.io/fxHBv", 0, "main was called\n", any())
-    }
-
-    @Test
-    @Tag("posix")
-    //TODO: @Tag("windows") - kscript on Windows doesn't return correctly error code ()
-    fun `Repeated compilation of buggy same script should end up in error again`() {
-        verify("kscript '1-'", 1, "", startsWith("[kscript] [ERROR] Compilation of scriplet failed:"))
-        verify("kscript '1-'", 1, "", startsWith("[kscript] [ERROR] Compilation of scriplet failed:"))
     }
 
     @Test
