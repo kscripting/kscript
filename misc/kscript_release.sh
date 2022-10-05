@@ -211,7 +211,7 @@ class Kscript < Formula
 
   def install
     libexec.install Dir["*"]
-    inreplace "#{libexec}/bin/kscript", /^KSCRIPT_LIB=.*/, "KSCRIPT_LIB=#{libexec}/bin/kscript.jar"
+    inreplace "#{libexec}/bin/kscript", /^KSCRIPT_LIB=.*/, "KSCRIPT_LIB=#{libexec}/lib/kscript.jar"
     bin.install_symlink "#{libexec}/bin/kscript"
   end
 end

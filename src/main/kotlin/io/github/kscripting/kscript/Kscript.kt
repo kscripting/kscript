@@ -22,7 +22,9 @@ import kotlin.system.exitProcess
 fun main(args: Array<String>) {
     try {
         val config = ConfigBuilder(
-            OsType.findOrThrow(args[0]), System.getProperties(), System.getenv()
+            OsType.findOrThrow(args[0]),
+            System.getProperties(),
+            System.getenv()
         ).build()
 
         val remainingArgs = args.drop(1)

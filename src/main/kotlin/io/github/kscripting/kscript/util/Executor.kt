@@ -13,6 +13,10 @@ import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.OsPath
 
 class Executor(private val commandResolver: CommandResolver, private val osConfig: OsConfig) {
+    //NOTE: for direct execution from Kotlin jars:
+    //# Kotlin compilation / running dependencies
+    //#CLASS_PATH="$KOTLIN_HOME/lib/kotlin-runner.jar:$KOTLIN_HOME/lib/kotlin-preloader.jar:$KOTLIN_HOME/lib/kotlin-compiler.jar:$KOTLIN_HOME/lib/kotlin-script-runtime.jar"
+
     fun compileKotlin(jar: OsPath, dependencies: Set<OsPath>, filePaths: Set<OsPath>, compilerOpts: Set<CompilerOpt>) {
         val command = commandResolver.compileKotlin(jar, dependencies, filePaths, compilerOpts)
         devMsg("JAR compile command: $command")

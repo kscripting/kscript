@@ -1,10 +1,64 @@
 package io.github.kscripting.kscript.util
 
 import io.github.kscripting.shell.ShellExecutor
+import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.OsType
+import io.github.kscripting.shell.model.readText
 import io.github.kscripting.shell.process.EnvAdjuster
 
 object ShellUtils {
+    fun guessKotlinHome(osType: OsType): String? {
+        if (osType.isWindowsLike()) {
+            return guessWindowsKotlinHome(osType)
+        }
+        return guessPosixKotlinHome(osType)
+    }
+
+    fun guessPosixKotlinHome(osType: OsType): String? {
+        val kotlinHome = ShellExecutor.eval(osType, "KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
+            "kotlin.home=([^\\s]*)".toRegex().find(this)?.groups?.get(1)?.value
+        } ?: return null
+
+        if (osType == OsType.MSYS) {
+            return OsPath.createOrThrow(OsType.MSYS, kotlinHome).convert(OsType.WINDOWS).stringPath()
+        }
+
+        return kotlinHome
+    }
+
+    fun guessWindowsKotlinHome(osType: OsType): String? {
+        val whereKotlinOutput = which(osType, "kotlinc.bat")
+
+        //Default case - Kotlin is installed manually and added to path
+        whereKotlinOutput.forEach {
+            val path = it.substringBefore("\\bin\\kotlinc.bat", "").ifBlank { null }
+
+            if (path != null) {
+                return path
+            }
+        }
+
+        //Scoop installer
+        whereKotlinOutput.forEach {
+            val path = it.substringBefore("kotlinc.cmd", "").ifBlank { null }
+
+            if (path != null) {
+                val outerScoopPath = OsPath.createOrThrow(osType, "$path\\kotlin.cmd")
+                val scoopScript = outerScoopPath.readText().lines()
+
+                scoopScript.forEach {
+                    val scoopPath = it.substringBefore("\\bin\\kotlinc.bat", "").ifBlank { null }
+
+                    if (scoopPath != null) {
+                        return scoopPath.substringAfter("@rem ").ifEmpty { null }
+                    }
+                }
+            }
+        }
+
+        return null
+    }
+
     fun which(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): List<String> = ShellExecutor.eval(
         osType, "${if (osType == OsType.WINDOWS) "where" else "which"} $command", null, envAdjuster
     ).stdout.trim().lines()

@@ -37,13 +37,9 @@ if [ -z "$JAVACMD" -a -n "$JAVA_HOME" -a -x "$JAVA_HOME/bin/java" ]; then
     JAVACMD="$JAVA_HOME/bin/java"
 fi
 
-# Resolve KOTLIN_HOME
-KOTLIN_HOME=${KOTLIN_HOME:=$(dirname $(dirname $(resolveSymlinks $(resolveAbsolutePath $(which kotlinc)))))}
-
 # OSTYPE can be: linux*, freebsd, darwin*, cygwin, msys
 if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
   KSCRIPT_LIB=$(cygpath -w "${KSCRIPT_LIB}")
-  KOTLIN_HOME=$(cygpath -w "${KOTLIN_HOME}")
   true
 fi
 
@@ -87,11 +83,8 @@ if [[ $JAVA_VERSION < 13 ]]; then
   JAVA_ARGS=("${JAVA_ARGS[@]}" "-noverify")
 fi
 
-JAVA_ARGS=("${JAVA_ARGS[@]}" "-Dkotlin.home=${KOTLIN_HOME}")
-# Kotlin compilation / running dependencies
-CLASS_PATH="$KOTLIN_HOME/lib/kotlin-runner.jar:$KOTLIN_HOME/lib/kotlin-preloader.jar:$KOTLIN_HOME/lib/kotlin-compiler.jar:$KOTLIN_HOME/lib/kotlin-script-runtime.jar"
 # KScript dependencies itself
-CLASS_PATH="$CLASS_PATH:$KSCRIPT_LIB/*"
+CLASS_PATH="$KSCRIPT_LIB/*"
 
 ## run it using command substitution to have just the user process once kscript is done
 COMMAND=$("${JAVACMD:=java}" $JAVA_OPTS "${JAVA_ARGS[@]}" -classpath "$CLASS_PATH" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${KOTLIN_ARGS[@]}")

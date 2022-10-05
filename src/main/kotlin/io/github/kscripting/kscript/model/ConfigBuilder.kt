@@ -1,5 +1,6 @@
 package io.github.kscripting.kscript.model
 
+import io.github.kscripting.kscript.util.ShellUtils
 import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.OsType
 import io.github.kscripting.shell.model.exists
@@ -17,8 +18,8 @@ class ConfigBuilder(
     var tempDir: OsPath? = null
     var selfName: String? = null
     var kscriptDir: OsPath? = null
-    var kotlinHomeDir: OsPath? = null
     var cacheDir: OsPath? = null
+    var kotlinHomeDir: OsPath? = null
     var configFile: OsPath? = null
     var intellijCommand: String? = null
     var gradleCommand: String? = null
@@ -53,6 +54,10 @@ class ConfigBuilder(
             else -> environment.getEnvVariableOrNull("XDG_CACHE_DIR")?.toNativeOsPath() ?: userHomeDir.resolve(".cache")
         }.resolve("kscript")
 
+        val kotlinHomeDir: OsPath =
+            kotlinHomeDir ?: (environment.getEnvVariableOrNull("KOTLIN_HOME") ?: ShellUtils.guessKotlinHome(osType)
+            ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")).toNativeOsPath()
+
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toNativeOsPath()
                 ?: userHomeDir.resolve(".config")
@@ -61,10 +66,6 @@ class ConfigBuilder(
             else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toNativeOsPath()
                 ?: userHomeDir.resolve(".config")
         }.resolve("kscript", "kscript.properties")
-
-        val kotlinHomeDir: OsPath =
-            kotlinHomeDir ?: (systemProperties.getPropertyOrNull("kotlin.home")
-                ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")).toNativeOsPath()
 
         val intellijCommand: String =
             intellijCommand ?: environment.getEnvVariableOrNull("KSCRIPT_COMMAND_IDEA") ?: "idea"

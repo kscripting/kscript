@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
+
 val kotlinVersion: String = "1.7.10"
 
 plugins {
@@ -5,6 +8,7 @@ plugins {
     application
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     `maven-publish`
     signing
 }
@@ -151,15 +155,11 @@ dependencies {
 }
 
 val createKscriptLayout by tasks.register<Copy>("createKscriptLayout") {
-    dependsOn(jar)
+    dependsOn(shadowJar)
 
     into(layout.projectDirectory)
 
-    from(configurations.runtimeClasspath.get()) {
-        into("build/kscript/lib")
-    }
-
-    from(jar) {
+    from(shadowJar) {
         into("build/kscript/lib")
     }
 
@@ -185,11 +185,33 @@ val packageKscriptDistribution by tasks.register<Zip>("packageKscriptDistributio
     from(layout.buildDirectory.dir("kscript-${project.version}"))
 }
 
+val shadowJar by tasks.getting(ShadowJar::class) {
+    // set empty string to classifier and version to get predictable jar file name: build/libs/kscript.jar
+    archiveFileName.set("kscript.jar")
+    transform(ComponentsXmlResourceTransformer())
+}
+
 application {
     mainClass.set(project.group.toString() + ".KscriptKt")
 }
 
 val jar: Task by tasks.getting {
+}
+
+val shadowDistTar: Task by tasks.getting {
+    enabled = false
+}
+
+val shadowDistZip: Task by tasks.getting {
+    enabled = false
+}
+
+val distTar: Task by tasks.getting {
+    enabled = false
+}
+
+val distZip: Task by tasks.getting {
+    enabled = false
 }
 
 val assemble: Task by tasks.getting {
