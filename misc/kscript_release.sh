@@ -253,6 +253,24 @@ source=("\${pkgname}-\${pkgver}-bin.zip::https://github.com/holgerbrandl/\${pkgn
 sha256sums=('${archiveMd5}')
 
 package() {
+    if ! [ -d /usr/share/kotlin/bin ] && ([ -f /usr/bin/kotlin ] || [ -f /usr/bin/kotlinc ])
+    then
+      echo "/usr/share/kotlin/bin doesn't exist, creating it"
+      mkdir -p "$pkgdir/usr/share/kotlin/bin"
+    fi
+
+    if [ -f /usr/bin/kotlin ] && ! [ -f /usr/share/kotlin/bin/kotlin ]
+    then
+      echo "Creating symlink /usr/share/kotlin/bin/kotlin to /usr/bin/kotlin"
+      ln -s /usr/bin/kotlin "$pkgdir/usr/share/kotlin/bin/kotlin"
+    fi
+
+    if [ -f /usr/bin/kotlinc ] && ! [ -f /usr/share/kotlin/bin/kotlinc ]
+    then
+      echo "Creating symlink /usr/share/kotlin/bin/kotlinc to /usr/bin/kotlinc"
+      ln -s /usr/bin/kotlinc "$pkgdir/usr/share/kotlin/bin/kotlinc"
+    fi
+
     cd "\${srcdir}/\${pkgname}-\${pkgver}/bin"
 
     install -Dm 755 kscript "\${pkgdir}/usr/bin/kscript"
