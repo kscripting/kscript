@@ -18,8 +18,6 @@ import kotlin.script.experimental.dependencies.maven.MavenDependenciesResolver
 
 class DependencyResolver(private val customRepos: Set<Repository>) {
     private val mvnResolver = MavenDependenciesResolver().apply {
-        addRepository(RepositoryCoordinates("https://repo.maven.apache.org/maven2"))
-
         customRepos.map {
             val options = mutableMapOf<String, String>()
 
@@ -33,10 +31,11 @@ class DependencyResolver(private val customRepos: Set<Repository>) {
             //Adding custom repository removes MavenCentral, so it must be re-added below
             addRepository(RepositoryCoordinates(it.url), makeExternalDependenciesResolverOptions(options))
         }
+
+        addRepository(RepositoryCoordinates("https://repo.maven.apache.org/maven2"))
     }
 
-    private val resolver =
-        CompoundDependenciesResolver(FileSystemDependenciesResolver(), MavenDependenciesResolver(), mvnResolver)
+    private val resolver = CompoundDependenciesResolver(FileSystemDependenciesResolver(), mvnResolver)
 
     fun resolve(depIds: Set<Dependency>): Set<OsPath> {
         val resolvedDependencies = runBlocking {
@@ -61,18 +60,17 @@ class DependencyResolver(private val customRepos: Set<Repository>) {
         }.flatten().map {
             it.toOsPath()
         }.filter {
-            it.extension == "jar"
+            it.extension == "jar" || it.extension == "aar"
         }.toSet()
 
         return resolvedDependencies
     }
 
     companion object {
-        //@formatter:off
-        private const val exceptionMessage =
-            "Failed while connecting to the server. Check the connection (http/https, port, proxy, credentials, etc.)" +
-                    "of your maven dependency locators. If you suspect this is a bug, " +
-                    "you can create an issue on https://github.com/holgerbrandl/kscript"
-        //@formatter:on
+        private val exceptionMessage =
+            """|Artifact resolution failure. Check the connection (http/https, port, proxy, credentials, etc.) of your
+               |maven dependency locators. If you suspect this is a bug, you can create an issue on:
+               |https://github.com/kscripting/kscript
+               |""".trimMargin()
     }
 }

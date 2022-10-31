@@ -6,11 +6,9 @@
   * switched to java executor; it works faster, and can handle multiple jars on classpath with asterisk 
   * kscript can be released to Maven Central as library, not the whole package
   * kotlin-script-runtime can be reused from jars
-* Extract shell library
 * Fix the bug on ArchLinux
 * Local jars path (ticket)
 * Onboard on brew
-* In-process execution of Kotlin (?)
 * Deprecate KotlinOptions
 
 

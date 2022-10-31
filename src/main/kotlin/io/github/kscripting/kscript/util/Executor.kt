@@ -21,7 +21,9 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         val command = commandResolver.compileKotlin(jar, dependencies, filePaths, compilerOpts)
         devMsg("JAR compile command: $command")
 
-        val processResult = ShellExecutor.eval(osConfig.osType, command, envAdjuster = ShellUtils::environmentAdjuster)
+        val processResult = ShellExecutor.evalAndGobble(
+            osConfig.osType, command, envAdjuster = ShellUtils::environmentAdjuster, waitTimeMinutes = 30
+        )
 
         devMsg("Script compilation result:\n$processResult")
 
@@ -36,21 +38,42 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         val command = commandResolver.executeKotlin(jarArtifact, dependencies, userArgs, kotlinOpts)
         devMsg("Kotlin execute command: $command")
 
-        println(command)
+        val processResult = ShellExecutor.eval(
+            osConfig.osType,
+            command,
+            envAdjuster = ShellUtils::environmentAdjuster,
+            waitTimeMinutes = Int.MAX_VALUE
+        )
+
+        devMsg("Script execution result:\n$processResult")
+
+        if (processResult.exitCode != 0) {
+            throw IllegalStateException("Execution of scriplet failed:\n$processResult")
+        }
     }
 
-    fun runInteractiveRepl(jarArtifact: JarArtifact, dependencies: Set<OsPath>, compilerOpts: Set<CompilerOpt>, kotlinOpts: Set<KotlinOpt>) {
+    fun runInteractiveRepl(
+        jarArtifact: JarArtifact, dependencies: Set<OsPath>, compilerOpts: Set<CompilerOpt>, kotlinOpts: Set<KotlinOpt>
+    ) {
         infoMsg("Creating REPL")
-        val command = commandResolver.interactiveKotlinRepl(dependencies + setOf(jarArtifact.path), compilerOpts, kotlinOpts)
+        val command =
+            commandResolver.interactiveKotlinRepl(dependencies + setOf(jarArtifact.path), compilerOpts, kotlinOpts)
         devMsg("REPL Kotlin command: $command")
 
-        println(command)
+        val processResult = ShellExecutor.eval(
+            osConfig.osType,
+            command,
+            envAdjuster = ShellUtils::environmentAdjuster,
+            waitTimeMinutes = Int.MAX_VALUE
+        )
+
+        devMsg("Repl execution result:\n$processResult")
     }
 
     fun runGradleInIdeaProject(projectPath: OsPath) {
         if (isInPath(osConfig.osType, osConfig.gradleCommand)) {
             // Create gradle wrapper
-            ShellExecutor.eval(osConfig.osType, "gradle wrapper", workingDirectory = projectPath)
+            ShellExecutor.evalAndGobble(osConfig.osType, "gradle wrapper", workingDirectory = projectPath)
         } else {
             warnMsg("Could not find '${osConfig.gradleCommand}' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_COMMAND_GRADLE' env property")
         }
@@ -58,7 +81,16 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         if (isInPath(osConfig.osType, osConfig.intellijCommand)) {
             val command = commandResolver.executeIdea(projectPath)
             devMsg("Idea execute command: $command")
-            println(command)
+
+            val processResult = ShellExecutor.evalAndGobble(
+                osConfig.osType, command
+            )
+
+            devMsg("Script execution result:\n$processResult")
+
+            if (processResult.exitCode != 0) {
+                throw IllegalStateException("Execution of idea command failed:\n$processResult")
+            }
         } else {
             warnMsg("Could not find '${osConfig.intellijCommand}' in your PATH. You should set the command used to launch your intellij as 'KSCRIPT_COMMAND_IDEA' env property")
         }
@@ -72,7 +104,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         val command = commandResolver.createPackage()
         devMsg("Create package command: $command")
 
-        val result = ShellExecutor.eval(osConfig.osType, command, workingDirectory = projectPath)
+        val result = ShellExecutor.evalAndGobble(osConfig.osType, command, workingDirectory = projectPath)
 
         if (result.exitCode != 0) {
             throw IllegalStateException("Packaging for path: '$projectPath' failed:$result")

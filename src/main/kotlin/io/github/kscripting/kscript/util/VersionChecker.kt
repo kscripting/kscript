@@ -28,8 +28,14 @@ object VersionChecker {
         }
     }
 
-    private fun padVersion(version: String) = try {
-        var versionNumbers = version.split(".").map { Integer.valueOf(it) }
+    fun padVersion(version: String) = try {
+        val versionWithoutSnapshot = if (version.endsWith("-SNAPSHOT", ignoreCase = true)) {
+            version.substringBeforeLast("-")
+        } else {
+            version
+        }
+
+        var versionNumbers = versionWithoutSnapshot.split(".").map { Integer.valueOf(it) }
         // adjust versions without a patch-release
         while (versionNumbers.size < 3) {
             versionNumbers = versionNumbers + 0

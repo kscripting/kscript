@@ -75,7 +75,7 @@ class CommandResolver(private val osConfig: OsConfig) {
     }
 
     fun executeIdea(projectPath: OsPath): String {
-        return "${osConfig.intellijCommand} \"$projectPath\""
+        return "${osConfig.intellijCommand} \"$projectPath\" &"
     }
 
     fun createPackage(): String {
@@ -143,6 +143,8 @@ class CommandResolver(private val osConfig: OsConfig) {
     private fun resolveQuotedPath(osPath: OsPath): String = osPath.toNativeOsPath().stringPath()
 
     private fun resolveKotlinBinary(binary: String): String {
-        return if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary
+        return osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
+            .convert(osConfig.osType)
+            .stringPath()
     }
 }

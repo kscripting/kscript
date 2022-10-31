@@ -23,7 +23,7 @@ repositories {
 }
 
 group = "io.github.kscripting"
-version = "4.2.0"
+version = "4.2.0-SNAPSHOT"
 
 buildConfig {
     packageName(project.group.toString() + "." + project.name)
@@ -140,7 +140,7 @@ dependencies {
 
     implementation("io.github.kscripting:shell:0.5.0-SNAPSHOT")
 
-    implementation("org.slf4j:slf4j-nop:2.0.0")
+    implementation("org.slf4j:slf4j-nop:2.0.1")
 
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.0")
@@ -226,7 +226,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             artifactId = "kscript"
-            from(components["java"])
+            artifact(jar)
 
             pom {
                 name.set("kscript")

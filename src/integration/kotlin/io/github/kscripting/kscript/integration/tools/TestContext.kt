@@ -36,7 +36,7 @@ object TestContext {
         return OsPath.createOrThrow(osType, path).stringPath()
     }
 
-    fun runProcess(command: String): ProcessResult {
+    fun runProcess(command: String): GobbledProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //(MSYS bash interpreter is also replacing double quotes into the single quotes: see: bash -xc 'kscript "println(1+1)"')
         val newCommand = when {
@@ -44,7 +44,7 @@ object TestContext {
             else -> command
         }
 
-        val result = ShellExecutor.eval(osType, newCommand, null, ::adjustEnv)
+        val result = ShellExecutor.evalAndGobble(osType, newCommand, null, ::adjustEnv)
 
         println(result)
         return result

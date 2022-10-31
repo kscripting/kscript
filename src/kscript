@@ -86,14 +86,5 @@ fi
 # KScript dependencies itself
 CLASS_PATH="$KSCRIPT_LIB/*"
 
-## run it using command substitution to have just the user process once kscript is done
-COMMAND=$("${JAVACMD:=java}" $JAVA_OPTS "${JAVA_ARGS[@]}" -classpath "$CLASS_PATH" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${KOTLIN_ARGS[@]}")
-RESULT=$?
-
-if [ ! $RESULT -eq 0 ]; then
-    exit $RESULT
-fi
-
-if [ -n "$COMMAND" ]; then
-    eval "exec $COMMAND"
-fi
+## execute process
+"${JAVACMD:=java}" $JAVA_OPTS "${JAVA_ARGS[@]}" -classpath "$CLASS_PATH" io.github.kscripting.kscript.KscriptKt "$OSTYPE" "${KOTLIN_ARGS[@]}"
