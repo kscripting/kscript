@@ -4,6 +4,7 @@ import io.github.kscripting.kscript.util.ShellUtils
 import io.github.kscripting.kscript.util.ShellUtils.which
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.*
+import java.util.*
 
 object TestContext {
     private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
@@ -36,11 +37,34 @@ object TestContext {
         return OsPath.createOrThrow(osType, path).stringPath()
     }
 
+    private fun processDetails(process: ProcessHandle): String {
+        return String.format(
+            "%8d %8s %10s %26s %-40s",
+            process.pid(),
+            text(process.parent().map { obj: ProcessHandle -> obj.pid() }),
+            text(process.info().user()),
+            text(process.info().startInstant()),
+            text(process.info().command()),
+            //text(process.info().commandLine())
+        )
+    }
+
+    private fun text(optional: Optional<*>): String? {
+        return optional.map { obj: Any -> obj.toString() }.orElse("-")
+    }
+
     fun runProcess(command: String): GobbledProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //(MSYS bash interpreter is also replacing double quotes into the single quotes: see: bash -xc 'kscript "println(1+1)"')
 
         println("Starting test (command: $command)")
+
+        ProcessHandle.allProcesses().filter {
+            val cmd = it.info().command().orElseGet { "<no command>" }
+            cmd.contains("bash") || cmd.contains("java")
+        }.forEach { process: ProcessHandle ->
+            println(processDetails(process))
+        }
 
         val newCommand = when {
             osType.isPosixHostedOnWindows() -> command.replace('"', '\'')
