@@ -39,6 +39,9 @@ object TestContext {
     fun runProcess(command: String): GobbledProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //(MSYS bash interpreter is also replacing double quotes into the single quotes: see: bash -xc 'kscript "println(1+1)"')
+
+        println("Starting test (command: $command)")
+
         val newCommand = when {
             osType.isPosixHostedOnWindows() -> command.replace('"', '\'')
             else -> command
@@ -47,6 +50,8 @@ object TestContext {
         val result = ShellExecutor.evalAndGobble(osType, newCommand, null, ::adjustEnv)
 
         println(result)
+
+        println("Finishing test (command: $command)")
         return result
     }
 
