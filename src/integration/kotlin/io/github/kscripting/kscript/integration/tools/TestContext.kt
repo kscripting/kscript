@@ -44,8 +44,8 @@ object TestContext {
             text(process.parent().map { obj: ProcessHandle -> obj.pid() }),
             text(process.info().user()),
             text(process.info().startInstant()),
-            text(process.info().command()),
-            //text(process.info().commandLine())
+            //text(process.info().command()),
+            text(process.info().commandLine())
         )
     }
 
