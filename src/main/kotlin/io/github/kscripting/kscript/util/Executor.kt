@@ -19,13 +19,13 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
 
     fun compileKotlin(jar: OsPath, dependencies: Set<OsPath>, filePaths: Set<OsPath>, compilerOpts: Set<CompilerOpt>) {
         val command = commandResolver.compileKotlin(jar, dependencies, filePaths, compilerOpts)
-        devMsg("JAR compile command: $command")
+        infoMsg("JAR compile command: $command")
 
         val processResult = ShellExecutor.evalAndGobble(
             osConfig.osType, command, envAdjuster = ShellUtils::environmentAdjuster, waitTimeMinutes = 30
         )
 
-        devMsg("Script compilation result:\n$processResult")
+        infoMsg("Script compilation result:\n$processResult")
 
         if (processResult.exitCode != 0) {
             throw IllegalStateException("Compilation of scriplet failed:\n$processResult")
@@ -36,7 +36,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         jarArtifact: JarArtifact, dependencies: Set<OsPath>, userArgs: List<String>, kotlinOpts: Set<KotlinOpt>
     ) {
         val command = commandResolver.executeKotlin(jarArtifact, dependencies, userArgs, kotlinOpts)
-        devMsg("Kotlin execute command: $command")
+        infoMsg("Kotlin execute command: $command")
 
         val processResult = ShellExecutor.eval(
             osConfig.osType,
@@ -45,7 +45,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
             waitTimeMinutes = Int.MAX_VALUE
         )
 
-        devMsg("Script execution result:\n$processResult")
+        infoMsg("Script execution result:\n$processResult")
 
         if (processResult.exitCode != 0) {
             throw IllegalStateException("Execution of scriplet failed:\n$processResult")
