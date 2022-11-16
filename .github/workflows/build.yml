@@ -68,7 +68,7 @@ jobs:
           
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
-            gradle --debug -DosType=$OSTYPE -DincludeTags='posix | linux' integration
+            gradle -DosType=$OSTYPE -DincludeTags='posix | linux' integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
             gradle -DosType=$OSTYPE -DincludeTags='posix | macos' integration
