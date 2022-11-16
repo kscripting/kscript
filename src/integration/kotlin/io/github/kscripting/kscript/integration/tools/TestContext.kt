@@ -59,12 +59,12 @@ object TestContext {
 
         println("Starting test (command: $command)")
 
-        ProcessHandle.allProcesses().filter {
-            val cmd = it.info().command().orElseGet { "<no command>" }
-            cmd.contains("bash") || cmd.contains("java")
-        }.forEach { process: ProcessHandle ->
-            println(processDetails(process))
-        }
+//        ProcessHandle.allProcesses().filter {
+//            val cmd = it.info().command().orElseGet { "<no command>" }
+//            cmd.contains("bash") || cmd.contains("java")
+//        }.forEach { process: ProcessHandle ->
+//            println(processDetails(process))
+//        }
 
         val newCommand = when {
             osType.isPosixHostedOnWindows() -> command.replace('"', '\'')
@@ -75,7 +75,6 @@ object TestContext {
 
         println(result)
 
-        println("Finishing test (command: $command)")
         return result
     }
 
