@@ -53,18 +53,31 @@ object TestContext {
         return optional.map { obj: Any -> obj.toString() }.orElse("-")
     }
 
+    private fun printMemoryInfo() {
+        println()
+        println("Available processors (cores): " + Runtime.getRuntime().availableProcessors())
+        println("Free memory (bytes): " + Runtime.getRuntime().freeMemory())
+
+        val maxMemory = Runtime.getRuntime().maxMemory()
+        println("Maximum memory (bytes): " + if (maxMemory == Long.MAX_VALUE) "no limit" else maxMemory)
+        println("Total memory (bytes): " + Runtime.getRuntime().totalMemory())
+    }
+
+    private fun printProcesses() {
+        ProcessHandle.allProcesses().filter {
+            val cmd = it.info().command().orElseGet { "<no command>" }
+            cmd.contains("bash") || cmd.contains("java")
+        }.forEach { process: ProcessHandle ->
+            println(processDetails(process))
+        }
+    }
+
     fun runProcess(command: String): GobbledProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //(MSYS bash interpreter is also replacing double quotes into the single quotes: see: bash -xc 'kscript "println(1+1)"')
 
         println("Starting test (command: $command)")
-
-//        ProcessHandle.allProcesses().filter {
-//            val cmd = it.info().command().orElseGet { "<no command>" }
-//            cmd.contains("bash") || cmd.contains("java")
-//        }.forEach { process: ProcessHandle ->
-//            println(processDetails(process))
-//        }
+        printMemoryInfo()
 
         val newCommand = when {
             osType.isPosixHostedOnWindows() -> command.replace('"', '\'')
