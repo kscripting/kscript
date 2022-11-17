@@ -4,7 +4,6 @@ import io.github.kscripting.kscript.util.ShellUtils
 import io.github.kscripting.kscript.util.ShellUtils.which
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.*
-import java.util.*
 
 object TestContext {
     private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
@@ -29,6 +28,7 @@ object TestContext {
         println("projectDir     : $projectDir")
         println("testDir        : $testDir")
         println("execDir        : ${execPath.convert(osType)}")
+        println("Kotlin version : ${ShellExecutor.evalAndGobble(osType, "kotlin -version", null, ::adjustEnv)}")
 
         testPath.createDirectories()
     }
