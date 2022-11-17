@@ -1,6 +1,7 @@
 package io.github.kscripting.kscript.integration
 
 import io.github.kscripting.kscript.integration.tools.TestAssertion.any
+import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
 import io.github.kscripting.kscript.integration.tools.TestContext.nl
 import org.junit.jupiter.api.Tag
@@ -17,7 +18,7 @@ class SupportApiTest : TestBase {
             """echo 'foo${nl}bar' | kscript -s --text 'lines.split().select(1,2,-3)'""",
             1,
             "",
-            "[ERROR] Can not mix positive and negative selections\n"
+            startsWith("[ERROR] Can not mix positive and negative selections\n")
         )
     }
 }

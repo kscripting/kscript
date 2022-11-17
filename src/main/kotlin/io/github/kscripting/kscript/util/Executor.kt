@@ -42,7 +42,8 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
             osConfig.osType,
             command,
             envAdjuster = ShellUtils::environmentAdjuster,
-            waitTimeMinutes = Int.MAX_VALUE
+            waitTimeMinutes = Int.MAX_VALUE,
+            inheritInput = true
         )
 
         devMsg("Script execution result:\n$processResult")
