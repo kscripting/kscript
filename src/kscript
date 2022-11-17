@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Based on kotlinc.bat from the Kotlin distribution
+
 resolveAbsolutePath() {
     # if the given path to the kscript launcher is absolute (i.e. it is either starting with / or a
     # 'letter:/' when using gitbash on windows) it is returned unchanged, otherwise we construct an absolute path
@@ -40,7 +42,6 @@ fi
 # OSTYPE can be: linux*, freebsd, darwin*, cygwin, msys
 if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]; then
   KSCRIPT_LIB=$(cygpath -w "${KSCRIPT_LIB}")
-  true
 fi
 
 ## expose the name of the script being run to the script itself
