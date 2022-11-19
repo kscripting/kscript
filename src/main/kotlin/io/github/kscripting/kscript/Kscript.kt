@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
             info(usage)
             VersionChecker.versionCheck(BuildConfig.APP_VERSION)
             val systemInfo = ShellExecutor.evalAndGobble(config.osConfig.osType, "kotlin -version").stdout.split('(')
+            info(systemInfo.toString())
             info("Kotlin    : " + systemInfo[0].removePrefix("Kotlin version").trim())
             info("Java      : " + systemInfo[1].split('-', ')')[0].trim())
             return
