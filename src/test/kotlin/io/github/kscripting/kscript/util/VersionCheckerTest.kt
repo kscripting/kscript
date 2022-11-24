@@ -15,8 +15,8 @@ class VersionCheckerTest {
 
     @Test
     fun `Assert that parsing remote kscript version works correctly`() {
-        assertThat(versionChecker.parseRemoteKscriptVersion("asdfasadfas")).isEqualTo("")
-        assertThat(versionChecker.parseRemoteKscriptVersion("")).isEqualTo("")
+        assertThat(versionChecker.parseRemoteKscriptVersion("asdfasadfas")).isEqualTo("-")
+        assertThat(versionChecker.parseRemoteKscriptVersion("")).isEqualTo("-")
         assertThat(
             versionChecker.parseRemoteKscriptVersion(
                 """
