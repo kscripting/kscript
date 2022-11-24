@@ -118,7 +118,7 @@ class ScriptInputModesTest : TestBase {
 
     @Test
     @Tag("posix")
-    //TODO: @Tag("windows") - kscript on Windows doesn't return correctly error code ()
+    @Tag("windows")
     fun `Missing script gives always error on execution`() {
         verify(
             "kscript i_do_not_exist.kts", 1, "", "[kscript] [ERROR] Could not read script from 'i_do_not_exist.kts'\n"
