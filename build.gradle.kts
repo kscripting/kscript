@@ -142,6 +142,8 @@ dependencies {
 
     implementation("org.slf4j:slf4j-nop:2.0.1")
 
+    implementation("org.semver4j:semver4j:3.0.0")
+
 
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.0")
     testImplementation("org.junit.platform:junit-platform-suite-api:1.9.0")

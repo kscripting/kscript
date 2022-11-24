@@ -95,7 +95,7 @@ object Templates {
             |""".trimStart().trimMargin()
     }
 
-    fun createUsageOptions(selfName: String, version: String) = """
+    fun createUsageOptions(selfName: String, version: String, newVersion: String = "") = """
         |$selfName - Enhanced scripting support for Kotlin on *nix-based systems.
         |
         |Usage:
@@ -119,7 +119,7 @@ object Templates {
         |
         |Copyright : 2022 Holger Brandl, Marcin Kuszczak
         |License   : MIT
-        |Version   : v${version}
+        |Version   : $version ${if (newVersion.isNotBlank()) "(new version v$newVersion is available)" else ""}
         |Website   : https://github.com/kscripting/kscript
         |""".trimMargin().trim()
 }

@@ -4,9 +4,7 @@ import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.ConfigBuilder
 import io.github.kscripting.kscript.util.Logger.errorMsg
 import io.github.kscripting.kscript.util.Logger.info
-import io.github.kscripting.kscript.util.ShellUtils
 import io.github.kscripting.kscript.util.VersionChecker
-import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.OsType
 import org.docopt.DocoptParser
 import kotlin.system.exitProcess
@@ -14,7 +12,7 @@ import kotlin.system.exitProcess
 /**
  * A kscript - Scripting enhancements for Kotlin
  *
- * For details and license see https://github.com/holgerbrandl/kscript
+ * For details and license see https://github.com/kscripting/kscript
  *
  * @author Holger Brandl
  * @author Marcin Kuszczak
@@ -28,18 +26,17 @@ fun main(args: Array<String>) {
 
         val remainingArgs = args.drop(1)
 
-        // skip org.docopt for version and help to allow for lazy version-check
-        val usage = Templates.createUsageOptions(config.osConfig.selfName, BuildConfig.APP_VERSION)
-
+        // skip DocOpt for version and help to allow lazy version-check
         if (remainingArgs.size == 1 && listOf("--help", "-h", "--version", "-v").contains(remainingArgs[0])) {
-            info(usage)
-            VersionChecker.versionCheck(BuildConfig.APP_VERSION)
-            val systemInfo = ShellExecutor.evalAndGobble(
-                config.osConfig.osType, "kotlin -version", null, ShellUtils::environmentAdjuster
-            ).stdout.split('(')
-            info("System info: $systemInfo")
-            info("Kotlin    : " + systemInfo[0].removePrefix("Kotlin version").trim())
-            info("Java      : " + systemInfo[1].split('-', ')')[0].trim())
+            val versionChecker = VersionChecker(config.osConfig)
+
+            val newVersion =
+                if (versionChecker.isThereANewKscriptVersion()) versionChecker.remoteKscriptVersion else ""
+
+            info(Templates.createUsageOptions(config.osConfig.selfName, BuildConfig.APP_VERSION, newVersion))
+
+            info("Kotlin    : ${versionChecker.localKotlinVersion}")
+            info("Java      : ${versionChecker.localJreVersion}")
             return
         }
 
@@ -47,6 +44,7 @@ fun main(args: Array<String>) {
         val userArgs = remainingArgs.dropWhile { it.startsWith("-") && it != "-" }.drop(1)
         val kscriptArgs = remainingArgs.take(remainingArgs.size - userArgs.size)
 
+        val usage = Templates.createUsageOptions(config.osConfig.selfName, BuildConfig.APP_VERSION)
         KscriptHandler(config, DocoptParser.parse(kscriptArgs, usage)).handle(kscriptArgs, userArgs)
     } catch (e: Exception) {
         errorMsg(e)

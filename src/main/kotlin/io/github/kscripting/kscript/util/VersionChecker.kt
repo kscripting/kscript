@@ -1,48 +1,58 @@
 package io.github.kscripting.kscript.util
 
-import io.github.kscripting.kscript.util.Logger.info
+import io.github.kscripting.kscript.BuildConfig
+import io.github.kscripting.kscript.model.OsConfig
+import io.github.kscripting.shell.ShellExecutor
 import kong.unirest.Unirest
-import java.util.*
+import org.semver4j.Semver
 
+class VersionChecker(private val osConfig: OsConfig) {
+    val localKscriptVersion: String = BuildConfig.APP_VERSION
+    val remoteKscriptVersion: String by lazy { parseRemoteKscriptVersion(retrieveRemoteKscriptVersion()) }
 
-object VersionChecker {
-    /** Determine the latest version by checking GitHub repo and print info if newer version is available. */
-    fun versionCheck(currentVersion: String) {
-        //https://api.github.com/repos/kscripting/kscript/releases/latest
-        // "tag_name":"v4.1.1",
+    val localKotlinVersion: String by lazy { kotlinInfo.first }
+    val localJreVersion: String by lazy { kotlinInfo.second }
 
-        val body = Unirest.get("https://api.github.com/repos/kscripting/kscript/releases/latest")
-            .header("Accept", "application/vnd.github+json").asString().body
+    fun isThereANewKscriptVersion(): Boolean = remoteKscriptVersion != "-" &&
+            Semver(localKscriptVersion).isLowerThan(remoteKscriptVersion)
 
-        Unirest.shutDown()
-
-        val latestKscriptVersion = body.substringAfter("\"tag_name\":\"v").substringBefore("\"")
-
-        if (latestKscriptVersion.isBlank()) {
-            info("Could not find information about new version of kscript.")
-            return
-        }
-
-        if (padVersion(latestKscriptVersion) > padVersion(currentVersion)) {
-            info("A new version (v${latestKscriptVersion}) of kscript is available.")
-        }
+    internal val kotlinInfo: Pair<String, String> by lazy {
+        parseLocalKotlinAndJreVersion(retrieveLocalKotlinAndJreVersion())
     }
 
-    fun padVersion(version: String) = try {
-        val versionWithoutSnapshot = if (version.endsWith("-SNAPSHOT", ignoreCase = true)) {
-            version.substringBeforeLast("-")
-        } else {
-            version
+    internal fun parseRemoteKscriptVersion(githubResponse: String): String {
+        return githubResponse.substringAfter("\"tag_name\":\"v", "").substringBefore("\"", "").trim().ifBlank { "-" }
+    }
+
+    internal fun retrieveRemoteKscriptVersion(): String {
+        //https://api.github.com/repos/kscripting/kscript/releases/latest
+        // "tag_name":"v4.1.1",
+        val body = Unirest.get("https://api.github.com/repos/kscripting/kscript/releases/latest")
+            .header("Accept", "application/vnd.github+json").asString().body
+        Unirest.shutDown()
+
+        return body
+    }
+
+    internal fun parseLocalKotlinAndJreVersion(processOutput: String): Pair<String, String> {
+        val kotlinAndJreVersion = processOutput.split('(')
+
+        if (kotlinAndJreVersion.size != 2) {
+            return Pair("-", "-")
         }
 
-        var versionNumbers = versionWithoutSnapshot.split(".").map { Integer.valueOf(it) }
-        // adjust versions without a patch-release
-        while (versionNumbers.size < 3) {
-            versionNumbers = versionNumbers + 0
-        }
+        val kotlinVersion = kotlinAndJreVersion[0].removePrefix("Kotlin version").trim()
+        val jreVersion = kotlinAndJreVersion[1].split('-', ')')[0].trim()
+        return Pair(kotlinVersion, jreVersion)
+    }
 
-        String.format("%03d%03d%03d", *versionNumbers.toTypedArray())
-    } catch (e: MissingFormatArgumentException) {
-        throw IllegalArgumentException("Could not pad version $version", e)
+    internal fun retrieveLocalKotlinAndJreVersion(): String {
+        val kotlinScript = "kotlin" + if (osConfig.osType.isPosixLike()) ".sh" else ".bat"
+        return ShellExecutor.evalAndGobble(
+            osConfig.osType,
+            osConfig.kotlinHomeDir.resolve("bin", kotlinScript).stringPath() + " -version",
+            null,
+            ShellUtils::environmentAdjuster
+        ).stdout
     }
 }
