@@ -28,7 +28,7 @@ class DeprecatedReportTest : TestBase {
         verify(
             "kscript --report ${resolvePath("$projectDir/test/resources/deprecated_report.kt")}",
             0,
-            "made it!\n",
+            "",
             contains("@file:DependsOn(\"org.apache.commons:commons-lang3:3.12.0\")")
         )
     }
