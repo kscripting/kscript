@@ -17,8 +17,8 @@ Enhancements
 * Get rid of docopt handler from KscriptHandler (helps with using kscript as library)
 * Changed the way of creating distribution package - now it is handled by Gradle
 * Version of kscript is set by Gradle (generated BuildConfig)
-* Improved DependencyResolver: aar archives are included in classpath
-* 
+* Improved DependencyResolver: aar archives are also included in classpath
+* Gradle and Idea are no more needed for generation of IntelliJ project
 
 ## 4.1.0
 

@@ -60,8 +60,11 @@ configurations {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(18))
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
+
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
@@ -133,14 +136,14 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.11.0")
     implementation("commons-codec:commons-codec:1.15")
-    implementation("com.konghq:unirest-java:3.13.11")
+    implementation("com.konghq:unirest-java:3.13.13")
 
     implementation("net.igsoft:tablevis:0.6.0")
     implementation("io.arrow-kt:arrow-core:1.1.2")
 
     implementation("io.github.kscripting:shell:0.5.0-SNAPSHOT")
 
-    implementation("org.slf4j:slf4j-nop:2.0.1")
+    implementation("org.slf4j:slf4j-nop:2.0.4")
 
     implementation("org.semver4j:semver4j:3.0.0")
 
@@ -151,7 +154,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
-    testImplementation("io.mockk:mockk:1.12.4")
+    testImplementation("io.mockk:mockk:1.13.2")
 
     testImplementation(kotlin("script-runtime"))
 }

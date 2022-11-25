@@ -2,15 +2,11 @@
 
 * Release kscript to Maven Central
 * Change a way of executing .kts files (investigate if we can get rid of reflections)
-* do not use shadow jar for kscript distribution
-  * switched to java executor; it works faster, and can handle multiple jars on classpath with asterisk 
-  * kscript can be released to Maven Central as library, not the whole package
-  * kotlin-script-runtime can be reused from jars
+* Switched to java executor; it works faster, and can handle multiple jars on classpath with asterisk 
 * Fix the bug on ArchLinux
 * Local jars path (ticket)
 * Onboard on brew
 * Deprecate KotlinOptions
-
 
 * New package for Windows e.g. scoop
 * Release scripts in Kotlin
