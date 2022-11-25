@@ -39,7 +39,7 @@ jobs:
           java-version: '11'
       - uses: fwilhe2/setup-kotlin@main
         with:
-          version: 1.7.10
+          version: 1.7.21
 
       - name: Prerequisites for ${{ runner.os }}
         shell: bash
