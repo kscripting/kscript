@@ -4,21 +4,24 @@
 
 Enhancements
 
-* New Github organization 'kscripting'
+* New GitHub organization: [kscripting](http://github.com/kscripting)
 * Change the name of kscript package to io.github.kscripting:kscript
 * Final execution of script is handled by kscript, not by bash (reduces dependency on bash)
 * Separate library for shell execution kscripting/shell
 * Deprecate old annotations in kscript-annotations library
-* Change the way of checking latest kscript version (will simplify releases)
-* SNAPSHOT versions are handled correctly by VersionChecker
-* Improved ConfigBuilder implementation
+* Change the way of checking latest kscript version (simplifies releases)
+* Improved implementation: VersionChecker, ConfigBuilder etc.
 * Updated Gradle and dependencies
 * Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting
 * Get rid of docopt handler from KscriptHandler (helps with using kscript as library)
 * Changed the way of creating distribution package - now it is handled by Gradle
-* Version of kscript is set by Gradle (generated BuildConfig)
+* Version of kscript is set by Gradle (generated BuildConfig class)
 * Improved DependencyResolver: aar archives are also included in classpath
 * Gradle and Idea are no more needed for generation of IntelliJ project
+
+Bugfixes
+
+* Fixed exit code on Windows
 
 ## 4.1.0
 

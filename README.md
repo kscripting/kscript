@@ -477,20 +477,21 @@ Boostrap IDEA from a `kscript`let
 
 Artifacts and versions will differ between scripts, so it is hard to maintain them all in a single project. To
 nevertheless provide optimal tooling when scripting with Kotlin `kscript` allows to create temporary projects
-for `<script>` arguments. .
+for `<script>` arguments.
 
 ```bash
 kscript --idea CountRecords.kts
 ```
 
-This will open [IntelliJ IDEA](https://www.jetbrains.com/idea/) with a minimalistic project containing just your (
-1) `<script>` and (2) a generated `gradle.build` file:
+If you have available `gradle` in the path project will be automatically built and if there is `idea` in the path 
+the project will be opened in [IntelliJ IDEA](https://www.jetbrains.com/idea/) with a minimalistic project containing 
+just your (1) `<script>` and (2) a generated `build.gradle.kts` file:
 
 ![](misc/readme_images/minus_idea.png)
 
-This assumes that you have the Intellij IDEA command line launcher `idea` in your `PATH`. It can be created in IntelliJ
-under `Tools -> Create Command-line Launcher` or you can set the command used to launch your intellij
-as `KSCRIPT_COMMAND_IDEA` env property
+The `idea` command line launcher can can be created in IntelliJ with `Create Command-line Launcher` command, or you can 
+set the command used to launch your IntelliJ as `KSCRIPT_COMMAND_IDEA` env property. Similarly, you can set `gradle` 
+command using `KSCRIPT_COMMAND_GRADLE` env property.
 
 Deploy scripts as standalone binaries
 --------------------------------------
