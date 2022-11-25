@@ -46,18 +46,18 @@ class ConfigBuilder(
         val selfName: String = selfName ?: environment.getEnvVariableOrNull("KSCRIPT_NAME") ?: "kscript"
 
         val kscriptDir: OsPath? =
-            kscriptDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY")?.toOsPathFromOsSpecific(osType)
+            kscriptDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY")?.toOsPathFromNative()
 
         val cacheDir: OsPath = cacheDir ?: kscriptDir?.resolve("cache") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative() ?: tempDir
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Caches")
-            else -> environment.getEnvVariableOrNull("XDG_CACHE_DIR")?.toOsPathFromOsSpecific(osType)
+            else -> environment.getEnvVariableOrNull("XDG_CACHE_DIR")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".cache")
         }.resolve("kscript")
 
         val kotlinHomeDir: OsPath =
-            kotlinHomeDir ?: environment.getEnvVariableOrNull("KOTLIN_HOME")?.toOsPathFromOsSpecific(osType)
-            ?: ShellUtils.guessKotlinHome(osType)?.toOsPathFromOsSpecific(osType)
+            kotlinHomeDir ?: environment.getEnvVariableOrNull("KOTLIN_HOME")?.toOsPathFromNative()
+            ?: ShellUtils.guessKotlinHome(osType)?.toOsPathFromNative()
             ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
 
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
@@ -65,7 +65,7 @@ class ConfigBuilder(
                 ?: userHomeDir.resolve(".config")
 
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Application Support")
-            else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toOsPathFromOsSpecific(osType)
+            else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".config")
         }.resolve("kscript", "kscript.properties")
 
@@ -110,7 +110,7 @@ class ConfigBuilder(
         ?: configProperties.getPropertyOrNull("scripting.repository.password") ?: ""
 
         val artifactsDir: OsPath? =
-            artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")?.toOsPathFromOsSpecific(osType)
+            artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")?.toOsPathFromNative()
             ?: configProperties.getPropertyOrNull("scripting.directory.artifacts")?.toOsPathFromOsSpecific(osType)
 
         val scriptingConfig = ScriptingConfig(
