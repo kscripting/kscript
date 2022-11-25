@@ -7,6 +7,7 @@ import io.github.kscripting.kscript.model.Config
 import io.github.kscripting.kscript.parser.Parser
 import io.github.kscripting.kscript.resolver.*
 import io.github.kscripting.kscript.util.Executor
+import io.github.kscripting.kscript.util.FileUtils.getArtifactsRecursively
 import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
@@ -63,14 +64,20 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         if (script.deprecatedItems.isNotEmpty()) {
             if (options.getBoolean("report")) {
                 info(DeprecatedInfoCreator().create(script.deprecatedItems))
-            } else {
-                warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
+                return
             }
+
+            warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
         }
+
+        val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
+            getArtifactsRecursively(config.scriptingConfig.artifactsDir)
+        } else emptyList()
 
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
             DependencyResolver(script.repositories).resolve(script.dependencies)
-        }
+        } + localArtifacts
+
         val executor = Executor(CommandResolver(config.osConfig), config.osConfig)
 
         //  Create temporary dev environment

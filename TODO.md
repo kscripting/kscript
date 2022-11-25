@@ -2,12 +2,11 @@
 
 * Release kscript to Maven Central
 * Change a way of executing .kts files (investigate if we can get rid of reflections)
-* Switched to java executor; it works faster, and can handle multiple jars on classpath with asterisk 
 * Fix the bug on ArchLinux
-* Local jars path (ticket)
 * Onboard on brew
-* Deprecate KotlinOptions
+* Test local artifacts directory
 
+* Deprecate KotlinOptions
 * New package for Windows e.g. scoop
 * Release scripts in Kotlin
 * Windows console support requires @argfiles as kotlin/kotlinc command line might be too long to execute it from console (especially for big classpaths).

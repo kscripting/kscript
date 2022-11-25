@@ -108,7 +108,7 @@ class CommandResolverTest {
             kotlinDir,
         )
 
-        val scriptingConfig = ScriptingConfig("", "", "", "", "")
+        val scriptingConfig = ScriptingConfig("", "", "", "", "", null)
 
         val jarPath = osConfig.userHomeDir.resolve(".kscript/cache/somefile.jar")
         val depPaths = sortedSetOf(

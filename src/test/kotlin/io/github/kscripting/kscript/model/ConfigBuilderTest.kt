@@ -45,6 +45,7 @@ internal class ConfigBuilderTest {
                 providedRepositoryUrl = "https://repository.example",
                 providedRepositoryUser = "user",
                 providedRepositoryPassword = "password",
+                artifactsDir = null,
             )
         )
     }

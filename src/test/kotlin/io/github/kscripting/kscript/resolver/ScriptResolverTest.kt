@@ -27,7 +27,7 @@ class ScriptResolverTest {
 
     private val cache = Cache(testHome.resolve("cache"))
     private val inputOutputResolver = InputOutputResolver(config.osConfig, cache)
-    private val scriptingConfig = ScriptingConfig("", "", "", "", "")
+    private val scriptingConfig = ScriptingConfig("", "", "", "", "", null)
     private val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig)
     private val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
 

@@ -1,10 +1,7 @@
 package io.github.kscripting.kscript.model
 
 import io.github.kscripting.kscript.util.ShellUtils
-import io.github.kscripting.shell.model.OsPath
-import io.github.kscripting.shell.model.OsType
-import io.github.kscripting.shell.model.exists
-import io.github.kscripting.shell.model.toNativePath
+import io.github.kscripting.shell.model.*
 import java.util.*
 import kotlin.io.path.reader
 
@@ -28,42 +25,47 @@ class ConfigBuilder(
     var repositoryUrl: String? = null
     var repositoryUser: String? = null
     var repositoryPassword: String? = null
+    var artifactsDir: OsPath? = null
 
     //Env variables paths read by Java are always in native format; All paths should be stored in Config as native,
     //and then converted to shell format as needed.
     //private fun path(path: String) = OsPath.createOrThrow(OsType.native, path)
-    private fun String.toNativeOsPath() = OsPath.createOrThrow(OsType.native, this)
+    private fun String.toOsPathFromNative() = OsPath.createOrThrow(OsType.native, this)
+    private fun String.toOsPathFromOsSpecific(osType: OsType) = OsPath.createOrThrow(osType, this).toNativeOsPath()
     private fun Properties.getPropertyOrNull(name: String) = this.getProperty(name).nullIfBlank()
     private fun Map<String, String?>.getEnvVariableOrNull(name: String) = this[name].nullIfBlank()
     private fun String?.nullIfBlank() = if (this.isNullOrBlank()) null else this
 
     fun build(): Config {
-        val userHomeDir: OsPath = userHomeDir ?: systemProperties.getPropertyOrNull("user.home")?.toNativeOsPath()
+        val userHomeDir: OsPath = userHomeDir ?: systemProperties.getPropertyOrNull("user.home")?.toOsPathFromNative()
         ?: throw IllegalStateException("Undefined 'user.home' property")
 
-        val tempDir: OsPath = tempDir ?: systemProperties.getPropertyOrNull("java.io.tmpdir")?.toNativeOsPath()
+        val tempDir: OsPath = tempDir ?: systemProperties.getPropertyOrNull("java.io.tmpdir")?.toOsPathFromNative()
         ?: throw IllegalStateException("Undefined 'java.io.tmpdir' property")
 
         val selfName: String = selfName ?: environment.getEnvVariableOrNull("KSCRIPT_NAME") ?: "kscript"
 
-        val kscriptDir: OsPath? = kscriptDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIR")?.toNativeOsPath()
+        val kscriptDir: OsPath? =
+            kscriptDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY")?.toOsPathFromOsSpecific(osType)
 
         val cacheDir: OsPath = cacheDir ?: kscriptDir?.resolve("cache") ?: when {
-            osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toNativeOsPath() ?: tempDir
+            osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative() ?: tempDir
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Caches")
-            else -> environment.getEnvVariableOrNull("XDG_CACHE_DIR")?.toNativeOsPath() ?: userHomeDir.resolve(".cache")
+            else -> environment.getEnvVariableOrNull("XDG_CACHE_DIR")?.toOsPathFromOsSpecific(osType)
+                ?: userHomeDir.resolve(".cache")
         }.resolve("kscript")
 
         val kotlinHomeDir: OsPath =
-            kotlinHomeDir ?: (environment.getEnvVariableOrNull("KOTLIN_HOME") ?: ShellUtils.guessKotlinHome(osType)
-            ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")).toNativeOsPath()
+            kotlinHomeDir ?: environment.getEnvVariableOrNull("KOTLIN_HOME")?.toOsPathFromOsSpecific(osType)
+            ?: ShellUtils.guessKotlinHome(osType)?.toOsPathFromOsSpecific(osType)
+            ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
 
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
-            osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toNativeOsPath()
+            osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".config")
 
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Application Support")
-            else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toNativeOsPath()
+            else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toOsPathFromOsSpecific(osType)
                 ?: userHomeDir.resolve(".config")
         }.resolve("kscript", "kscript.properties")
 
@@ -107,12 +109,17 @@ class ConfigBuilder(
         val repositoryPassword = repositoryPassword ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_PASSWORD")
         ?: configProperties.getPropertyOrNull("scripting.repository.password") ?: ""
 
+        val artifactsDir: OsPath? =
+            artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")?.toOsPathFromOsSpecific(osType)
+            ?: configProperties.getPropertyOrNull("scripting.directory.artifacts")?.toOsPathFromOsSpecific(osType)
+
         val scriptingConfig = ScriptingConfig(
             customPreamble,
             providedKotlinOpts,
             repositoryUrl,
             repositoryUser,
             repositoryPassword,
+            artifactsDir
         )
 
         return Config(osConfig, scriptingConfig)

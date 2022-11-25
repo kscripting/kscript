@@ -8,7 +8,8 @@ data class ScriptingConfig(
     val providedKotlinOpts: String,
     val providedRepositoryUrl: String,
     val providedRepositoryUser: String,
-    val providedRepositoryPassword: String
+    val providedRepositoryPassword: String,
+    val artifactsDir: OsPath?
 ) {
     override fun toString(): String {
         return """|ScriptingConfig {
@@ -17,6 +18,7 @@ data class ScriptingConfig(
                   |  providedRepositoryUrl:         $providedRepositoryUrl
                   |  providedRepositoryUser:        $providedRepositoryUser
                   |  providedRepositoryPassword:    $providedRepositoryPassword
+                  |  artifactsDir:                  $artifactsDir
                   |}
                """.trimMargin()
     }
