@@ -141,7 +141,7 @@ dependencies {
     implementation("net.igsoft:tablevis:0.6.0")
     implementation("io.arrow-kt:arrow-core:1.1.2")
 
-    implementation("io.github.kscripting:shell:0.5.0-SNAPSHOT")
+    implementation("io.github.kscripting:shell:0.5.0")
 
     implementation("org.slf4j:slf4j-nop:2.0.4")
 
