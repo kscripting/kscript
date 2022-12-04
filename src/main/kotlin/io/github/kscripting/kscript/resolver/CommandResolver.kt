@@ -8,9 +8,14 @@ import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.OsType
 import io.github.kscripting.shell.model.toNativeOsPath
 
-class CommandResolver(private val osConfig: OsConfig) {
+class CommandResolver(val osConfig: OsConfig) {
     private val classPathSeparator =
         if (osConfig.osType.isWindowsLike() || osConfig.osType.isPosixHostedOnWindows()) ";" else ":"
+
+    fun getKotlinJreVersion(): String {
+        val kotlin = resolveKotlinBinary("kotlin")
+        return "$kotlin -version"
+    }
 
     //Syntax for different OS-es:
     //LINUX:    /usr/local/sdkman/..../kotlin  -classpath "/home/vagrant/workspace/Kod/Repos/kscript/test:/home/vagrant/.kscript/cache/jar_2ccd53e06b0355d3573a4ae8698398fe/scriplet.jar:/usr/local/sdkman/candidates/kotlin/1.6.21/lib/kotlin-script-runtime.jar" Main_Scriplet

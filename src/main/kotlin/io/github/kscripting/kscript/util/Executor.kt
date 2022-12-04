@@ -3,7 +3,6 @@ package io.github.kscripting.kscript.util
 import io.github.kscripting.kscript.creator.JarArtifact
 import io.github.kscripting.kscript.model.CompilerOpt
 import io.github.kscripting.kscript.model.KotlinOpt
-import io.github.kscripting.kscript.model.OsConfig
 import io.github.kscripting.kscript.resolver.CommandResolver
 import io.github.kscripting.kscript.util.Logger.devMsg
 import io.github.kscripting.kscript.util.Logger.infoMsg
@@ -12,7 +11,19 @@ import io.github.kscripting.kscript.util.ShellUtils.isInPath
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.OsPath
 
-class Executor(private val commandResolver: CommandResolver, private val osConfig: OsConfig) {
+class Executor(private val commandResolver: CommandResolver) {
+
+    fun retrieveLocalKotlinAndJreVersion(): String {
+        val command = commandResolver.getKotlinJreVersion()
+
+        return ShellExecutor.evalAndGobble(
+            commandResolver.osConfig.osType,
+            command,
+            null,
+            ShellUtils::environmentAdjuster
+        ).stdout
+    }
+
     //NOTE: for direct execution from Kotlin jars:
     //# Kotlin compilation / running dependencies
     //#CLASS_PATH="$KOTLIN_HOME/lib/kotlin-runner.jar:$KOTLIN_HOME/lib/kotlin-preloader.jar:$KOTLIN_HOME/lib/kotlin-compiler.jar:$KOTLIN_HOME/lib/kotlin-script-runtime.jar"
@@ -22,7 +33,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         devMsg("JAR compile command: $command")
 
         val processResult = ShellExecutor.evalAndGobble(
-            osConfig.osType, command, envAdjuster = ShellUtils::environmentAdjuster, waitTimeMinutes = 30
+            commandResolver.osConfig.osType, command, envAdjuster = ShellUtils::environmentAdjuster, waitTimeMinutes = 30
         )
 
         devMsg("Script compilation result:\n$processResult")
@@ -39,7 +50,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         devMsg("Kotlin execute command: $command")
 
         val processResult = ShellExecutor.eval(
-            osConfig.osType,
+            commandResolver.osConfig.osType,
             command,
             envAdjuster = ShellUtils::environmentAdjuster,
             waitTimeMinutes = Int.MAX_VALUE,
@@ -62,7 +73,7 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
         devMsg("REPL Kotlin command: $command")
 
         val processResult = ShellExecutor.eval(
-            osConfig.osType,
+            commandResolver.osConfig.osType,
             command,
             envAdjuster = ShellUtils::environmentAdjuster,
             waitTimeMinutes = Int.MAX_VALUE,
@@ -73,19 +84,19 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
     }
 
     fun runGradleInIdeaProject(projectPath: OsPath) {
-        if (isInPath(osConfig.osType, osConfig.gradleCommand)) {
+        if (isInPath(commandResolver.osConfig.osType, commandResolver.osConfig.gradleCommand)) {
             // Create gradle wrapper
-            ShellExecutor.evalAndGobble(osConfig.osType, "gradle wrapper", workingDirectory = projectPath)
+            ShellExecutor.evalAndGobble(commandResolver.osConfig.osType, "gradle wrapper", workingDirectory = projectPath)
         } else {
-            warnMsg("Could not find '${osConfig.gradleCommand}' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_COMMAND_GRADLE' env property")
+            warnMsg("Could not find '${commandResolver.osConfig.gradleCommand}' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_COMMAND_GRADLE' env property")
         }
 
-        if (isInPath(osConfig.osType, osConfig.intellijCommand)) {
+        if (isInPath(commandResolver.osConfig.osType, commandResolver.osConfig.intellijCommand)) {
             val command = commandResolver.executeIdea(projectPath)
             devMsg("Idea execute command: $command")
 
             val processResult = ShellExecutor.evalAndGobble(
-                osConfig.osType, command
+                commandResolver.osConfig.osType, command
             )
 
             devMsg("Script execution result:\n$processResult")
@@ -94,19 +105,19 @@ class Executor(private val commandResolver: CommandResolver, private val osConfi
                 throw IllegalStateException("Execution of idea command failed:\n$processResult")
             }
         } else {
-            warnMsg("Could not find '${osConfig.intellijCommand}' in your PATH. You should set the command used to launch your intellij as 'KSCRIPT_COMMAND_IDEA' env property")
+            warnMsg("Could not find '${commandResolver.osConfig.intellijCommand}' in your PATH. You should set the command used to launch your intellij as 'KSCRIPT_COMMAND_IDEA' env property")
         }
     }
 
     fun createPackage(projectPath: OsPath) {
-        if (!isInPath(osConfig.osType, osConfig.gradleCommand)) {
+        if (!isInPath(commandResolver.osConfig.osType, commandResolver.osConfig.gradleCommand)) {
             throw IllegalStateException("Gradle is required to package scripts.")
         }
 
         val command = commandResolver.createPackage()
         devMsg("Create package command: $command")
 
-        val result = ShellExecutor.evalAndGobble(osConfig.osType, command, workingDirectory = projectPath)
+        val result = ShellExecutor.evalAndGobble(commandResolver.osConfig.osType, command, workingDirectory = projectPath)
 
         if (result.exitCode != 0) {
             throw IllegalStateException("Packaging for path: '$projectPath' failed:$result")

@@ -2,16 +2,12 @@ package io.github.kscripting.kscript.util
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import io.github.kscripting.kscript.model.OsConfig
-import io.github.kscripting.shell.model.OsPath
-import io.github.kscripting.shell.model.OsType
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 class VersionCheckerTest {
-    private val somePath = OsPath.createOrThrow(OsType.LINUX, "/home/kscript/")
-    private val osConfig =
-        OsConfig(OsType.LINUX, "kscript", "intellij", "gradle", somePath, somePath, somePath, somePath)
-    private val versionChecker = VersionChecker(osConfig)
+    private val executor = mockk<Executor>()
+    private val versionChecker = VersionChecker(executor)
 
     @Test
     fun `Assert that parsing remote kscript version works correctly`() {

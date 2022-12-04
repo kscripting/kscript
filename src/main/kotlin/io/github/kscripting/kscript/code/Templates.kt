@@ -4,6 +4,7 @@ import io.github.kscripting.kscript.model.KotlinOpt
 import io.github.kscripting.kscript.model.PackageName
 import io.github.kscripting.shell.model.ScriptType
 import org.intellij.lang.annotations.Language
+import java.time.ZonedDateTime
 
 object Templates {
     @Language("sh")
@@ -95,7 +96,20 @@ object Templates {
             |""".trimStart().trimMargin()
     }
 
-    fun createUsageOptions(selfName: String, version: String, newVersion: String = "") = """
+    fun createUsageOptions(
+        selfName: String, buildDateTime: ZonedDateTime, version: String, newVersion: String = "", kotlinVersion: String = "", jreVersion: String = ""
+    ): String {
+        val versionLine =
+            "Version   : $version ${if (newVersion.isNotBlank()) "(new version v$newVersion is available)" else ""}"
+
+        val kotlinAndJreVersion = if (kotlinVersion.isNotBlank()) {
+            """|
+               |Kotlin    : $kotlinVersion
+               |Java      : $jreVersion
+               |""".trimMargin()
+        } else ""
+
+        return """
         |$selfName - Enhanced scripting support for Kotlin on *nix-based systems.
         |
         |Usage:
@@ -115,11 +129,15 @@ object Templates {
         | --report                Prints script's deprecated features report
         | --package               Package script and dependencies into self-dependent binary
         | --add-bootstrap-header  Prepend bash header that installs kscript if necessary
+        | -h --help               Prints help information
+        | -v --version            Same as '--help'
         |
         |
         |Copyright : 2022 Holger Brandl, Marcin Kuszczak
         |License   : MIT
-        |Version   : $version ${if (newVersion.isNotBlank()) "(new version v$newVersion is available)" else ""}
+        |$versionLine
+        |Build     : $buildDateTime
         |Website   : https://github.com/kscripting/kscript
-        |""".trimMargin().trim()
+        |""".trimMargin().trim() + kotlinAndJreVersion
+    }
 }

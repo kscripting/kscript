@@ -1,5 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 val kotlinVersion: String = "1.7.21"
 
@@ -29,8 +31,11 @@ buildConfig {
     packageName(project.group.toString() + "." + project.name)
     useKotlinOutput()
 
+    val dateTime = ZonedDateTime.now(ZoneOffset.UTC)
+
     buildConfigField("String", "APP_NAME", "\"${project.name}\"")
     buildConfigField("String", "APP_VERSION", provider { "\"${project.version}\"" })
+    buildConfigField("java.time.ZonedDateTime", "APP_BUILD_TIME", provider { "java.time.ZonedDateTime.parse(\"$dateTime\")" })
     buildConfigField("String", "KOTLIN_VERSION", provider { "\"${kotlinVersion}\"" })
 }
 
@@ -123,6 +128,7 @@ tasks.test {
 dependencies {
     //compileOnly(fileTree("libs"))
     implementation("com.offbytwo:docopt:0.6.0.20150202")
+    implementation("commons-cli:commons-cli:1.5.0")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")

@@ -1,12 +1,10 @@
 package io.github.kscripting.kscript.util
 
 import io.github.kscripting.kscript.BuildConfig
-import io.github.kscripting.kscript.model.OsConfig
-import io.github.kscripting.shell.ShellExecutor
 import kong.unirest.Unirest
 import org.semver4j.Semver
 
-class VersionChecker(private val osConfig: OsConfig) {
+class VersionChecker(private val executor: Executor) {
     val localKscriptVersion: String = BuildConfig.APP_VERSION
     val remoteKscriptVersion: String by lazy { parseRemoteKscriptVersion(retrieveRemoteKscriptVersion()) }
 
@@ -17,7 +15,7 @@ class VersionChecker(private val osConfig: OsConfig) {
             Semver(localKscriptVersion).isLowerThan(remoteKscriptVersion)
 
     internal val kotlinInfo: Pair<String, String> by lazy {
-        parseLocalKotlinAndJreVersion(retrieveLocalKotlinAndJreVersion())
+        parseLocalKotlinAndJreVersion(executor.retrieveLocalKotlinAndJreVersion())
     }
 
     internal fun parseRemoteKscriptVersion(githubResponse: String): String {
@@ -44,15 +42,5 @@ class VersionChecker(private val osConfig: OsConfig) {
         val kotlinVersion = kotlinAndJreVersion[0].removePrefix("Kotlin version").trim()
         val jreVersion = kotlinAndJreVersion[1].split('-', ')')[0].trim()
         return Pair(kotlinVersion, jreVersion)
-    }
-
-    internal fun retrieveLocalKotlinAndJreVersion(): String {
-        val kotlinScript = "kotlin" + if (osConfig.osType.isPosixLike()) ".sh" else ".bat"
-        return ShellExecutor.evalAndGobble(
-            osConfig.osType,
-            osConfig.kotlinHomeDir.resolve("bin", kotlinScript).stringPath() + " -version",
-            null,
-            ShellUtils::environmentAdjuster
-        ).stdout
     }
 }

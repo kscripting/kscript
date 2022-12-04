@@ -1,12 +1,10 @@
 package io.github.kscripting.kscript
 
-import io.github.kscripting.kscript.code.Templates
+import io.github.kscripting.kscript.code.Templates.createUsageOptions
 import io.github.kscripting.kscript.model.ConfigBuilder
+import io.github.kscripting.kscript.util.DocoptParser
 import io.github.kscripting.kscript.util.Logger.errorMsg
-import io.github.kscripting.kscript.util.Logger.info
-import io.github.kscripting.kscript.util.VersionChecker
 import io.github.kscripting.shell.model.OsType
-import org.docopt.DocoptParser
 import kotlin.system.exitProcess
 
 /**
@@ -24,28 +22,19 @@ fun main(args: Array<String>) {
             OsType.findOrThrow(args[0]), System.getProperties(), System.getenv()
         ).build()
 
+        // note: first argument has to be OSTYPE
         val remainingArgs = args.drop(1)
-
-        // skip DocOpt for version and help to allow lazy version-check
-        if (remainingArgs.size == 1 && listOf("--help", "-h", "--version", "-v").contains(remainingArgs[0])) {
-            val versionChecker = VersionChecker(config.osConfig)
-
-            val newVersion =
-                if (versionChecker.isThereANewKscriptVersion()) versionChecker.remoteKscriptVersion else ""
-
-            info(Templates.createUsageOptions(config.osConfig.selfName, BuildConfig.APP_VERSION, newVersion))
-
-            info("Kotlin    : ${versionChecker.localKotlinVersion}")
-            info("Java      : ${versionChecker.localJreVersion}")
-            return
-        }
 
         // note: with current implementation we still don't support `kscript -1` where "-1" is a valid kotlin expression
         val userArgs = remainingArgs.dropWhile { it.startsWith("-") && it != "-" }.drop(1)
         val kscriptArgs = remainingArgs.take(remainingArgs.size - userArgs.size)
 
-        val usage = Templates.createUsageOptions(config.osConfig.selfName, BuildConfig.APP_VERSION)
-        KscriptHandler(config, DocoptParser.parse(kscriptArgs, usage)).handle(kscriptArgs, userArgs)
+        val options = DocoptParser.parse(
+            kscriptArgs,
+            createUsageOptions(config.osConfig.selfName, BuildConfig.APP_BUILD_TIME, BuildConfig.APP_VERSION)
+        )
+
+        KscriptHandler(config, options).handle(kscriptArgs, userArgs)
     } catch (e: Exception) {
         errorMsg(e)
         exitProcess(1)

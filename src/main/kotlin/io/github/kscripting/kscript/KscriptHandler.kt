@@ -12,6 +12,7 @@ import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
+import io.github.kscripting.kscript.util.VersionChecker
 import io.github.kscripting.shell.model.ScriptType
 import java.net.URI
 
@@ -22,6 +23,34 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         if (Logger.devMode) {
             info(DebugInfoCreator().create(config, kscriptArgs, userArgs))
+        }
+
+        val executor = Executor(CommandResolver(config.osConfig))
+
+        if (options.getBoolean("help") || options.getBoolean("version")) {
+            val versionChecker = VersionChecker(executor)
+
+            val newVersion =
+                if (versionChecker.isThereANewKscriptVersion()) versionChecker.remoteKscriptVersion else ""
+
+            info(
+                Templates.createUsageOptions(
+                    config.osConfig.selfName,
+                    BuildConfig.APP_BUILD_TIME,
+                    BuildConfig.APP_VERSION,
+                    newVersion,
+                    versionChecker.localKotlinVersion,
+                    versionChecker.localJreVersion
+                )
+            )
+
+            val message = options.getOrDefault("message", "")
+
+            if (message.isNotBlank()) {
+                throw IllegalArgumentException(message)
+            }
+
+            return
         }
 
         val cache = Cache(config.osConfig.cacheDir)
@@ -78,8 +107,6 @@ class KscriptHandler(private val config: Config, private val options: Map<String
             DependencyResolver(script.repositories).resolve(script.dependencies)
         } + localArtifacts
 
-        val executor = Executor(CommandResolver(config.osConfig), config.osConfig)
-
         //  Create temporary dev environment
         if (options.getBoolean("idea")) {
             val path = cache.getOrCreateIdeaProject(script.digest) { basePath ->
@@ -123,6 +150,6 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
     }
 
-    private fun Map<String, String>.getBoolean(key: String): Boolean = getValue(key).toBoolean()
+    private fun Map<String, String>.getBoolean(key: String): Boolean = getOrDefault(key, "false").toBoolean()
     private fun Map<String, String>.getString(key: String): String = getValue(key)
 }
