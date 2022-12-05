@@ -53,7 +53,7 @@ class KscriptHandler(
         val sectionResolver = SectionResolver(inputOutputResolver, Parser(), config.scriptingConfig)
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, config.scriptingConfig)
 
-        if (options.containsKey("bootstrap-header")) {
+        if (options.containsKey("add-bootstrap-header")) {
             val script = scriptResolver.resolve(scriptSource, maxResolutionLevel = 0)
             BootstrapCreator().create(script)
             return
