@@ -25,8 +25,6 @@ class SimpleTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Help is printed`() {
-        //@formatter:off
-        verify("kscript --help", 0, "", startsWith("kscript - Enhanced scripting support for Kotlin on *nix-based systems."))
-        //@formatter:on
+        verify("kscript --help", 0, "", startsWith("kscript - Enhanced scripting support for Kotlin"))
     }
 }

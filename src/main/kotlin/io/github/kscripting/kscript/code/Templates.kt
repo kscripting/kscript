@@ -96,48 +96,32 @@ object Templates {
             |""".trimStart().trimMargin()
     }
 
-    fun createUsageOptions(
-        selfName: String, buildDateTime: ZonedDateTime, version: String, newVersion: String = "", kotlinVersion: String = "", jreVersion: String = ""
-    ): String {
-        val versionLine =
-            "Version   : $version ${if (newVersion.isNotBlank()) "(new version v$newVersion is available)" else ""}"
+    fun createTitleInfo(selfName: String) =
+        "$selfName - Enhanced scripting support for Kotlin on *nix and Windows based systems.\n\n"
 
-        val kotlinAndJreVersion = if (kotlinVersion.isNotBlank()) {
-            """|
-               |Kotlin    : $kotlinVersion
-               |Java      : $jreVersion
-               |""".trimMargin()
-        } else ""
+    fun createHeaderInfo() =
+        "\nThe <script> can be a script file (*kts), a script URL, - for stdin, a *.kt source file with a main method, or some kotlin code.\n\n"
 
-        return """
-        |$selfName - Enhanced scripting support for Kotlin on *nix-based systems.
-        |
-        |Usage:
-        | $selfName [options] <script> [<script_args>]...
-        | $selfName --clear-cache
-        |
-        |The <script> can be a script file (*kts), a script URL, - for stdin, a *.kt source file with a main method, or some kotlin code.
-        |
-        |Use '--clear-cache' to wipe cached script jars and urls
-        |
-        |Options:
-        | -i --interactive        Create interactive shell with dependencies as declared in script
-        | -t --text               Enable stdin support API for more streamlined text processing
-        | --idea                  Open script in temporary Intellij session
-        | -s --silent             Suppress status logging
-        | -d --development        Enable logging of exception stack trace and additional log messages
-        | --report                Prints script's deprecated features report
-        | --package               Package script and dependencies into self-dependent binary
-        | --add-bootstrap-header  Prepend bash header that installs kscript if necessary
-        | -h --help               Prints help information
-        | -v --version            Same as '--help'
-        |
-        |
-        |Copyright : 2022 Holger Brandl, Marcin Kuszczak
-        |License   : MIT
-        |$versionLine
-        |Build     : $buildDateTime
-        |Website   : https://github.com/kscripting/kscript
-        |""".trimMargin().trim() + kotlinAndJreVersion
-    }
+
+    fun createUsageInfo(selfName: String) =
+         """|Usage:
+            |  $selfName [options] <script> [<script_args>]...
+            |  $selfName --clear-cache [--development]
+            |  $selfName (--help | --version) [--development]""".trimMargin()
+
+
+    fun createFooterInfo() =
+         """|
+            |Copyright : 2022 Holger Brandl, Marcin Kuszczak
+            |Website   : https://github.com/kscripting/kscript
+            |License   : MIT""".trimMargin()
+
+    fun createVersionInfo(
+        buildDateTime: ZonedDateTime, version: String, newVersion: String, kotlinVersion: String, jreVersion: String
+    ): String =
+        """|Version   : $version ${if (newVersion.isNotBlank()) "(new version v$newVersion is available)" else ""}
+                    |Build     : $buildDateTime
+                    |Kotlin    : $kotlinVersion
+                    |Java      : $jreVersion
+                    |""".trimMargin().trim()
 }

@@ -5,70 +5,41 @@ import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.creator.*
 import io.github.kscripting.kscript.model.Config
 import io.github.kscripting.kscript.parser.Parser
-import io.github.kscripting.kscript.resolver.*
+import io.github.kscripting.kscript.resolver.DependencyResolver
+import io.github.kscripting.kscript.resolver.InputOutputResolver
+import io.github.kscripting.kscript.resolver.ScriptResolver
+import io.github.kscripting.kscript.resolver.SectionResolver
 import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.FileUtils.getArtifactsRecursively
-import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
-import io.github.kscripting.kscript.util.VersionChecker
 import io.github.kscripting.shell.model.ScriptType
 import java.net.URI
 
-class KscriptHandler(private val config: Config, private val options: Map<String, String>) {
-    fun handle(kscriptArgs: List<String>, userArgs: List<String>) {
-        Logger.silentMode = options.getBoolean("silent")
-        Logger.devMode = options.getBoolean("development")
-
-        if (Logger.devMode) {
-            info(DebugInfoCreator().create(config, kscriptArgs, userArgs))
-        }
-
-        val executor = Executor(CommandResolver(config.osConfig))
-
-        if (options.getBoolean("help") || options.getBoolean("version")) {
-            val versionChecker = VersionChecker(executor)
-
-            val newVersion =
-                if (versionChecker.isThereANewKscriptVersion()) versionChecker.remoteKscriptVersion else ""
-
-            info(
-                Templates.createUsageOptions(
-                    config.osConfig.selfName,
-                    BuildConfig.APP_BUILD_TIME,
-                    BuildConfig.APP_VERSION,
-                    newVersion,
-                    versionChecker.localKotlinVersion,
-                    versionChecker.localJreVersion
-                )
-            )
-
-            val message = options.getOrDefault("message", "")
-
-            if (message.isNotBlank()) {
-                throw IllegalArgumentException(message)
-            }
-
-            return
-        }
-
+class KscriptHandler(
+    private val executor: Executor, private val config: Config, private val options: Map<String, String>
+) {
+    fun handle(userArgs: List<String>) {
         val cache = Cache(config.osConfig.cacheDir)
 
         // optionally clear up the jar cache
-        if (options.getBoolean("clear-cache")) {
+        if (options.containsKey("clear-cache")) {
             info("Cleaning up cache...")
             cache.clear()
-            return
+
+            if (!options.containsKey("script")) {
+                return
+            }
         }
 
-        val scriptSource = options.getString("script")
+        val scriptSource = options["script"] ?: throw IllegalArgumentException("Script argument is required")
 
         if (scriptSource.isBlank()) {
             return
         }
 
-        val enableSupportApi = options.getBoolean("text")
+        val enableSupportApi = options.containsKey("text")
 
         val preambles = buildList {
             if (enableSupportApi) {
@@ -82,7 +53,7 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         val sectionResolver = SectionResolver(inputOutputResolver, Parser(), config.scriptingConfig)
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, config.scriptingConfig)
 
-        if (options.getBoolean("add-bootstrap-header")) {
+        if (options.containsKey("bootstrap-header")) {
             val script = scriptResolver.resolve(scriptSource, maxResolutionLevel = 0)
             BootstrapCreator().create(script)
             return
@@ -91,7 +62,7 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         val script = scriptResolver.resolve(scriptSource, preambles)
 
         if (script.deprecatedItems.isNotEmpty()) {
-            if (options.getBoolean("report")) {
+            if (options.containsKey("report")) {
                 info(DeprecatedInfoCreator().create(script.deprecatedItems))
                 return
             }
@@ -108,7 +79,7 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         } + localArtifacts
 
         //  Create temporary dev environment
-        if (options.getBoolean("idea")) {
+        if (options.containsKey("idea")) {
             val path = cache.getOrCreateIdeaProject(script.digest) { basePath ->
                 val uriLocalPathProvider = { uri: URI -> inputOutputResolver.resolveContent(uri).localPath }
                 IdeaProjectCreator(executor).create(basePath, script, userArgs, uriLocalPathProvider)
@@ -130,13 +101,13 @@ class KscriptHandler(private val config: Config, private val options: Map<String
         }
 
         //  Optionally enter interactive mode
-        if (options.getBoolean("interactive")) {
+        if (options.containsKey("interactive")) {
             executor.runInteractiveRepl(jar, resolvedDependencies, script.compilerOpts, script.kotlinOpts)
             return
         }
 
         //if requested try to package the into a standalone binary
-        if (options.getBoolean("package")) {
+        if (options.containsKey("package")) {
             val path =
                 cache.getOrCreatePackage(script.digest, script.scriptLocation.scriptName) { basePath, packagePath ->
                     PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
@@ -149,7 +120,4 @@ class KscriptHandler(private val config: Config, private val options: Map<String
 
         executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
     }
-
-    private fun Map<String, String>.getBoolean(key: String): Boolean = getOrDefault(key, "false").toBoolean()
-    private fun Map<String, String>.getString(key: String): String = getValue(key)
 }

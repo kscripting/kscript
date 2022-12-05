@@ -121,10 +121,10 @@ class ScriptInputModesTest : TestBase {
     @Tag("windows")
     fun `Missing script gives always error on execution`() {
         verify(
-            "kscript i_do_not_exist.kts", 1, "", "[kscript] [ERROR] Could not read script from 'i_do_not_exist.kts'\n"
+            "kscript i_do_not_exist.kts", 1, "", "[kscript] [ERROR] Could not read script from 'i_do_not_exist.kts'\n\n"
         )
         verify(
-            "kscript i_do_not_exist.kts", 1, "", "[kscript] [ERROR] Could not read script from 'i_do_not_exist.kts'\n"
+            "kscript i_do_not_exist.kts", 1, "", "[kscript] [ERROR] Could not read script from 'i_do_not_exist.kts'\n\n"
         )
     }
 }

@@ -25,9 +25,19 @@ class VersionChecker(private val executor: Executor) {
     internal fun retrieveRemoteKscriptVersion(): String {
         //https://api.github.com/repos/kscripting/kscript/releases/latest
         // "tag_name":"v4.1.1",
-        val body = Unirest.get("https://api.github.com/repos/kscripting/kscript/releases/latest")
-            .header("Accept", "application/vnd.github+json").asString().body
-        Unirest.shutDown()
+
+        val body = try {
+            Unirest.config()
+                .socketTimeout(1000)
+                .connectTimeout(2000)
+
+            Unirest.get("https://api.github.com/repos/kscripting/kscript/releases/latest")
+                .header("Accept", "application/vnd.github+json").asString().body
+        } catch (e: Exception) {
+            ""
+        } finally {
+            Unirest.shutDown()
+        }
 
         return body
     }

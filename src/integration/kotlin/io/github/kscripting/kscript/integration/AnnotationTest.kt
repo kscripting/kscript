@@ -53,7 +53,7 @@ class AnnotationTest : TestBase {
             "kscript ${resolvePath("$projectDir/test/resources/illegal_depends_on_arg.kts")}",
             1,
             "",
-            "[kscript] [ERROR] Artifact locators must be provided as separate annotation arguments and not as comma-separated list: [com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0]\n"
+            "[kscript] [ERROR] Artifact locators must be provided as separate annotation arguments and not as comma-separated list: [com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0]\n\n"
         )
         verify("kscript $projectDir/test/resources/script_with_compile_flags.kts", 0, "hoo_ray\n", any())
     }

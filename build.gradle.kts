@@ -127,7 +127,6 @@ tasks.test {
 
 dependencies {
     //compileOnly(fileTree("libs"))
-    implementation("com.offbytwo:docopt:0.6.0.20150202")
     implementation("commons-cli:commons-cli:1.5.0")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
@@ -149,7 +148,7 @@ dependencies {
 
     implementation("io.github.kscripting:shell:0.5.0")
 
-    implementation("org.slf4j:slf4j-nop:2.0.4")
+    implementation("org.slf4j:slf4j-nop:2.0.5")
 
     implementation("org.semver4j:semver4j:3.0.0")
 
