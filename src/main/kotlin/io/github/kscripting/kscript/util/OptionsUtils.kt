@@ -11,15 +11,15 @@ import java.io.StringWriter
 
 object OptionsUtils {
     fun createOptions(): Options {
-        return Options().addOption(
-            "i", "interactive", false, "Create interactive shell with dependencies as declared in script"
-        ).addOption("t", "text", false, "Enable stdin support API for more streamlined text processing")
+        return Options()
+            .addOption("i", "interactive", false, "Create interactive shell with dependencies as declared in script")
+            .addOption("t", "text", false, "Enable stdin support API for more streamlined text processing")
             .addOption("e", "idea", false, "Open script in temporary Intellij session")
             .addOption("s", "silent", false, "Suppress status logging")
             .addOption("d", "development", false, "Logging of exception stack traces and additional log messages")
             .addOption("r", "report", false, "Prints script's deprecated features report")
             .addOption("p", "package", false, "Package script and dependencies into self-dependent binary")
-            .addOption("b", "bootstrap-header", false, "Prepend bash header that installs kscript if necessary")
+            .addOption("a", "add-bootstrap-header", false, "Prepend bash header that installs kscript if necessary")
             .addOption("h", "help", false, "Prints help information")
             .addOption("v", "version", false, "Prints version information")
             .addOption("c", "clear-cache", false, "Wipes out cached script jars and urls")
