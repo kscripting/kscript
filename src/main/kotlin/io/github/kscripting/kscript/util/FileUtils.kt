@@ -65,6 +65,6 @@ object FileUtils {
             }
         }
 
-        return artifacts
+        return artifacts.sortedBy { it.leaf }
     }
 }
