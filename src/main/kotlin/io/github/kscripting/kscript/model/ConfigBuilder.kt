@@ -63,7 +63,6 @@ class ConfigBuilder(
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".config")
-
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Application Support")
             else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".config")
@@ -110,7 +109,7 @@ class ConfigBuilder(
         ?: configProperties.getPropertyOrNull("scripting.repository.password") ?: ""
 
         val artifactsDir: OsPath? =
-            artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")?.toOsPathFromNative()
+            artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")?.toOsPathFromOsSpecific(osType)
             ?: configProperties.getPropertyOrNull("scripting.directory.artifacts")?.toOsPathFromOsSpecific(osType)
 
         val scriptingConfig = ScriptingConfig(

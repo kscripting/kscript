@@ -17,13 +17,13 @@
 * Improved implementation: VersionChecker, ConfigBuilder etc.
 * Updated Gradle and dependencies
 * Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting
-* Get rid of docopt handler from KscriptHandler (helps with using kscript as library)
+* Replaced DocOpt with Apache CLI
 * Changed the way of creating distribution package - now it is handled by Gradle
 * Version of kscript is set by Gradle (generated BuildConfig class)
 * Improved DependencyResolver: aar archives are also included in classpath
 * When creating IntelliJ project Gradle and Idea are no more required
-* Ability to provide local artifacts path through KSCRIPT_DIRECTORY_ARTIFACTS or configuration file property:
-  scripting.directory.artifacts (thanks to [Vsajip](https://github.com/vsajip) for initial implementation)
+* Ability to provide local artifacts path through **KSCRIPT_DIRECTORY_ARTIFACTS** or configuration file property:
+  **scripting.directory.artifacts** (thanks to [Vsajip](https://github.com/vsajip) for initial implementation)
 
 **Bugfixes**
 

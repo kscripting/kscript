@@ -40,7 +40,7 @@ kotlin scripting interpreter.
 - [Script Configuration](#script-configuration)
 - [Text Processing Mode](#text-processing-mode)
 - [Treat yourself a REPL with `--interactive`](#treat-yourself-a-repl-with---interactive)
-- [Boostrap IDEA from a `kscript`let](#boostrap-idea-from-a-kscriptlet)
+- [Boostrap IDEA from a scriptlet](#boostrap-idea-from-a-scriptlet)
 - [Deploy scripts as standalone binaries](#deploy-scripts-as-standalone-binaries)
 - [Embed kscript installer within your script](#embed-kscript-installer-within-your-script)
 - [KScript configuration file](#kscript-configuration-file)
@@ -105,7 +105,8 @@ instance [bind mounts](https://docs.docker.com/storage/bind-mounts/).
 #### Installation without `sdkman`
 
 If you have Kotlin already, and you would like to install the latest `kscript` release without using `sdkman`
-you can do so by unzipping the [latest ](https://github.com/holgerbrandl/kscript/releases/latest) binary release. Don't forget to update your `$PATH` accordingly.
+you can do so by unzipping the [latest ](https://github.com/holgerbrandl/kscript/releases/latest) binary release. Don't
+forget to update your `$PATH` accordingly.
 
 #### Installation with Homebrew
 
@@ -131,6 +132,23 @@ favorite [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers) to insta
 ```shell
 yay -S kscript
 ```
+
+There is an uncommon directory layout of Kotlin package for Arch Linux, which causes problems when using kscript with
+default Kotlin package.
+Two workarounds for ArchLinux exists, which can be used to make 'kscript' working with ArchLinux:
+
+1. Manually create symlinks in the system:
+
+    ```shell
+    sudo mkdir /usr/share/kotlin/bin
+    sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin   
+    sudo ln -s /usr/bin/kotlinc /usr/share/kotlin/bin/kotlinc
+    ```
+2. Install Kotlin using SdkMan:
+   [Installation of SdkMan](#installation)
+
+The problem should be fixed in the Kotlin package for ArchLinux. See more in the Github issue:  
+https://github.com/kscripting/kscript/issues/371
 
 #### Build it yourself
 
@@ -279,12 +297,14 @@ println("Hello from Kotlin!")
 println("Parsed script arguments are: \n" + doArgs)
 ```
 
-`kscript` will read dependencies from all lines in a script that start with `@file:DependsOn` (if any). Multiple dependencies can
+`kscript` will read dependencies from all lines in a script that start with `@file:DependsOn` (if any). Multiple
+dependencies can
 be split by comma, space or semicolon.
 
 ### Configure the runtime  with `@file:KotlinOptions`
 
-`kscript` allows to provide a `@file:KotlinOptions` directive followed by parameters passed on to `kotlin` similar to how
+`kscript` allows to provide a `@file:KotlinOptions` directive followed by parameters passed on to `kotlin` similar to
+how
 dependencies are defined:
 
 ```kotlin
@@ -298,7 +318,8 @@ Note: Similar to the runtime you can also tweak the compile step by providing `@
 
 ### Ease prototyping with `@file:Import`
 
-`kscript` supports an `@file:Import` directive to directly include other source files without prior compilation. Absolute
+`kscript` supports an `@file:Import` directive to directly include other source files without prior compilation.
+Absolute
 and relative paths, as well as URLs are supported. Example:
 
 ```kotlin
@@ -359,7 +380,7 @@ The latter is the default for `kt` files and could be omitted
 #!/usr/bin/env kscript
 
 // Declare dependencies
-@file:DependsOn("com.github.holgerbrandl:kutils:0.12") 
+@file:DependsOn("com.github.holgerbrandl:kutils:0.12")
 @file:DependsOn("com.beust:klaxon:0.24", "com.github.kittinunf.fuel:fuel:2.3.1")
 
 // To use a custom maven repository you can declare it with
@@ -380,8 +401,8 @@ The latter is the default for `kt` files and could be omitted
 @file:Import("util.kt")
 
 // Define kotlin options
-@file:KotlinOptions("-J-Xmx5g") 
-@file:KotlinOptions("-J-server") 
+@file:KotlinOptions("-J-Xmx5g")
+@file:KotlinOptions("-J-server")
 @file:CompilerOptions("-jvm-target 1.8")
 
 // declare application entry point (applies on for kt-files)
@@ -472,7 +493,7 @@ Welcome to Kotlin version 1.1.51 (JRE 1.8.0_151-b12)
 >>> 
 ```
 
-Boostrap IDEA from a `kscript`let
+Boostrap IDEA from a scriptlet
 -----------------------------------
 
 Artifacts and versions will differ between scripts, so it is hard to maintain them all in a single project. To
@@ -483,14 +504,14 @@ for `<script>` arguments.
 kscript --idea CountRecords.kts
 ```
 
-If you have available `gradle` in the path project will be automatically built and if there is `idea` in the path 
-the project will be opened in [IntelliJ IDEA](https://www.jetbrains.com/idea/) with a minimalistic project containing 
+If you have available `gradle` in the path project will be automatically built and if there is `idea` in the path
+the project will be opened in [IntelliJ IDEA](https://www.jetbrains.com/idea/) with a minimalistic project containing
 just your (1) `<script>` and (2) a generated `build.gradle.kts` file:
 
 ![](misc/readme_images/minus_idea.png)
 
-The `idea` command line launcher can can be created in IntelliJ with `Create Command-line Launcher` command, or you can 
-set the command used to launch your IntelliJ as `KSCRIPT_COMMAND_IDEA` env property. Similarly, you can set `gradle` 
+The `idea` command line launcher can can be created in IntelliJ with `Create Command-line Launcher` command, or you can
+set the command used to launch your IntelliJ as `KSCRIPT_COMMAND_IDEA` env property. Similarly, you can set `gradle`
 command using `KSCRIPT_COMMAND_GRADLE` env property.
 
 Deploy scripts as standalone binaries
@@ -523,7 +544,7 @@ the [Installation](#installation) steps first.
 
 Note that unlike the [`--package` option](#deploy-scripts-as-standalone-binaries) this doesn't produce a separate file,
 allowing the distributed script to be read and modified(including
-with [`kscript --idea`](#boostrap-idea-from-a-kscriptlet)) similar to what you might expect with bash/python/ruby
+with [`kscript --idea`](#boostrap-idea-from-a-scriptlet)) similar to what you might expect with bash/python/ruby
 scripts.
 On the other hand this doesn't embed dependencies within the script("fat jar"), so internet connection may be required
 on its first run.
@@ -533,14 +554,17 @@ kscript configuration file
 
 To keep some options stored permanently in configuration you can create kscript configuration file.
 
-KScript follows XDG directory standard, so the file should be created in:
+KScript follows XDG directory standard, so the file should be created in (paths are resolved in provided order; first
+existing path is used):
 
+| OS          | PATH                                                                                              |
+|-------------|---------------------------------------------------------------------------------------------------|
+| **Windows** | %LOCALAPPDATA%\kscript\kscript.properties; %USERPROFILE%\.config\kscript\kscript.properties       |
+| **MacOs**   | ~/Library/Application Support/kscript/kscript.properties;                                         |
+| **Posix**   | \\${XDG_CONFIG_DIR}/kscript/kscript.properties; \\${user.home}/.config/kscript/kscript.properties |
 
-| OS          | PATH                                                                                |
-|-------------|-------------------------------------------------------------------------------------|
-| **Windows** | %LOCALAPPDATA%\kscript.properties                                                   |
-| **Posix**   | \\${XDG_CONFIG_DIR}/kscript.properties or \\${user.home}/.config/kscript.properties |
-
+If the environment variable: **KSCRIPT_DIRECTORY** is defined the configuration file 'kscript.properties' will be placed
+directly inside it.
 
 Content of kscript.properties file is a standard Java format, with following properties available:
 
@@ -550,6 +574,7 @@ scripting.kotlin.opts=
 scripting.repository.url=
 scripting.repository.user=
 scripting.repository.password=
+scripting.directory.artifacts=
 ```
 
 Example configuration file:
@@ -594,11 +619,12 @@ is a valid Kotlin `kts` script. Plain and simple, no `main`, no `companion`, jus
 
 ### Does `kscript` also work for regular kotlin `.kt` source files with a `main` as entry point?
 
-Yes, (since kscript v1.6) you can run kotlin source files through `kscript`. By default, it will assume a top-level `main` method
+Yes, (since kscript v1.6) you can run kotlin source files through `kscript`. By default, it will assume a
+top-level `main` method
 as entry-point.
 
-However, in case you're using a companion object to declare the entry point, you need to indicate this via the `@file:Entry`.
-
+However, in case you're using a companion object to declare the entry point, you need to indicate this via
+the `@file:Entry`.
 
 ### What are performance and resource usage difference between scripting with kotlin and python?
 

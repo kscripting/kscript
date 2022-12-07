@@ -1,11 +1,10 @@
 # kscript 4.2 features:
 
 * Release kscript to Maven Central
-* Change a way of executing .kts files (investigate if we can get rid of reflections)
-* Fix the bug on ArchLinux
-* Onboard on brew
 * Test local artifacts directory
 
+* Change a way of executing .kts files (investigate if we can get rid of reflections)
+* Onboard on brew
 * Deprecate KotlinOptions
 * New package for Windows e.g. scoop
 * Release scripts in Kotlin

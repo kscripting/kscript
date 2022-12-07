@@ -11,7 +11,7 @@ class KtSupportTest : TestBase {
     @Test
     @Tag("posix")
     fun `Run kt via interpreter mode`() {
-        verify(resolvePath("$projectDir/test/resources/kt_tests/simple_app.kt"), 0, "main was called\n", any())
+        verify(resolvePath("$projectDir/test/resources/kt_tests/simple_app.kt").stringPath(), 0, "main was called\n", any())
     }
 
     @Test
@@ -43,6 +43,6 @@ class KtSupportTest : TestBase {
     @Test
     @Tag("posix")
     fun `Also make sure that kts in package can be run via kscript`() {
-        verify(resolvePath("$projectDir/test/resources/script_in_pckg.kts"), 0, "I live in a package!\n", any())
+        verify(resolvePath("$projectDir/test/resources/script_in_pckg.kts").stringPath(), 0, "I live in a package!\n", any())
     }
 }

@@ -70,13 +70,13 @@ class KscriptHandler(
             warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
         }
 
-        val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
-            getArtifactsRecursively(config.scriptingConfig.artifactsDir)
-        } else emptyList()
-
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
-            DependencyResolver(script.repositories).resolve(script.dependencies)
-        } + localArtifacts
+            val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
+                getArtifactsRecursively(config.scriptingConfig.artifactsDir)
+            } else emptyList()
+
+            DependencyResolver(script.repositories).resolve(script.dependencies) + localArtifacts
+        }
 
         //  Create temporary dev environment
         if (options.containsKey("idea")) {

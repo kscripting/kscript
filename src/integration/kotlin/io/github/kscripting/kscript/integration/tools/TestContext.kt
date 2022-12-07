@@ -33,8 +33,8 @@ object TestContext {
         testPath.createDirectories()
     }
 
-    fun resolvePath(path: String): String {
-        return OsPath.createOrThrow(osType, path).stringPath()
+    fun resolvePath(path: String): OsPath {
+        return OsPath.createOrThrow(osType, path)
     }
 
     fun runProcess(command: String): GobbledProcessResult {

@@ -59,7 +59,7 @@ object FileUtils {
     fun getArtifactsRecursively(osPath: OsPath): List<OsPath> {
         val artifacts = mutableListOf<OsPath>()
 
-        osPath.toNativeFile().walk().forEach {
+        osPath.toNativeFile().absoluteFile.walk().forEach {
             if (it.isFile && (it.extension == "jar" || it.extension == "aar")) {
                 artifacts.add(it.toOsPath())
             }

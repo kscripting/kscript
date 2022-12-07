@@ -4,6 +4,7 @@ import io.github.kscripting.kscript.integration.tools.TestAssertion.any
 import io.github.kscripting.kscript.integration.tools.TestAssertion.contains
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
 import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
+import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
 import io.github.kscripting.kscript.integration.tools.TestContext.testDir
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -31,7 +32,11 @@ class MiscTest : TestBase {
     @Tag("windows")
     fun `Prevent regressions of #98 (it fails to process empty or space-containing arguments)`() {
         verify("""kscript "print(args.size)" foo bar""", 0, "2") //regular args
-        verify("""kscript "print(args.size)" "--params foo"""", 0, "1") //make sure dash args are not confused with options
+        verify(
+            """kscript "print(args.size)" "--params foo"""",
+            0,
+            "1"
+        ) //make sure dash args are not confused with options
         verify("""kscript "print(args.size)" "foo bar"""", 0, "1") //allow for spaces
     }
 
@@ -76,5 +81,18 @@ class MiscTest : TestBase {
         verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
         //real test
         verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
+    }
+
+    @Test
+    @Tag("posix")
+    @Tag("windows")
+    fun `Test local jar dir referenced in ENV variable`() {
+        val shellPath = resolvePath("$projectDir/test/resources/config/")
+        verify(
+            "KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jarFiles")} kscript ${shellPath.resolve("script_with_local_jars.kts")}",
+            0,
+            "I am living in Test1 class...\nAnd I come from Test2 class...\n",
+            ""
+        )
     }
 }
