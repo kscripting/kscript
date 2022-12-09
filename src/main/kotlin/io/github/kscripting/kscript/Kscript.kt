@@ -56,9 +56,9 @@ fun main(args: Array<String>) {
         }
 
         // Constraints
-        if (parsedOptions.containsKey("interactive") && !parsedOptions.containsKey("script")) {
+        if (parsedOptions.isEmpty() || (parsedOptions.containsKey("interactive") && !parsedOptions.containsKey("script"))) {
             info(OptionsUtils.createHelpText(config.osConfig.selfName, options))
-            throw IllegalArgumentException("Interactive option requires Kotlin 'script' as an argument")
+            throw IllegalArgumentException("KScript requires 'script' as an argument")
         }
 
         Logger.silentMode = parsedOptions.containsKey("silent")
