@@ -4,9 +4,10 @@ import io.github.kscripting.kscript.util.ShellUtils
 import io.github.kscripting.kscript.util.ShellUtils.which
 import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.*
+import io.github.kscripting.shell.process.EnvAdjuster
 
 object TestContext {
-    val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
+    private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
     private val nativeType = if (osType.isPosixHostedOnWindows()) OsType.WINDOWS else osType
 
     private val projectPath: OsPath = OsPath.createOrThrow(nativeType, System.getProperty("projectPath"))
@@ -37,7 +38,7 @@ object TestContext {
         return OsPath.createOrThrow(osType, path)
     }
 
-    fun runProcess(command: String): GobbledProcessResult {
+    fun runProcess(command: String, envAdjuster: EnvAdjuster): GobbledProcessResult {
         //In MSYS all quotes should be single quotes, otherwise content is interpreted e.g. backslashes.
         //(MSYS bash interpreter is also replacing double quotes into the single quotes: see: bash -xc 'kscript "println(1+1)"')
         val newCommand = when {
@@ -45,7 +46,13 @@ object TestContext {
             else -> command
         }
 
-        val result = ShellExecutor.evalAndGobble(osType, newCommand, null, ::adjustEnv)
+        fun internalEnvAdjuster(map: MutableMap<String, String>) {
+            ShellUtils.environmentAdjuster(map)
+            map[pathEnvName] = envPath
+            envAdjuster(map)
+        }
+
+        val result = ShellExecutor.evalAndGobble(osType, newCommand, null, ::internalEnvAdjuster)
         println(result)
 
         return result

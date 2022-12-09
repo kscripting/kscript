@@ -65,6 +65,6 @@ object FileUtils {
             }
         }
 
-        return artifacts.sortedBy { it.leaf }
+        return artifacts.sortedBy { it.stringPath() }
     }
 }

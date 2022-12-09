@@ -3,7 +3,6 @@ package io.github.kscripting.kscript.integration
 import io.github.kscripting.kscript.integration.tools.TestAssertion.any
 import io.github.kscripting.kscript.integration.tools.TestAssertion.contains
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
-import io.github.kscripting.kscript.integration.tools.TestContext.osType
 import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
 import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
 import io.github.kscripting.kscript.integration.tools.TestContext.testDir
@@ -90,18 +89,13 @@ class MiscTest : TestBase {
     fun `Test local jar dir referenced in ENV variable`() {
         val shellPath = resolvePath("$projectDir/test/resources/config/")
 
-
-        val envSetter = if (osType.isWindowsLike()) {
-            "set KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jars")} &&"
-        } else {
-            "KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jars")}"
-        }
-
         verify(
-            "$envSetter kscript ${shellPath.resolve("script_with_local_jars.kts")}",
+            "kscript ${shellPath.resolve("script_with_local_jars.kts")}",
             0,
             "I am living in Test1 class...\nAnd I come from Test2 class...\n",
             ""
-        )
+        ) { env ->
+            env["KSCRIPT_DIRECTORY_ARTIFACTS"] = shellPath.resolve("jars").stringPath()
+        }
     }
 }

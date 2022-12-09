@@ -9,14 +9,16 @@ import org.junit.jupiter.api.Test
 class EnvironmentTest : TestBase {
     @Test
     @Tag("posix")
+    @Tag("windows")
     fun `Do not run interactive mode prep without script argument`() {
         verify("kscript -i", 1, "", startsWith("kscript - Enhanced scripting support for Kotlin"))
     }
 
     @Test
     @Tag("posix")
+    @Tag("windows")
     fun `Make sure that KOTLIN_HOME can be guessed from kotlinc correctly`() {
-        verify("unset KOTLIN_HOME; echo 'println(99)' | kscript -", 0, "99\n")
+        verify("echo 'println(99)' | kscript -", 0, "99\n") { env -> env.remove("KOTLIN_HOME") }
     }
 
     //TODO: test what happens if kotlin/kotlinc/java/gradle/idea is not in PATH

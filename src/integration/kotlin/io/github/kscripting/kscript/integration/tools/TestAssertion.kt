@@ -2,6 +2,7 @@ package io.github.kscripting.kscript.integration.tools
 
 import io.github.kscripting.kscript.integration.tools.TestContext.runProcess
 import io.github.kscripting.shell.model.GobbledProcessResult
+import io.github.kscripting.shell.process.EnvAdjuster
 
 object TestAssertion {
     fun <T : Any> geq(value: T) = GenericEquals(value)
@@ -15,20 +16,34 @@ object TestAssertion {
         command: String,
         exitCode: Int = 0,
         stdOut: TestMatcher<String>,
-        stdErr: String = ""
-    ): GobbledProcessResult =
-        verify(command, exitCode, stdOut, eq(stdErr))
-
-    fun verify(command: String, exitCode: Int = 0, stdOut: String, stdErr: TestMatcher<String>): GobbledProcessResult =
-        verify(command, exitCode, eq(stdOut), stdErr)
-
-    fun verify(command: String, exitCode: Int = 0, stdOut: String = "", stdErr: String = ""): GobbledProcessResult =
-        verify(command, exitCode, eq(stdOut), eq(stdErr))
+        stdErr: String = "",
+        envAdjuster: EnvAdjuster = {}
+    ): GobbledProcessResult = verify(command, exitCode, stdOut, eq(stdErr), envAdjuster)
 
     fun verify(
-        command: String, exitCode: Int = 0, stdOut: TestMatcher<String>, stdErr: TestMatcher<String>
+        command: String,
+        exitCode: Int = 0,
+        stdOut: String,
+        stdErr: TestMatcher<String>,
+        envAdjuster: EnvAdjuster = {}
+    ): GobbledProcessResult = verify(command, exitCode, eq(stdOut), stdErr, envAdjuster)
+
+    fun verify(
+        command: String,
+        exitCode: Int = 0,
+        stdOut: String = "",
+        stdErr: String = "",
+        envAdjuster: EnvAdjuster = {}
+    ): GobbledProcessResult = verify(command, exitCode, eq(stdOut), eq(stdErr), envAdjuster)
+
+    fun verify(
+        command: String,
+        exitCode: Int = 0,
+        stdOut: TestMatcher<String>,
+        stdErr: TestMatcher<String>,
+        envAdjuster: EnvAdjuster = {}
     ): GobbledProcessResult {
-        val processResult = runProcess(command)
+        val processResult = runProcess(command, envAdjuster)
         val extCde = geq(exitCode)
 
         extCde.checkAssertion("ExitCode", processResult.exitCode)
