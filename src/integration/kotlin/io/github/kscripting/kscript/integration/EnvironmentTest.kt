@@ -1,6 +1,5 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
 import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
 import org.junit.jupiter.api.Tag
@@ -10,15 +9,8 @@ class EnvironmentTest : TestBase {
     @Test
     @Tag("posix")
     @Tag("windows")
-    fun `Do not run interactive mode prep without script argument`() {
-        verify("kscript -i", 1, "", startsWith("kscript - Enhanced scripting support for Kotlin"))
-    }
-
-    @Test
-    @Tag("posix")
-    @Tag("windows")
     fun `Make sure that KOTLIN_HOME can be guessed from kotlinc correctly`() {
-        verify("echo 'println(99)' | kscript -", 0, "99\n") { env -> env.remove("KOTLIN_HOME") }
+        verify("kscript \"println(99)\"", 0, "99\n") { env -> env.remove("KOTLIN_HOME") }
     }
 
     //TODO: test what happens if kotlin/kotlinc/java/gradle/idea is not in PATH

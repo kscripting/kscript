@@ -7,9 +7,7 @@ import kotlin.io.path.reader
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ConfigBuilder(
-    private val osType: OsType,
-    private val systemProperties: Properties,
-    private val environment: Map<String, String?>
+    private val osType: OsType, private val systemProperties: Properties, private val environment: Map<String, String?>
 ) {
     var userHomeDir: OsPath? = null
     var tempDir: OsPath? = null
@@ -27,11 +25,16 @@ class ConfigBuilder(
     var repositoryPassword: String? = null
     var artifactsDir: OsPath? = null
 
-    //Env variables paths read by Java are always in native format; All paths should be stored in Config as native,
+    //Java properties paths are always in native format. All paths should be stored in Config as native,
     //and then converted to shell format as needed.
-    //private fun path(path: String) = OsPath.createOrThrow(OsType.native, path)
     private fun String.toOsPathFromNative() = OsPath.createOrThrow(OsType.native, this)
-    private fun String.toOsPathFromOsSpecific(osType: OsType) = OsPath.createOrThrow(osType, this).toNativeOsPath()
+    private fun String.toOsPathFromOsSpecific(osType: OsType) = OsPath.createOrThrow(osType, this)
+    private fun String.toOsPathFromEnvVariable(osType: OsType) = when (osType) {
+        //MSYS automatically converts any path in env to windows format
+        OsType.MSYS -> OsPath.createOrThrow(OsType.native, this)
+        else -> OsPath.createOrThrow(osType, this)
+    }.toNativeOsPath()
+
     private fun Properties.getPropertyOrNull(name: String) = this.getProperty(name).nullIfBlank()
     private fun Map<String, String?>.getEnvVariableOrNull(name: String) = this[name].nullIfBlank()
     private fun String?.nullIfBlank() = if (this.isNullOrBlank()) null else this
@@ -46,7 +49,7 @@ class ConfigBuilder(
         val selfName: String = selfName ?: environment.getEnvVariableOrNull("KSCRIPT_NAME") ?: "kscript"
 
         val kscriptDir: OsPath? =
-            kscriptDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY")?.toOsPathFromNative()
+            kscriptDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY")?.toOsPathFromEnvVariable(osType)
 
         val cacheDir: OsPath = cacheDir ?: kscriptDir?.resolve("cache") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative() ?: tempDir
@@ -63,6 +66,7 @@ class ConfigBuilder(
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".config")
+
             osType == OsType.MACOS -> userHomeDir.resolve("Library", "Application Support")
             else -> environment.getEnvVariableOrNull("XDG_CONFIG_DIR")?.toOsPathFromNative()
                 ?: userHomeDir.resolve(".config")
@@ -108,17 +112,12 @@ class ConfigBuilder(
         val repositoryPassword = repositoryPassword ?: environment.getEnvVariableOrNull("KSCRIPT_REPOSITORY_PASSWORD")
         ?: configProperties.getPropertyOrNull("scripting.repository.password") ?: ""
 
-        val artifactsDir: OsPath? =
-            artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")?.toOsPathFromOsSpecific(osType)
-            ?: configProperties.getPropertyOrNull("scripting.directory.artifacts")?.toOsPathFromOsSpecific(osType)
+        val artifactsDir: OsPath? = artifactsDir ?: environment.getEnvVariableOrNull("KSCRIPT_DIRECTORY_ARTIFACTS")
+            ?.toOsPathFromEnvVariable(osType) ?: configProperties.getPropertyOrNull("scripting.directory.artifacts")
+            ?.toOsPathFromOsSpecific(osType)
 
         val scriptingConfig = ScriptingConfig(
-            customPreamble,
-            providedKotlinOpts,
-            repositoryUrl,
-            repositoryUser,
-            repositoryPassword,
-            artifactsDir
+            customPreamble, providedKotlinOpts, repositoryUrl, repositoryUser, repositoryPassword, artifactsDir
         )
 
         return Config(osConfig, scriptingConfig)
