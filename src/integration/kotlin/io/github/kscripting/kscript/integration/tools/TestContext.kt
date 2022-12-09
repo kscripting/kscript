@@ -6,7 +6,7 @@ import io.github.kscripting.shell.ShellExecutor
 import io.github.kscripting.shell.model.*
 
 object TestContext {
-    private val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
+    val osType: OsType = OsType.findOrThrow(System.getProperty("osType"))
     private val nativeType = if (osType.isPosixHostedOnWindows()) OsType.WINDOWS else osType
 
     private val projectPath: OsPath = OsPath.createOrThrow(nativeType, System.getProperty("projectPath"))

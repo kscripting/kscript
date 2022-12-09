@@ -18,4 +18,4 @@
 * Compatibility with Kotlin Scripting
 * Consider changing a way of executing last command, so that it is not executed by shell, but is executed directly in kscript (main concern: kotlin interactive shell, but maybe this use case is not that important)
 * Onboard on docker etc. and other release channels
-* 
+* Abstraction for shell command (Command class containing e.g. environment variables)
