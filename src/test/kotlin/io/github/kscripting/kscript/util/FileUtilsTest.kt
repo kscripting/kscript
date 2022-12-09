@@ -52,10 +52,10 @@ class FileUtilsTest {
 
     @Test
     fun `Assert that getArtifactsRecursively finds all the artifacts in the path`() {
-        val artifactsPath = OsPath.createOrThrow(OsType.native, "test/resources/config/jarfiles/")
+        val artifactsPath = OsPath.createOrThrow(OsType.native, "test/resources/config/jars/")
 
         assertThat(FileUtils.getArtifactsRecursively(artifactsPath)).transform {
-            it.map { it.stringPath().substringAfterLast("jarfiles").replace("\\", "/") }
+            it.map { it.stringPath().substringAfterLast("jars").replace("\\", "/") }
         }.isEqualTo(listOf("/jar_file_1.jar", "/subdir/jar_file_2.jar"))
     }
 }
