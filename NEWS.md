@@ -9,11 +9,15 @@
 **Enhancements**
 
 * New GitHub organization: [kscripting](http://github.com/kscripting)
+* More work on Windows shell compatibility; most functionality works on Windows as on systems with bash
 * Change the name of kscript package to io.github.kscripting:kscript
 * Final execution of script is handled by kscript, not by bash (reduces dependency on bash)
 * Separate library for shell execution kscripting/shell
-* Deprecate old annotations in kscript-annotations library
+* Ability to provide local artifacts path through **KSCRIPT_DIRECTORY_ARTIFACTS** or configuration file property:
+  **scripting.directory.artifacts** (thanks to [Vsajip](https://github.com/vsajip) for initial implementation)
+* kscript jar is released to Maven Central: **io.github.kscripting:kscript:4.2.0**
 * Change the way of checking latest kscript version (simplifies releases)
+* Deprecate old annotations in kscript-annotations library
 * Improved implementation: VersionChecker, ConfigBuilder etc.
 * Updated Gradle and dependencies
 * Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting
@@ -22,8 +26,6 @@
 * Version of kscript is set by Gradle (generated BuildConfig class)
 * Improved DependencyResolver: aar archives are also included in classpath
 * When creating IntelliJ project Gradle and Idea are no more required
-* Ability to provide local artifacts path through **KSCRIPT_DIRECTORY_ARTIFACTS** or configuration file property:
-  **scripting.directory.artifacts** (thanks to [Vsajip](https://github.com/vsajip) for initial implementation)
 
 **Bugfixes**
 

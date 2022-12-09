@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/holgerbrandl/kscript/actions/workflows/build.yml/badge.svg)](https://github.com/holgerbrandl/kscript/actions/workflows/build.yml)
 [![Gitter](https://badges.gitter.im/holgerbrandl/kscript.svg)](https://gitter.im/holgerbrandl/kscript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Enhanced scripting support for [Kotlin](https://kotlinlang.org/) on *nix-based systems.
+Enhanced scripting support for [Kotlin](https://kotlinlang.org/) on *nix-based and Windows systems.
 
 Kotlin has some built-in support for scripting already, but it is not yet feature-rich enough to be a viable alternative
 in the shell.
