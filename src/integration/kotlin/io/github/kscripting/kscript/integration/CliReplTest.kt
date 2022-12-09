@@ -1,6 +1,6 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.kscript.integration.tools.TestAssertion
+import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
 import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -10,7 +10,7 @@ class CliReplTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Do not run interactive mode prep without script argument`() {
-        verify("kscript -i", 1, "", TestAssertion.startsWith("kscript - Enhanced scripting support for Kotlin"))
+        verify("kscript -i", 1, "", startsWith("kscript - Enhanced scripting support for Kotlin"))
     }
 
 //    fun `CLI REPL tests`() {

@@ -60,13 +60,15 @@ class DependencyResolver(private val customRepos: Set<Repository>) {
         }.flatten().map {
             it.toOsPath()
         }.filter {
-            it.extension == "jar" || it.extension == "aar"
+            supportedExtensions.contains(it.extension)
         }.toSet()
 
         return resolvedDependencies
     }
 
     companion object {
+        val supportedExtensions = listOf("jar", "aar")
+
         private val exceptionMessage =
             """|Artifact resolution failure. Check the connection (http/https, port, proxy, credentials, etc.) of your
                |maven dependency locators. If you suspect this is a bug, you can create an issue on:

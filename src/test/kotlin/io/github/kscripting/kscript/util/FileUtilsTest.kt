@@ -7,12 +7,11 @@ import io.github.kscripting.shell.model.OsType
 import io.github.kscripting.shell.model.readText
 import io.github.kscripting.shell.model.toNativeFile
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.apache.commons.io.FileUtils as ApacheFileUtils
 
 class FileUtilsTest {
-    private val path = OsPath.createOrThrow(OsType.native, "build/tmp/file_utils_test")
+    private val path = OsPath.createOrThrow(OsType.native, "./build/tmp/file_utils_test")
     private val newFile1 = path.resolve("test1.txt")
     private val newFile2 = path.resolve("test2.txt")
     private val newFile3 = path.resolve("firstDir", "secondDir", "test3.txt")
@@ -31,8 +30,6 @@ class FileUtilsTest {
     }
 
     @Test
-    //TODO: re-enable it
-    @Disabled
     fun `Test symlink file`() {
         FileUtils.createFile(newFile1, content1)
         FileUtils.symLinkOrCopy(newFile2, newFile1)
@@ -41,8 +38,6 @@ class FileUtilsTest {
     }
 
     @Test
-    //TODO: re-enable it
-    @Disabled
     fun `Create dirs if needed`() {
         FileUtils.createFile(newFile3, content1)
         FileUtils.symLinkOrCopy(newFile4, newFile3)
@@ -53,8 +48,9 @@ class FileUtilsTest {
     @Test
     fun `Assert that getArtifactsRecursively finds all the artifacts in the path`() {
         val artifactsPath = OsPath.createOrThrow(OsType.native, "test/resources/config/jars/")
+        val supportedExtensions = listOf("jar", "aar")
 
-        assertThat(FileUtils.getArtifactsRecursively(artifactsPath)).transform {
+        assertThat(FileUtils.getArtifactsRecursively(artifactsPath, supportedExtensions)).transform {
             it.map { it.stringPath().substringAfterLast("jars").replace("\\", "/") }
         }.isEqualTo(listOf("/jar_file_1.jar", "/subdir/jar_file_2.jar"))
     }

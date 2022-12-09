@@ -72,7 +72,7 @@ class KscriptHandler(
 
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
             val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
-                getArtifactsRecursively(config.scriptingConfig.artifactsDir)
+                getArtifactsRecursively(config.scriptingConfig.artifactsDir, DependencyResolver.supportedExtensions)
             } else emptyList()
 
             DependencyResolver(script.repositories).resolve(script.dependencies) + localArtifacts

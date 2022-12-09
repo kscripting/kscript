@@ -1,7 +1,6 @@
 # kscript 4.2 features:
 
 * Release kscript to Maven Central
-* Test local artifacts directory
 
 * Change a way of executing .kts files (investigate if we can get rid of reflections)
 * Onboard on brew
