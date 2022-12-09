@@ -13,6 +13,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     `maven-publish`
     signing
+    idea
 }
 
 repositories {
@@ -35,21 +36,19 @@ buildConfig {
 
     buildConfigField("String", "APP_NAME", "\"${project.name}\"")
     buildConfigField("String", "APP_VERSION", provider { "\"${project.version}\"" })
-    buildConfigField("java.time.ZonedDateTime", "APP_BUILD_TIME", provider { "java.time.ZonedDateTime.parse(\"$dateTime\")" })
+    buildConfigField("java.time.ZonedDateTime",
+        "APP_BUILD_TIME",
+        provider { "java.time.ZonedDateTime.parse(\"$dateTime\")" })
     buildConfigField("String", "KOTLIN_VERSION", provider { "\"${kotlinVersion}\"" })
 }
 
 sourceSets {
     create("integration") {
-//        test {  //With that idea can understand that 'integration' is a test source set and do not complain about test
-//        names starting with upper case, but it doesn't compile correctly with it
-        java {
-            srcDir("$projectDir/src/integration/kotlin")
-        }
+        kotlin.srcDir("$projectDir/src/integration/kotlin")
         resources.srcDir("$projectDir/src/integration/resources")
+
         compileClasspath += main.get().output + test.get().output
         runtimeClasspath += main.get().output + test.get().output
-//        }
     }
 }
 
@@ -61,6 +60,13 @@ configurations.all {
 configurations {
     get("integrationImplementation").extendsFrom(get("testImplementation"))
     get("integrationRuntimeOnly").extendsFrom(get("testRuntimeOnly"))
+}
+
+idea {
+    module {
+        @Suppress("UnstableApiUsage")
+        testSources.from(sourceSets["integration"].kotlin.srcDirs)
+    }
 }
 
 java {
@@ -78,7 +84,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     }
 }
 
-tasks.create<Test>("integration") {
+tasks.create<Test>("integrationTest") {
     val itags = System.getProperty("includeTags") ?: ""
     val etags = System.getProperty("excludeTags") ?: ""
 
@@ -101,7 +107,7 @@ tasks.create<Test>("integration") {
     testClassesDirs = sourceSets["integration"].output.classesDirs
     classpath = sourceSets["integration"].runtimeClasspath
     outputs.upToDateWhen { false }
-    mustRunAfter(tasks["test"])
+    //mustRunAfter(tasks["test"])
     //dependsOn(tasks["assemble"], tasks["test"])
 
     doLast {
@@ -205,8 +211,7 @@ application {
     mainClass.set(project.group.toString() + ".KscriptKt")
 }
 
-val jar: Task by tasks.getting {
-}
+val jar: Task by tasks.getting {}
 
 val shadowDistTar: Task by tasks.getting {
     enabled = false

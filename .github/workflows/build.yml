@@ -64,23 +64,23 @@ jobs:
           
           echo "OsType:         $OSTYPE"
           
-          gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
+          ./gradlew clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
           
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | linux' integration
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | linux' integration
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | macos' integration
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | macos' integration
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | msys' integration
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | msys' integration
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix' integration      
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix' integration      
           else
             echo "Unknown OS"
             exit 1
@@ -91,9 +91,9 @@ jobs:
         shell: cmd
         run: |
           echo "Windows test..."
-          gradle clean assemble test
+          .\gradlew.bat clean assemble test
           if %errorlevel% neq 0 exit /b %errorlevel%
-          gradle -DosType=windows -DincludeTags="windows" integration
+          .\gradlew.bat -DosType=windows -DincludeTags="windows" integration
 
       - name: Install Cygwin (only Windows)
         if: matrix.variant == 'cygwin'
@@ -107,5 +107,5 @@ jobs:
           echo "Cygwin test..."
           echo "Changing directory to $GITHUB_WORKSPACE ..."
           cd $GITHUB_WORKSPACE
-          gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
-          gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
+          ./gradlew clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
+          ./gradlew -DosType=$OSTYPE -DincludeTags='posix | cygwin' integration
