@@ -92,13 +92,13 @@ class MiscTest : TestBase {
 
 
         val envSetter = if (osType.isWindowsLike()) {
-            "set KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jarFiles")} &&"
+            "set KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jars")} &&"
         } else {
-            "KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jarFiles")}"
+            "KSCRIPT_DIRECTORY_ARTIFACTS=${shellPath.resolve("jars")}"
         }
 
         verify(
-            "$envSetter kscript -d ${shellPath.resolve("script_with_local_jars.kts")}",
+            "$envSetter kscript ${shellPath.resolve("script_with_local_jars.kts")}",
             0,
             "I am living in Test1 class...\nAnd I come from Test2 class...\n",
             ""

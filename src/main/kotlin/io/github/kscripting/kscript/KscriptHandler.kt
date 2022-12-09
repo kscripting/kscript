@@ -11,14 +11,11 @@ import io.github.kscripting.kscript.resolver.ScriptResolver
 import io.github.kscripting.kscript.resolver.SectionResolver
 import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.FileUtils.getArtifactsRecursively
-import io.github.kscripting.kscript.util.Logger.devMsg
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
 import io.github.kscripting.shell.model.ScriptType
-import io.github.kscripting.shell.model.toNativePath
 import java.net.URI
-import kotlin.io.path.listDirectoryEntries
 
 class KscriptHandler(
     private val executor: Executor, private val config: Config, private val options: Map<String, String>
@@ -74,11 +71,6 @@ class KscriptHandler(
         }
 
         val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
-            devMsg("Local artifacts dir: ${config.scriptingConfig.artifactsDir}")
-            devMsg("Content of dir:\n ${config.scriptingConfig.artifactsDir?.toNativePath()?.listDirectoryEntries()}")
-            devMsg("Artifacts read: ${if (config.scriptingConfig.artifactsDir != null) getArtifactsRecursively(config.scriptingConfig.artifactsDir).toString() else  ""}")
-
-
             val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
                 getArtifactsRecursively(config.scriptingConfig.artifactsDir)
             } else emptyList()
