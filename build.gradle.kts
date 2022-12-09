@@ -71,7 +71,7 @@ idea {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 
     withJavadocJar()
@@ -80,7 +80,7 @@ java {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
@@ -176,7 +176,7 @@ val createKscriptLayout by tasks.register<Copy>("createKscriptLayout") {
     into(layout.projectDirectory)
 
     from(shadowJar) {
-        into("build/kscript/lib")
+        into("build/kscript/bin")
     }
 
     from("src/kscript") {

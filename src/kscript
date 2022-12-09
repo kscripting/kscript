@@ -32,7 +32,7 @@ findJavaVersion() {
 
 # Resolve KSCRIPT_HOME
 KSCRIPT_HOME=$(dirname $(dirname $(resolveSymlinks $(resolveAbsolutePath $0))))
-KSCRIPT_LIB="$KSCRIPT_HOME/lib"
+KSCRIPT_LIB="$KSCRIPT_HOME/bin"
 
 # Resolve JAVA_CMD
 if [ -z "$JAVACMD" -a -n "$JAVA_HOME" -a -x "$JAVA_HOME/bin/java" ]; then

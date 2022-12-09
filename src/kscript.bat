@@ -46,7 +46,7 @@ if !_java_major_version! geq 9 (
 )
 
 for /f "tokens=* USEBACKQ" %%o in (`where kscript.bat`) do set ABS_KSCRIPT_PATH=%%o
-set JAR_PATH=%ABS_KSCRIPT_PATH:~0,-16%\lib\*
+set JAR_PATH=%ABS_KSCRIPT_PATH:~0,-16%\bin\*
 
 java !JAVA_OPTS! -classpath %JAR_PATH% io.github.kscripting.kscript.KscriptKt windows %KOTLIN_OPTS%
 
