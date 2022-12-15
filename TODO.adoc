@@ -1,4 +1,4 @@
-# kscript 4.3 features:
+= kscript 4.3 features:
 
 * Change a way of executing .kts files (investigate if we can get rid of reflections)
 * Passing additional information to scripts (args, script name, script path, kscript path etc.)
@@ -7,9 +7,9 @@
 * New package for Windows e.g. scoop
 * Release scripts in Kotlin
 * Windows console support requires @argfiles as kotlin/kotlinc command line might be too long to execute it from console (especially for big classpaths).
-* Improve Unit tests coverage 
+* Improve Unit tests coverage
 * Use compilation option -include-runtime: https://kotlinlang.org/docs/command-line.html#create-and-run-an-application
-* Integration tests - more tests should be enabled; 
+* Integration tests - more tests should be enabled;
 * kscript - some features might be disabled on specific OSes - handle that on code level e.g. throw exception if for some OS feature is not available.
 * Deprecate referencing script by $HOME and by '/' (it is handled now safely, but does it make sense to keep it?)
 * Compatibility with Kotlin Scripting

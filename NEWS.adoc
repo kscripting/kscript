@@ -1,0 +1,386 @@
+= Changes
+
+== [4.2.0-SNAPSHOT] - 2022-11-25
+
+*Breaking changes*
+
+* Renamed environment variable from 'KSCRIPT_DIR' to 'KSCRIPT_DIRECTORY'
+
+*Enhancements*
+
+* New GitHub organization: http://github.com/kscripting[kscripting]
+* More work on Windows shell compatibility; most functionality works on Windows as on systems with bash
+* Change the name of kscript package to io.github.kscripting:kscript
+* Final execution of script is handled by kscript, not by bash (reduces dependency on bash)
+* Separate library for shell execution kscripting/shell
+* Ability to provide local artifacts path through *KSCRIPT_DIRECTORY_ARTIFACTS* or configuration file property:
+ *scripting.directory.artifacts* (thanks to https://github.com/vsajip[Vsajip] for initial implementation)
+* kscript jar is released to Maven Central: *io.github.kscripting:kscript:4.2.0*
+* Change the way of checking latest kscript version (simplifies releases)
+* Deprecate old annotations in kscript-annotations library
+* Improved implementation: VersionChecker, ConfigBuilder etc.
+* Updated Gradle and dependencies
+* Deprecated @file:Include in favour of @file:Import as a preparation of switch to Kotlin Scripting
+* Replaced DocOpt with Apache CLI
+* Changed the way of creating distribution package - now it is handled by Gradle
+* Version of kscript is set by Gradle (generated BuildConfig class)
+* Improved DependencyResolver: aar archives are also included in classpath
+* When creating IntelliJ project Gradle and Idea are no more required
+
+*Bugfixes*
+
+* Fixed exit code on Windows
+
+== [4.1.x] - (last 4.1.1 - 2022-08-27)
+
+*Breaking changes*
+
+* Renamed env variables (cleanup):
+ CUSTOM_KSCRIPT_PREAMBLE -&gt; KSCRIPT_PREAMBLE
+ KSCRIPT_IDEA_COMMAND -&gt; KSCRIPT_COMMAND_IDEA
+ KSCRIPT_GRADLE_COMMAND -&gt; KSCRIPT_COMMAND_GRADLE
+
+*Enhancements*
+
+* Windows support and proper Cygwin and MSys support
+* File argument for specific OS should be in format of that OS (eg. Cygwin: kscript /cygdrive/c/file.kts)
+* Multiplatform tests for different OS-es using Github actions
+* Ability to use configuration file for kscript (thanks to https://github.com/meztihn[meztihn])
+* kscript follows XDG Spec (Issue #323) (thanks to https://github.com/meztihn[meztihn])
+* Packaging scripts works again (thanks to https://github.com/vsajip[Vsajip])
+* When creating IntelliJ project 'gradle' and 'idea' do not have to be in path
+* Integration tests rewritten from bash to JUnit
+* Replacements for (current annotations are deprecated):
+** @MavenRepository -&gt; @Repository
+** @KotlinOpts -&gt; @KotlinOptions
+** @CompilerOpts -&gt; @CompilerOptions
+* Deprecation of comment based annotations
+* Report for deprecated features (–report option)
+
+*Bugfixes*
+
+* Fix for dependency resolution
+* Fix for creation of Gradle files and their indentation
+* Fix for handling potentially duplicated file names in Idea projects
+* Fix for Idea runtime configuration
+
+== [4.0.x] - (last 4.0.3 - 2022-05-28)
+
+**Rewrite by https://github.com/aartiPl**
+
+Functionality:
+
+* Recursive inclusion of dependant scripts without hardcoded limits
+
+Improved test_suite.sh
+
+* Automatic setting up of test environment (assert.sh, test directories)
+* Automatic compilation
+* idea - script to help to test idea use cases
+* Script setup_environment.sh can be used for local testing
+* Some script tests moved to Unit Tests
+* Ability to start test suites by name
+
+Improved Unit Tests
+
+* Several new Unit tests
+* New Unit Tests can be created much easier (Major point why modularization makes sense)
+
+Improved Logging
+
+* Silent mode / Development mode logging
+
+Modularisation of source code
+
+* Removed duplication
+* Code divided in logical pieces and moved to packages
+* Script resolution creates immutable objects
+
+Build script
+
+* Updated Gradle to version 7.4.3 and shadowJar to 7.1.2
+* Fixes in build file
+
+Performance
+
+* Much less IO operations - that should contribute to better performance
+
+Misc
+
+* Updated Kotlin to 1.5.31, but only for compiler, not kotlin-scripting. It's far from optimal, but it is not possible
+ to move fully to Kotlin 1.5 or even 1.6, because of the issues with resolution of artifacts in latest
+ kotlin-scripting. I have put report here: https://youtrack.jetbrains.com/issue/KT-49511
+* Fixed a lot of IDE warnings in code
+* Packaging - gradle file converted to Kotlin; still does not work, but it was like that before anyway
+* Changes for kscript dir allow simple implementation of config file if needed. (.kscript/kscript.config); Not
+ implemented by me, but might be useful e.g. for storing preambles
+
+INCOMPATIBLE CHANGES:
+
+* In annotations the only allowed delimiter is coma "," (to allow options with arguments, separated by space)
+* Resolution of env variables is more restrictive - only vars expected by kscript can be resolved (for security - it's
+ not good to include arbitrary strings from user env into the script)
+* Reworked caching mechanism
+
+== [3.2]
+
+Not released - incorporated in 4.0
+
+Major changes &amp; enhancements
+
+* Improved for relative script inclusions (Thanks to PR by **
+ aartiPI** https://github.com/holgerbrandl/kscript/pull/330[#330])
+* Fixed bootstrap header support (https://github.com/holgerbrandl/kscript/issues/324[#324])
+
+== [3.1]
+
+Major changes &amp; enhancements
+
+* Removed jcenter as default dependency repository
+* Updated tests and build integration to function without jcenter
+
+== [3.0]
+
+Major Enhancements
+
+* New dependency resolver based
+ on https://kotlinlang.org/docs/reference/whatsnew14.html#scripting-and-repl[kotlin-scripting]
+* Java11 support (fixes #239)
+
+Minor improvements
+
+* Forward jvm target to –idea generated build.gradle.kts (#258)
+* Add maven repo credentials to build.gradle.kts generated by –idea (#262)
+* Add option to launch temp intellij as custom command through env property (#264). E.g on ubuntu we could
+ use `export KSCRIPT_IDEA_COMMAND=/snap/bin/intellij-idea-ultimate` to enable `kscript --idea &lt;script.kts&gt;`
+* Fixed idea project symlinks for complex projects (#268)
+* Fixed bootstrap script env variable issue (#271)
+* Fixed parsing of named arguments in @MavenRepository (fixes #274)
+* Added executable docker container to release plan (fixes #224)
+* Updated Kotlin to 1.4.10 (#283)
+* Updated gradle in temporary projects to 6.7 (#282)
+* Add Kotlin run configuration for .kt based scripts. (#284)
+* Use absolute paths to avoid issues with relative paths and relativize (#285)
+
+Incompatible API changes
+
+* Pom dependencies must be now declared as `org.javamoney:moneta:pom:1.3` (and no longer
+ as `org.javamoney:moneta:1.3@pom`)
+* Dynamic version dependencies must be now declared as `log4j:log4j:[1.2,)` (and no longer as `log4j:log4j:1.2+`)
+
+== [2.9]
+
+Support environment variables in repository credentials (https://github.com/holgerbrandl/kscript/issues/159[#248])
+
+* Make INCLUDE directive files relative to script dir
+* Create a default Run Configuration for Idea (https://github.com/holgerbrandl/kscript/issues/159[#244])
+
+Minor enhancements &amp; fixes:
+
+* Support whitespace around maven repo credentials (fixes https://github.com/holgerbrandl/kscript/issues/159[#228])
+* Make INCLUDE directive files relative to script dir
+* Fixed support for gitbash
+* Fixed bootstrap header (https://github.com/holgerbrandl/kscript/issues/159[#234])
+* Improved and documented basic testing support (https://github.com/holgerbrandl/kscript/issues/159[#247])
+
+== [2.8]
+
+Improvements &amp; Fixes
+
+* https://github.com/holgerbrandl/kscript/pull/214[#214] Added credentials support for `@file:MavenRepository`
+ annotation (thanks to https://github.com/meonlol[@meonlol]
+ for providing the PR and his patience)
+
+== [2.7]
+
+Improvements &amp; Fixes
+
+* https://github.com/holgerbrandl/kscript/issues/159[#159] Use aether instead of maven to pull dependencies
+* https://github.com/holgerbrandl/kscript/issues/210[#210]: Updated gradle capsule plugin
+* https://github.com/holgerbrandl/kscript/issues/102[#102]: Removed `--self-update`
+* Use resource from repo for resolve boostrap header
+* https://github.com/holgerbrandl/kscript/issues/203[#203]: Fix cache check bug on Windows
+* https://github.com/holgerbrandl/kscript/issues/199[#199]: Allow to bootstrap kscript installation
+ with `--add-bootstrap-header`
+* https://github.com/holgerbrandl/kscript/issues/200[#200]: Expose script file name to script
+
+== [2.6]
+
+Major Improvements
+
+* https://github.com/holgerbrandl/kscript/issues/166[#166]: Support dynamic versions ending with `+`
+* https://github.com/holgerbrandl/kscript/issues/185[#185]: Support "~" in INCLUDE ()
+* https://github.com/holgerbrandl/kscript/issues/187[#187]: Added support for shortened URLs
+* https://github.com/holgerbrandl/kscript/issues/146[#146]: Allow kscript cache directory to be configurable
+ via `KSCRIPT_CACHE_DIR` environment variable
+* https://github.com/holgerbrandl/kscript/issues/175[#175]: `cygwin` support improvements
+* Improved `kshell` launcher to also launch scripts with invalid code
+
+Notable Bug Fixes
+
+* Confusing error when filename starts with a number
+* Fixed usage `@file:CompilerOpts` in combination with `@file:Include`
+* Renamed `kshell_from_kscript` to `kshell_kts`
+
+== [2.5]
+
+Major Improvements
+
+* Support dependencies with different types (pom instead of jar)
+* Use current kotlin for temporary project when using `--idea`
+* Started https://github.com/holgerbrandl/kscript/tree/master/misc/kshell_launcher[kshell launcher] for kscriptlets
+* Support `--idea` with includes
+
+Minor Enhancements
+
+* Avoid dependency duplications when using `//INCLUDE` recursively
+* Fixed: Unable to run script with plus character in filename
+* Allow to include same file from multiple files
+* Fixed: Space-containing argument propagation
+
+== [2.4]
+
+Major Enhancements:
+
+* Allow to set `kotlinc` compiler flags with `@file:CompilerOpts` or `//COMPILER_OPTS` (#84).
+ See https://github.com/holgerbrandl/kscript#deploy-scripts-as-standalone-binaries[here].
+* Provide a way to _package_ kscripts (#63).
+ See https://github.com/holgerbrandl/kscript#configure-the-runtime--with-kotlin_opts[here].
+
+Minor Enhancements:
+
+* Fixed #95: `//INCLUDE` requiring full path
+* Fixed #94: stdin does not allow further switches
+* Allow for round brackets in artifact ids (fixes #100).
+* Fixed #83: interactive fails unless your script contains dependencies
+* Fixed #82: Sym-linking does not work correctly with –idea and relative script paths
+* New: Implemented benchmarking suite to assess runtime impact of `kscript`
+* Fixed: Don't use null in classpath arguments if classpath is empty
+* Fixed: Use `exec` for derived interpreter
+* Simplify Gradle config for script bootstrapping with IDEA (#86)
+* Added Gradle wrapper to the project (#87 and #88)
+
+== [2.3]
+
+Major Enhancements:
+
+* Replaced `javac` with `kotlinc` for faster script compilation
+* Added symlink support
+* Allow to
+ derive https://github.com/holgerbrandl/kscript/blob/master/docs/user_guide.md#create-interpreters-for-custom-dsls[custom DSL interpreters]
+ from kscript (fixes https://github.com/holgerbrandl/kscript/issues/67[#67])
+* Implemented `@file:Include` and `@EntryPoint`
+ as https://github.com/holgerbrandl/kscript#annotation-driven-script-configuration[documented] in README (
+ fixes https://github.com/holgerbrandl/kscript/issues/73[#73])
+* Added https://gitter.im/holgerbrandl/kscript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge[gitter] channel
+
+Minor Enhancements:
+
+* Consolidate imports and dependencies when `//INCLUDE` is used (
+ fixes https://github.com/holgerbrandl/kscript/pull/75[#75]) …
+* Support artifact should have better namespace (fixes https://github.com/holgerbrandl/kscript/issues/57[#57])
+* Fixed https://github.com/holgerbrandl/kscript/issues/76[#76]: Unspecific error when dependency resolution fails
+* Fixed https://github.com/holgerbrandl/kscript/issues/66[#66]: It should die more gracefully if `idea` is not present
+* Fixed https://github.com/holgerbrandl/kscript/issues/81[#81]: Allow package declarations for scripts
+* Fixed https://github.com/holgerbrandl/kscript/issues/78[#78]: When using `--idea` the script argument should be
+ symlinked
+* Fixed https://github.com/holgerbrandl/kscript/pull/79[#79]: Provide setup instructions if idea launcher is missing
+* Simplified build instructions (fixes https://github.com/holgerbrandl/kscript/issues/60[#60])
+* Document dependencies of kscript (fixes https://github.com/holgerbrandl/kscript/issues/69[#69])
+
+== [2.2]
+
+* Logging of maven artifact downloads to stderr (fixes https://github.com/holgerbrandl/kscript/issues/23[#23])
+* Added `-s` / `--silent` to suppress all logging
+* Fixed https://github.com/holgerbrandl/kscript/issues/55[#55]: dependency resolution fails on travis ci and within
+ docker containers
+* Added alternative `@DependsOnMaven(val artifactId: String)` annotaiton to declare dependencies. This has been
+ implemented to make kscripts compatible with https://github.com/ligee/kotlin-jupyter
+* Added support for custom maven repositories (fixes https://github.com/holgerbrandl/kscript/issues/22[#22])
+
+See link:README.adoc[README] for usage details.
+
+== [2.1]
+
+* support for annotation-driven script configuration
+* refactored support api mode into `-t` parameter
+
+== [2.0]
+
+* Reimplemented in kotlin (fixes https://github.com/holgerbrandl/kscript/issues/36[#36])
+* Added cygwin support (fixes https://github.com/holgerbrandl/kscript/issues/39[#39])
+* Added `//INCLUDE` directive (fixes https://github.com/holgerbrandl/kscript/issues/34[#34]
+* Fixed: interactive mode is not correctly started when using stdin as script
+ argument (https://github.com/holgerbrandl/kscript/issues/40[#40]
+* Fixed compatibility with java9 (https://github.com/holgerbrandl/kscript/issues/41[#41])
+
+== [1.5.1]
+
+* Fixed `--self-update`
+* More robust self-update on OSses with file-locking (e.g. windows)
+
+== [1.5]
+
+* removed `curl` dependency
+* more streamlined dependency lookup
+
+== [1.4]
+
+Major new features
+
+* Redesigned https://github.com/holgerbrandl/kscript-support-api[support library] for streamlined tabular data
+ processing. See http://holgerbrandl.github.io/kotlin/2017/05/08/kscript_as_awk_substitute.html[here] for an
+ overview.
+
+== [1.3]
+
+Major new features
+
+* Dramatically reduced overhead by using dependency lookup cache more efficiently. After the initial
+ scriptlet-jar-building, `kscript` runs with almost *zero overhead* now (
+ fixes https://github.com/holgerbrandl/kscript/issues/4[#4])
+* Dependencies can now declared in multiple lines for better readability (
+ fixes https://github.com/holgerbrandl/kscript/issues/2[#2])
+* Automatic inclusion of support library for one-liners (fixes https://github.com/holgerbrandl/kscript/issues/19[#19])
+* Direct script arguments `kscript &#39;println(&quot;hello kotlin&quot;)&#39;` (
+ fixes https://github.com/holgerbrandl/kscript/issues/18[#18])
+* More robust dependency resolution with more informative error messages
+
+Support API improvements
+
+* Kotlin DocOpt helpers to build
+ CLIs (https://github.com/holgerbrandl/kscript-support-api/blob/master/src/test/kotlin/kscript/test/DocOptTest.kt[example])
+* New https://github.com/holgerbrandl/kscript-support-api/blob/master/src/main/kotlin/kscript/StreamUtil.kt[utilities]
+ to automatically resolve arguments files and stdin to `Sequence&lt;String` for by-line processing
+
+Other changes
+
+* Allow dependencies to be declared in multiple lines prefixed by `//DEPS` (
+ fixes https://github.com/holgerbrandl/kscript/issues/2[#2])
+* To ensure long-term stability of `kscript` we've added a suite of link:test/TestsReadme.md[unit tests]. The repository
+ tested continuously by https://travis-ci.org/holgerbrandl/kscript[Travis CI]
+* Cache directory is now `~/.kscript`
+* More heuristics to guess `KOTLIN_HOME`
+* Cache cleanup `--clear-cache` now applies to jars, scripts, urls, and cached dependency lookups
+
+== [1.2]
+
+* Fixed compatibility with https://kotlinlang.org/docs/reference/whatsnew11.html[Kotlin v1.1]
+ (fixes https://github.com/holgerbrandl/kscript/issues/15[#15])
+* Added `-i` to dump interactive console command incl deps (
+ fixes https://github.com/holgerbrandl/kscript/issues/10[#10])
+* Compile jars should go to TEMP (fixes https://github.com/holgerbrandl/kscript/issues/13[#13])
+* started test-suite
+
+== [1.1]
+
+* Support for stdin and process substitution as script source. See link:examples[examples]
+* versioning and auto-update
+* basic command-line help
+* Added support for `KOTLIN_OPTS` (see https://github.com/holgerbrandl/kscript/issues/8[#8])
+* Added CLI help to `resdeps.kts`
+* Added option to clear dependency lookup cache: `resdeps.kts --clear-cache`
+
+== [1.0]
+
+Initial Release
