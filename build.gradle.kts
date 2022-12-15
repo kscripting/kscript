@@ -36,7 +36,8 @@ buildConfig {
 
     buildConfigField("String", "APP_NAME", "\"${project.name}\"")
     buildConfigField("String", "APP_VERSION", provider { "\"${project.version}\"" })
-    buildConfigField("java.time.ZonedDateTime",
+    buildConfigField(
+        "java.time.ZonedDateTime",
         "APP_BUILD_TIME",
         provider { "java.time.ZonedDateTime.parse(\"$dateTime\")" })
     buildConfigField("String", "KOTLIN_VERSION", provider { "\"${kotlinVersion}\"" })
@@ -241,7 +242,8 @@ publishing {
         maven {
             val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = uri(if (project.version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+            val projectVersion = project.version.toString()
+            url = uri(if (projectVersion.endsWith("-SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
 
             credentials {
                 username = project.findProperty("sonatype.user") as String? ?: System.getenv("SONATYPE_USER")

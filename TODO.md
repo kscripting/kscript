@@ -15,3 +15,6 @@
 * Compatibility with Kotlin Scripting
 * Onboard on docker etc. and other release channels
 * Abstraction for shell command (Command class containing e.g. environment variables)
+* Change description of kscript in SDKMan page
+* Deployments for Docker
+* Deployments for ArchLinux

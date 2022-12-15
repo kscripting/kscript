@@ -113,14 +113,14 @@ forget to update your `$PATH` accordingly.
 On MacOS you can install `kscript` also with [Homebrew](https://brew.sh/)
 
 ```bash
-brew install holgerbrandl/tap/kscript
+brew install kscripting/tap/kscript
 ```
 
 To upgrade to latest version
 
 ```bash
 brew update
-brew upgrade holgerbrandl/tap/kscript
+brew upgrade kscripting/tap/kscript
 ```
 
 #### Installation on Arch Linux
@@ -137,14 +137,15 @@ There is an uncommon directory layout of Kotlin package for Arch Linux, which ca
 default Kotlin package.
 Two workarounds for ArchLinux exists, which can be used to make 'kscript' working with ArchLinux:
 
-1. Manually create symlinks in the system:
+1. Manually create symlinks in the system...
 
     ```shell
     sudo mkdir /usr/share/kotlin/bin
     sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin   
     sudo ln -s /usr/bin/kotlinc /usr/share/kotlin/bin/kotlinc
     ```
-2. Install Kotlin using SdkMan:
+
+2. ...or install Kotlin using SdkMan:
    [Installation of SdkMan](#installation)
 
 The problem should be fixed in the Kotlin package for ArchLinux. See more in the Github issue:  
@@ -158,7 +159,7 @@ To build `kscript` yourself, simply clone the repo and do
 ./gradlew assemble
 
 ## Run kscript from output dir
-./build/libs/kscript
+./build/kscript/bin/kscript
 ```
 
 ## Script Input Modes
