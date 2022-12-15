@@ -98,7 +98,7 @@ docker run -i holgerbrandl/kscript - < script.kts
 This will make `kscript` read the code from stdin while piping the file. Beware that the -i flag is needed to have
 stdout redirected outside the container.
 
-Please note, that currently `@Include` are not supported when using a dockerized kscript. Also, any resource outside the
+Please note, that currently `@Import` are not supported when using a dockerized kscript. Also, any resource outside the
 container context may not be resolved correctly. To overcome this limitation, you could use for
 instance https://docs.docker.com/storage/bind-mounts/[bind mounts].
 
