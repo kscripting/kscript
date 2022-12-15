@@ -51,19 +51,19 @@ To use `kscript` just Kotlin is required.
 To https://kotlinlang.org/docs/tutorials/command-line.html[install Kotlin] we
 recommend http://sdkman.io/install[sdkman]:
 
+[source,bash]
 ----
 curl -s "https://get.sdkman.io" | bash     # install sdkman
 source "$HOME/.sdkman/bin/sdkman-init.sh"  # add sdkman to PATH
 
 sdk install kotlin                         # install Kotlin
-
 ----
 
 Once Kotlin is ready, you can install `kscript` with
 
+[source,bash]
 ----
 sdk install kscript
-
 ----
 
 To test your installation simply run
@@ -71,7 +71,6 @@ To test your installation simply run
 [source,bash]
 ----
 kscript --help
-
 ----
 
 This will check and inform about updates. To update `kscript` simply install it again as described above.
@@ -87,7 +86,6 @@ docker run -i holgerbrandl/kscript 'println("Hello, world!")'
 
 # or using versioned container
 docker run -i holgerbrandl/kscript:2.9.3 'println("Hello, world!")'
-
 ----
 
 To use a script file outside the container as input, you could do
@@ -95,7 +93,6 @@ To use a script file outside the container as input, you could do
 [source,bash]
 ----
 docker run -i holgerbrandl/kscript - < script.kts
-
 ----
 
 This will make `kscript` read the code from stdin while piping the file. Beware that the -i flag is needed to have
@@ -134,7 +131,7 @@ On Arch Linux, `kscript` is available through
 the https://aur.archlinux.org/packages/kscript/[Arch Linux User repository (AUR)]. Use your
 favorite https://wiki.archlinux.org/index.php/AUR_helpers[AUR helper] to install, e.g. `yay`:
 
-[source,shell]
+[source,bash]
 ----
 yay -S kscript
 ----
@@ -145,7 +142,7 @@ Two workarounds for ArchLinux exists, which can be used to make 'kscript' workin
 
 . Manually create symlinks in the system…
 +
-[source,shell]
+[source,bash]
 ----
 sudo mkdir /usr/share/kotlin/bin
 sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin   
@@ -173,9 +170,9 @@ To build `kscript` yourself, simply clone the repo and do
 
 == Script Input Modes
 
-The main mode of operation is `kscript &lt;script&gt;`.
+The main mode of operation is `kscript <script>`.
 
-The `&lt;script&gt;` can be a Kotlin `*.kts` script file , a script URL, `-` for stdin, a process substitution file handle,
+The `<script>` can be a Kotlin `*.kts` script file , a script URL, `-` for stdin, a process substitution file handle,
 a `*.kt` source file with a main method, or some kotlin code.
 
 === Interpreter Usage
@@ -198,12 +195,14 @@ To use `kscript` in a workflow without creating an additional script file, you c
 for _inlined usage_. The following modes are supported:
 
 * Directly provide a Kotlin scriptlet as argument
+
 [source,bash]
 ----
 kscript 'println("hello world")'
 ----
 
 * Pipe a Kotlin snippet into `kscript` and instruct it to read from `stdin` by using `-` as script argument
+
 [source,bash]
 ----
 echo 'println("Hello Kotlin.")' |  kscript -
@@ -219,6 +218,7 @@ EOF
 ----
 
 * Since the piped content is considered as a regular script it can also have dependencies
+
 [source,bash]
 ----
 kscript - <<"EOF"
@@ -232,7 +232,7 @@ EOF
 ----
 
 * Finally, (for sake of completeness), it also works with process substitution and for sure you can always provide
- additional arguments (exposed as `args : Array&lt;String&gt;` within the script)
+ additional arguments (exposed as `args : Array<String>` within the script)
 
 [source,bash]
 ----
@@ -466,7 +466,7 @@ cat some_file | kscript -t 'lines
 ----
 
 In this example, the extension
-method https://github.com/holgerbrandl/kscript-support-api/blob/master/src/main/kotlin/kscript/text/StreamUtil.kt#L34[`Iterable&lt;String&gt;.print()`]
+method https://github.com/holgerbrandl/kscript-support-api/blob/master/src/main/kotlin/kscript/text/StreamUtil.kt#L34[`Iterable<String>.print()`]
 to print the lines to stdout comes from the support API. The rest is stdlib Kotlin.
 
 For more examples using the support library see
@@ -516,7 +516,7 @@ Welcome to Kotlin version 1.1.51 (JRE 1.8.0_151-b12)
 
 Artifacts and versions will differ between scripts, so it is hard to maintain them all in a single project. To
 nevertheless provide optimal tooling when scripting with Kotlin `kscript` allows to create temporary projects
-for `&lt;script&gt;` arguments.
+for `<script>` arguments.
 
 [source,bash]
 ----
@@ -525,7 +525,7 @@ kscript --idea CountRecords.kts
 
 If you have available `gradle` in the path project will be automatically built and if there is `idea` in the path
 the project will be opened in https://www.jetbrains.com/idea/[IntelliJ IDEA] with a minimalistic project containing
-just your (1) `&lt;script&gt;` and (2) a generated `build.gradle.kts` file:
+just your (1) `<script>` and (2) a generated `build.gradle.kts` file:
 
 image:misc/readme_images/minus_idea.png[]
 
