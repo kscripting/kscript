@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -26,7 +27,7 @@ repositories {
 }
 
 group = "io.github.kscripting"
-version = "4.2.0-SNAPSHOT"
+version = "4.2.0-rc.2"
 
 buildConfig {
     packageName(project.group.toString() + "." + project.name)
@@ -173,7 +174,31 @@ application {
     mainClass.set(project.group.toString() + ".KscriptKt")
 }
 
-val jar: Task by tasks.getting {}
+fun adjustVersion(archiveVersion: String): String {
+    var newVersion = archiveVersion.toLowerCaseAsciiOnly()
+
+    val temporaryVersion = newVersion.substringBeforeLast(".")
+
+    if (temporaryVersion.endsWith("-rc") || temporaryVersion.endsWith("-beta") || temporaryVersion.endsWith("-alpha") ||
+        temporaryVersion.endsWith("-snapshot")
+    ) {
+        newVersion = temporaryVersion.substringBeforeLast("-") + "-SNAPSHOT"
+    }
+
+    return newVersion
+}
+
+val jar: Jar by tasks.getting(Jar::class) {
+    archiveVersion.set(adjustVersion(archiveVersion.get()))
+}
+
+val sourcesJar: Jar by tasks.getting(Jar::class) {
+    archiveVersion.set(adjustVersion(archiveVersion.get()))
+}
+
+val javadocJar: Jar by tasks.getting(Jar::class) {
+    archiveVersion.set(adjustVersion(archiveVersion.get()))
+}
 
 val shadowDistTar: Task by tasks.getting {
     enabled = false
@@ -202,8 +227,13 @@ val test: Task by tasks.getting {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            artifactId = "kscript"
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = adjustVersion(project.version.toString())
+
             artifact(jar)
+            artifact(javadocJar)
+            artifact(sourcesJar)
 
             pom {
                 name.set("kscript")
@@ -242,8 +272,8 @@ publishing {
         maven {
             val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            val projectVersion = project.version.toString()
-            url = uri(if (projectVersion.endsWith("-SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+            val adjustedVersion = adjustVersion(project.version.toString())
+            url = uri(if (adjustedVersion.endsWith("-SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
 
             credentials {
                 username = project.findProperty("sonatype.user") as String? ?: System.getenv("SONATYPE_USER")

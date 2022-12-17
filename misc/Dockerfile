@@ -1,11 +1,17 @@
-FROM bellsoft/liberica-openjdk-alpine:11
+FROM alpine:latest
 
-MAINTAINER holgerbrandl@gmail.com
+MAINTAINER go.kscripting@gmail.com
 
-ARG KSCRIPT_VERSION=4.0.0
-ARG KOTLIN_VERSION=1.6.20
+ARG KSCRIPT_VERSION=4.1.1
+ARG KOTLIN_VERSION=1.7.21
 
-RUN cd $(mktemp -d) && \
+RUN \
+# Install bash & Java \
+apk add bash openjdk11 && \
+\
+# Create temp dir
+cd $(mktemp -d) && \
+\
 # Install kscript \
     wget https://github.com/holgerbrandl/kscript/releases/download/v${KSCRIPT_VERSION}/kscript-${KSCRIPT_VERSION}-bin.zip -q -O - | \
     unzip - && \
@@ -17,9 +23,6 @@ RUN cd $(mktemp -d) && \
     unzip - && \
     chmod a+x kotlinc/bin/kotlin kotlinc/bin/kotlinc && \
     mv kotlinc /opt && \
-\
-# Install bash
-    apk add bash && \
 \
 # Done
     rm -rf $PWD
