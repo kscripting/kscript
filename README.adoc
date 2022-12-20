@@ -573,7 +573,7 @@ existing path is used):
 
 |*Windows* | %LOCALAPPDATA%\kscript\kscript.properties; %USERPROFILE%.config\kscript\kscript.properties
 |*MacOs*   | ~/Library/Application Support/kscript/kscript.properties;
-|*Posix*   | $\{XDG_CONFIG_DIR}/kscript/kscript.properties; $\{user.home}/.config/kscript/kscript.properties
+|*Posix*   | \${XDG_CONFIG_DIR}/kscript/kscript.properties; \${user.home}/.config/kscript/kscript.properties
 |===
 
 If the environment variable: *KSCRIPT_DIRECTORY* is defined the configuration file 'kscript.properties' will be placed
