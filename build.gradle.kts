@@ -27,7 +27,7 @@ repositories {
 }
 
 group = "io.github.kscripting"
-version = "4.2.0-rc.2"
+version = "4.2.0-RC.2"
 
 buildConfig {
     packageName(project.group.toString() + "." + project.name)
@@ -179,8 +179,8 @@ fun adjustVersion(archiveVersion: String): String {
 
     val temporaryVersion = newVersion.substringBeforeLast(".")
 
-    if (temporaryVersion.endsWith("-rc") || temporaryVersion.endsWith("-beta") || temporaryVersion.endsWith("-alpha") ||
-        temporaryVersion.endsWith("-snapshot")
+    if (temporaryVersion.endsWith("-RC", true) || temporaryVersion.endsWith("-BETA", true) || temporaryVersion.endsWith("-ALPHA", true) ||
+        temporaryVersion.endsWith("-SNAPSHOT", true)
     ) {
         newVersion = temporaryVersion.substringBeforeLast("-") + "-SNAPSHOT"
     }
