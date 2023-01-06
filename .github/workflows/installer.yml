@@ -68,7 +68,8 @@ jobs:
         shell: bash
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install holgerbrandl/tap/kscript
+          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+          brew install kscripting/tap/kscript
           kscript --help
           kscript -d "println(1+1)"
-          brew uninstall holgerbrandl/tap/kscript
+          brew uninstall kscripting/tap/kscript
