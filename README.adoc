@@ -1,8 +1,8 @@
 = kscript - Having fun with Kotlin scripting
 
-image:https://img.shields.io/github/release/holgerbrandl/kscript.svg[GitHub release,link=https://github.com/holgerbrandl/kscript/releases]
-image:https://github.com/holgerbrandl/kscript/actions/workflows/build.yml/badge.svg[Build Status,link=https://github.com/holgerbrandl/kscript/actions/workflows/build.yml]
-image:https://badges.gitter.im/holgerbrandl/kscript.svg[Gitter,link=https://gitter.im/holgerbrandl/kscript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge]
+image:https://img.shields.io/github/release/kscripting/kscript.svg[GitHub release,link=https://github.com/kscripting/kscript/releases]
+image:https://github.com/kscripting/kscript/actions/workflows/build.yml/badge.svg[Build Status,link=https://github.com/kscripting/kscript/actions/workflows/build.yml]
+image:https://badges.gitter.im/kscripting/kscript.svg[Gitter,link=https://gitter.im/kscripting/kscript?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge]
 
 Enhanced scripting support for https://kotlinlang.org/[Kotlin] on *nix-based and Windows systems.
 
@@ -76,17 +76,17 @@ We provide an executable docker container to run `kscript`
 [source,bash]
 ----
 # using the latest version of kscript
-docker run -i holgerbrandl/kscript 'println("Hello, world!")'
+docker run -i kscripting/kscript 'println("Hello, world!")'
 
 # or using versioned container
-docker run -i holgerbrandl/kscript:2.9.3 'println("Hello, world!")'
+docker run -i kscripting/kscript:2.9.3 'println("Hello, world!")'
 ----
 
 To use a script file outside the container as input, you could do
 
 [source,bash]
 ----
-docker run -i holgerbrandl/kscript - < script.kts
+docker run -i kscripting/kscript - < script.kts
 ----
 
 This will make `kscript` read the code from stdin while piping the file. Beware that the -i flag is needed to have
@@ -99,7 +99,7 @@ instance https://docs.docker.com/storage/bind-mounts/[bind mounts].
 === Installation without `sdkman`
 
 If you have Kotlin already, and you would like to install the latest `kscript` release without using `sdkman`
-you can do so by unzipping the https://github.com/holgerbrandl/kscript/releases/latest[latest ] binary release. Don't
+you can do so by unzipping the https://github.com/kscripting/kscript/releases/latest[latest ] binary release. Don't
 forget to update your `$PATH` accordingly.
 
 === Installation with Homebrew
@@ -239,9 +239,9 @@ sitting in `~/.kscript`).
 === URL usage
 
 To support remote scriplet repositories, `kscript` can also work with URLs. Consider the
-following https://github.com/holgerbrandl/kscript/blob/master/examples/url_example.kts[hello-world-gist-scriptlet]
+following https://github.com/kscripting/kscript/blob/master/examples/url_example.kts[hello-world-gist-scriptlet]
 which is hosted on github (but any URL would work). To run it locally as a tool simply refer to it (here using the
-shortened https://raw.githubusercontent.com/holgerbrandl/kscript/master/examples/url_example.kts[raw-URL] of the
+shortened https://raw.githubusercontent.com/kscripting/kscript/master/examples/url_example.kts[raw-URL] of the
 script for better readability)
 
 [source,bash]
@@ -401,7 +401,7 @@ The latter is the default for `kt` files and could be omitted
 @file:DependsOnMaven("net.clearvolume:cleargl:2.0.1")
 // Note that for compatibility reasons, only one locator argument is allowed for @DependsOnMaven
 
-// also protected artifact repositories are supported, see <https://github.com/holgerbrandl/kscript/blob/master/test/TestsReadme.md#manual-testing>
+// also protected artifact repositories are supported, see <https://github.com/kscripting/kscript/blob/master/test/TestsReadme.md#manual-testing>
 // @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
 // You can use environment variables for user and password when string surrounded by double {} brackets 
 // @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{ARTIFACTORY_USER}}", password="{{ARTIFACTORY_PASSWORD}}")
@@ -440,8 +440,8 @@ e.g. `import DependsOn`).
 `kscript` can be used as a speedier and more flexible substitute for built-in terminal text tools such as `awk` or `sed`
 . Its text processing mode can be enabled with `-t` or `--text`. If so, `kscript` will
 
-* Declare `com.github.holgerbrandl:kscript-support-api:1.2.5` as dependency for the script.
- This https://github.com/holgerbrandl/kscript-support-api[support library] eases the writing of Kotlin scriptlets for
+* Declare `com.github.kscripting:kscript-support-api:1.2.5` as dependency for the script.
+ This https://github.com/kscripting/kscript-support-api[support library] eases the writing of Kotlin scriptlets for
  text-processing. It includes solutions to common use-cases like argument parsing, data streaming, IO utilities, and
  various iterators to streamline the writing of scriptlets for text processing.
 * Import the `kscript.*` namespace
@@ -460,7 +460,7 @@ cat some_file | kscript -t 'lines
 ----
 
 In this example, the extension
-method https://github.com/holgerbrandl/kscript-support-api/blob/master/src/main/kotlin/kscript/text/StreamUtil.kt#L34[`Iterable<String>.print()`]
+method https://github.com/kscripting/kscript-support-api/blob/master/src/main/kotlin/kscript/text/StreamUtil.kt#L34[`Iterable<String>.print()`]
 to print the lines to stdout comes from the support API. The rest is stdlib Kotlin.
 
 For more examples using the support library see
@@ -598,7 +598,7 @@ scripting.preamble=// declare dependencies\n\
 \n\
 // make sure to also support includes in here\n\
 // @file:Import("util.kt")\n\
-@file:Import("https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")\n\
+@file:Import("https://raw.githubusercontent.com/kscripting/kscript/master/test/resources/custom_dsl/test_dsl_include.kt")\n\
 \n\
 \n\
 // define some important variables to be used throughout the dsl\n\
@@ -668,7 +668,7 @@ or link:test/resources/custom_mvn_repo_annot.kts[custom_mvn_repo_annot] for a co
 
 == Support
 
-Feel welcome to post ideas and suggestions to our https://github.com/holgerbrandl/kscript/issues[tracker].
+Feel welcome to post ideas and suggestions to our https://github.com/kscripting/kscript/issues[tracker].
 
 More advanced use-cases are documented in the link:docs/user_guide.md[complementary user guide]
 
@@ -703,7 +703,7 @@ The initial version of `kscript` was kindly contributed by https://github.com/os
 Special thanks to https://github.com/ilanpillemer[Ilan Pillemer], https://github.com/gildor[Andrey Mischenko ]
 , https://github.com/stephenbyrne-mfj[Stephen Byrne], https://github.com/EugeneSusla[Eugene Susla]
 , https://github.com/elihart[Eli Hart], https://github.com/hj-lee[Hwijae Lee] and https://github.com/oshai[oshai]
-for https://github.com/holgerbrandl/kscript/graphs/contributors[contributing] PRs to this repo.
+for https://github.com/kscripting/kscript/graphs/contributors[contributing] PRs to this repo.
 
 Thanks also to the https://www.scionics.com/[Scionics Computer Innovation GmbH] and
 the http://www.mpi-cbg.de[MPI-CBG] for supporting this project.
