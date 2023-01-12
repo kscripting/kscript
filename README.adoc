@@ -79,7 +79,7 @@ We provide an executable docker container to run `kscript`
 docker run -i kscripting/kscript 'println("Hello, world!")'
 
 # or using versioned container
-docker run -i kscripting/kscript:2.9.3 'println("Hello, world!")'
+docker run -i kscripting/kscript:4.2.0 'println("Hello, world!")'
 ----
 
 To use a script file outside the container as input, you could do
