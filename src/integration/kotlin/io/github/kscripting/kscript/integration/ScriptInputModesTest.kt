@@ -107,12 +107,9 @@ class ScriptInputModesTest : TestBase {
     @Tag("windows")
     fun `Make sure that it runs with remote URLs`() {
         verify(
-            "kscript https://raw.githubusercontent.com/holgerbrandl/kscript/master/test/resources/url_test.kts",
-            0,
-            "I came from the internet\n",
-            any()
+            "kscript https://raw.githubusercontent.com/kscripting/kscript/master/test/resources/url_test.kts",
+            0, "I came from the internet\n", any()
         )
-//        verify("kscript https://git.io/fxHBv", 0, "main was called\n", "[kscript] Resolving log4j:log4j:1.2.14...\n")
         verify("kscript https://git.io/fxHBv", 0, "main was called\n", any())
     }
 

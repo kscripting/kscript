@@ -15,9 +15,7 @@ class SupportApiTest : TestBase {
         verify("""echo "foo${nl}bar" | kscript -t "lines.print()"""", 0, "foo\nbar\n", any())
         verify("""echo 'foo${nl}bar' | kscript -t 'lines.print()'""", 0, "foo\nbar\n", any())
         verify(
-            """echo 'foo${nl}bar' | kscript -s --text 'lines.split().select(1,2,-3)'""",
-            1,
-            "",
+            """echo 'foo${nl}bar' | kscript -s --text 'lines.split().select(1,2,-3)'""", 1, "",
             startsWith("[ERROR] Can not mix positive and negative selections\n")
         )
     }

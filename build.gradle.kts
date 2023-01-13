@@ -315,11 +315,11 @@ dependencies {
     implementation("org.semver4j:semver4j:4.1.1")
 
 
-    testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.0")
-    testImplementation("org.junit.platform:junit-platform-suite-api:1.9.0")
-    testImplementation("org.junit.platform:junit-platform-suite-commons:1.9.0")
+    testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.2")
+    testImplementation("org.junit.platform:junit-platform-suite-api:1.9.2")
+    testImplementation("org.junit.platform:junit-platform-suite-commons:1.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
     testImplementation("io.mockk:mockk:1.13.2")
 
