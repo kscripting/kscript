@@ -45,8 +45,7 @@ if !_java_major_version! geq 9 (
   set JAVA_OPTS=!JAVA_OPTS! "--add-opens" "java.base/java.util=ALL-UNNAMED"
 )
 
-for /f "tokens=* USEBACKQ" %%o in (`where kscript.bat`) do set ABS_KSCRIPT_PATH=%%o
-set CLASS_PATH=%ABS_KSCRIPT_PATH:~0,-16%\bin\*
+set CLASS_PATH=%_BIN_DIR%\*
 
 java !JAVA_OPTS! -classpath %CLASS_PATH% io.github.kscripting.kscript.KscriptKt windows %KOTLIN_OPTS%
 
@@ -56,8 +55,7 @@ rem ##########################################################################
 rem # subroutines
 
 :set_home
-  set _BIN_DIR=
-  for %%i in (%~sf0) do set _BIN_DIR=%_BIN_DIR%%%~dpsi
+  set _BIN_DIR=%~dp0
   set _KOTLIN_HOME=%_BIN_DIR%..
 goto :eof
 
