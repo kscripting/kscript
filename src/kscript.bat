@@ -55,7 +55,7 @@ rem ##########################################################################
 rem # subroutines
 
 :set_home
-  set _BIN_DIR=%~dp0
+  set _BIN_DIR=%~dps0
   set _KOTLIN_HOME=%_BIN_DIR%..
 goto :eof
 
