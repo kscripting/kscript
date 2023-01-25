@@ -4,10 +4,10 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
-val kotlinVersion: String = "1.7.21"
+val kotlinVersion: String = "1.8.0"
 
 plugins {
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.8.0"
     application
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
@@ -27,7 +27,7 @@ repositories {
 }
 
 group = "io.github.kscripting"
-version = "4.2.0"
+version = "4.3.0-SNAPSHOT"
 
 buildConfig {
     packageName(project.group.toString() + "." + project.name)
@@ -291,14 +291,22 @@ dependencies {
     //compileOnly(fileTree("libs"))
     implementation("commons-cli:commons-cli:1.5.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host:$kotlinVersion")
 //    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven-all:$kotlinVersion")
+//    implementation("org.jetbrains.kotlin:kotlin-scripting-compiler:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$kotlinVersion")
+
+
+//    implementation("org.jetbrains.kotlin:kotlin-main-kts:$kotlinVersion")
+//    implementation("org.jetbrains.kotlin:kotlin-scripting-jsr223:$kotlinVersion")
+
 
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.11.0")

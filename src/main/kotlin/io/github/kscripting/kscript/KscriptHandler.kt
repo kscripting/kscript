@@ -1,5 +1,6 @@
 package io.github.kscripting.kscript
 
+import io.github.kscripting.kscript.Utils.resolveCodeForNode
 import io.github.kscripting.kscript.cache.Cache
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.creator.*
@@ -15,7 +16,12 @@ import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
 import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.shell.model.toOsPath
 import java.net.URI
+import kotlin.io.path.toPath
+import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.api.scriptFileLocation
+import kotlin.script.experimental.api.valueOrThrow
 
 class KscriptHandler(
     private val executor: Executor, private val config: Config, private val options: Map<String, String>
@@ -70,13 +76,13 @@ class KscriptHandler(
             warnMsg("There are deprecated features in scripts. Use --report option to print full report.")
         }
 
-        val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
-            val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
-                getArtifactsRecursively(config.scriptingConfig.artifactsDir, DependencyResolver.supportedExtensions)
-            } else emptyList()
-
-            DependencyResolver(script.repositories).resolve(script.dependencies) + localArtifacts
-        }
+//        val resolvedDependencies = cache.getOrCreateDependencies(script.digest) {
+//            val localArtifacts = if (config.scriptingConfig.artifactsDir != null) {
+//                getArtifactsRecursively(config.scriptingConfig.artifactsDir, DependencyResolver.supportedExtensions)
+//            } else emptyList()
+//
+//            DependencyResolver(script.repositories).resolve(script.dependencies) + localArtifacts
+//        }
 
         //  Create temporary dev environment
         if (options.containsKey("idea")) {
@@ -96,28 +102,54 @@ class KscriptHandler(
             throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
         }
 
-        val jar = cache.getOrCreateJar(script.digest) { basePath ->
-            JarArtifactCreator(executor).create(basePath, script, resolvedDependencies)
-        }
+//        val jar = cache.getOrCreateJar(script.digest) { basePath ->
+//            JarArtifactCreator(executor).create(basePath, script, resolvedDependencies)
+//        }
 
         //  Optionally enter interactive mode
-        if (options.containsKey("interactive")) {
-            executor.runInteractiveRepl(jar, resolvedDependencies, script.compilerOpts, script.kotlinOpts)
-            return
-        }
+//        if (options.containsKey("interactive")) {
+//            executor.runInteractiveRepl(jar, resolvedDependencies, script.compilerOpts, script.kotlinOpts)
+//            return
+//        }
 
         //if requested try to package the into a standalone binary
-        if (options.containsKey("package")) {
-            val path =
-                cache.getOrCreatePackage(script.digest, script.scriptLocation.scriptName) { basePath, packagePath ->
-                    PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
-                }
+//        if (options.containsKey("package")) {
+//            val path =
+//                cache.getOrCreatePackage(script.digest, script.scriptLocation.scriptName) { basePath, packagePath ->
+//                    PackageCreator(executor).packageKscript(basePath, packagePath, script, jar)
+//                }
+//
+//            infoMsg("Packaged script '${script.scriptLocation.scriptName}' available at path:")
+//            infoMsg(path.convert(config.osConfig.osType).stringPath())
+//            return
+//        }
 
-            infoMsg("Packaged script '${script.scriptLocation.scriptName}' available at path:")
-            infoMsg(path.convert(config.osConfig.osType).stringPath())
-            return
-        }
+        //executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
+        //--------------------------------------------------------------------------------------------------------------
 
-        executor.executeKotlin(jar, resolvedDependencies, userArgs, script.kotlinOpts)
+//        println("scriptFileLocation (before compile)        : ${script.scriptLocation.sourceUri}")
+//        println("scriptContextLocation (before compile)     : ${script.scriptLocation.sourceContextUri}")
+
+        val kscriptHost = KscriptHost(config.osConfig.cacheDir)
+
+        val scriptFile =
+            (script.rootNode.scriptLocation.sourceUri
+                ?: script.rootNode.scriptLocation.sourceContextUri.resolve("script.main.kts")).toPath().toOsPath()
+        val scriptCode = resolveCodeForNode(script.rootNode)
+
+
+        val compilationDiagnostics = kscriptHost.compile(config.osConfig.cacheDir, scriptFile, scriptCode)
+        kscriptHost.handleDiagnostics(compilationDiagnostics)
+
+        val compiledScript = compilationDiagnostics.valueOrThrow()
+//        println("compiledScript.sourceLocationId    : ${compiledScript.sourceLocationId}")
+//        println("compiledScript.resultField         : ${compiledScript.resultField}")
+//        println("compiledScript.otherScripts        : ${compiledScript.otherScripts}")
+//        println("scriptFileLocation                 : ${compiledScript.compilationConfiguration[ScriptCompilationConfiguration.scriptFileLocation]}")
+
+        //KJvmCompiledScript
+
+        val evaluationDiagnostics = kscriptHost.evaluate(userArgs, scriptFile, compiledScript)
+        kscriptHost.handleDiagnostics(evaluationDiagnostics)
     }
 }
