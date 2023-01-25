@@ -150,6 +150,19 @@ sudo ln -s /usr/bin/kotlinc /usr/share/kotlin/bin/kotlinc
 The problem should be fixed in the Kotlin package for ArchLinux. See more in the Github issue: +
 https://github.com/kscripting/kscript/issues/371
 
+=== Installation on Windows
+
+On Windows, `kscript` is available through
+the https://github.com/ScoopInstaller/Extras/blob/master/bucket/kscript.json[Scoop Extras bucket]. Use the following commands to install:
+
+[source,powershell]
+----
+scoop bucket add extras
+scoop install kscript
+----
+
+To install `scoop` use the https://github.com/ScoopInstaller/Install[official guide].
+
 === Build it yourself
 
 To build `kscript` yourself, simply clone the repo and do
