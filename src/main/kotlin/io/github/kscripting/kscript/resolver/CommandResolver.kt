@@ -137,12 +137,7 @@ class CommandResolver(val osConfig: OsConfig) {
             osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
                 .convert(osConfig.osType)
                 .stringPath()
-        return if (osConfig.osType == OsType.WINDOWS) {
-            // if the first character in args in `cmd /c <args>` is a quote, cmd will remove it as well as the
-            // last quote character within args before processing the term, which removes our quotes.
-            " ${filePathQuotationMark}${pathToKotlinc}${filePathQuotationMark}"
-        } else {
-            pathToKotlinc
-        }
+        val quotes = if (osConfig.osType == OsType.WINDOWS) filePathQuotationMark else ""
+        return "${quotes}${pathToKotlinc}${quotes}"
     }
 }
