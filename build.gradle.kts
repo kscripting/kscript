@@ -27,7 +27,7 @@ repositories {
 }
 
 group = "io.github.kscripting"
-version = "4.2.1"
+version = "4.2.2"
 
 buildConfig {
     packageName(project.group.toString() + "." + project.name)
@@ -66,7 +66,6 @@ configurations {
 
 idea {
     module {
-        @Suppress("UnstableApiUsage")
         testSources.from(sourceSets["integration"].kotlin.srcDirs)
     }
 }

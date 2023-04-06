@@ -44,7 +44,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: wrapper
+          gradle-version: 7.6.1
 
       - name: Install dependencies for ${{ runner.os }}
         shell: bash
