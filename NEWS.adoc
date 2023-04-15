@@ -1,5 +1,12 @@
 = Changes
 
+== [4.2.2] - 2023-04-..
+
+*Bugfixes*
+
+* Fixed handling path with spaces on Windows https://github.com/kscripting/kscript/issues/397[#397] (thanks to https://github.com/ckaag[ckaag])
+
+
 == [4.2.1] - 2023-01-26
 
 *Enhancements*
