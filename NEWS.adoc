@@ -2,9 +2,14 @@
 
 == [4.2.2] - 2023-04-..
 
+*Enhancements*
+
+* Updated Gradle to version 8.0.2
+
 *Bugfixes*
 
 * Fixed handling path with spaces on Windows https://github.com/kscripting/kscript/issues/397[#397] (thanks to https://github.com/ckaag[ckaag])
+* Fixed build script (dependencies between tasks)
 
 
 == [4.2.1] - 2023-01-26
