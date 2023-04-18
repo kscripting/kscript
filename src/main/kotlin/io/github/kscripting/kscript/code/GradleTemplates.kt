@@ -70,7 +70,7 @@ object GradleTemplates {
             |    manifest {
             |        attributes["Main-Class"] = "$capsuleApp"
             |    }
-            |    baseName = "$baseName"
+            |    archiveBaseName.set("$baseName")
             |    configurations["compileClasspath"].forEach { file: File ->
             |        from(zipTree(file.absoluteFile))
             |    }
