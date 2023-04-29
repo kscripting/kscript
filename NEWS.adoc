@@ -1,12 +1,36 @@
 = Changes
 
+== [4.2.2] - 2023-04-29
+
+=== Added
+
+* Updated Gradle to version 8.0.2
+
+=== Fixed
+
+* Fixed handling path with spaces on Windows https://github.com/kscripting/kscript/issues/397[#397] (thanks to https://github.com/ckaag[ckaag])
+* Fixed build script (dependencies between tasks)
+* Fixed reading Unicode characters from executed scriptlets
+* Fixed Windows integration tests
+
+
+== [4.2.1] - 2023-01-26
+
+=== Added
+
+* Scoop installer (thanks to https://github.com/Dany-coder778[Dany-coder778] and https://github.com/goto1134[goto1134])
+
+=== Fixed
+
+* The correct way of resolving kscript binary on Windows (thanks to https://github.com/goto1134[goto1134])
+
 == [4.2.0] - 2023-01-14
 
-*Breaking changes*
+=== Breaking changes
 
 * Renamed environment variable from 'KSCRIPT_DIR' to 'KSCRIPT_DIRECTORY'
 
-*Enhancements*
+=== Added
 
 * New GitHub organization: http://github.com/kscripting[kscripting]
 * More work on Windows shell compatibility; most functionality works on Windows as on systems with bash
@@ -27,20 +51,20 @@
 * Improved DependencyResolver: aar archives are also included in classpath
 * When creating IntelliJ project Gradle and Idea are no more required
 
-*Bugfixes*
+=== Fixed
 
 * Fixed exit code on Windows
 
-== [4.1.x] - (last 4.1.1 - 2022-08-27)
+== [4.1.1] - 2022-08-27
 
-*Breaking changes*
+=== Breaking changes
 
 * Renamed env variables (cleanup):
  CUSTOM_KSCRIPT_PREAMBLE -&gt; KSCRIPT_PREAMBLE
  KSCRIPT_IDEA_COMMAND -&gt; KSCRIPT_COMMAND_IDEA
  KSCRIPT_GRADLE_COMMAND -&gt; KSCRIPT_COMMAND_GRADLE
 
-*Enhancements*
+=== Added
 
 * Windows support and proper Cygwin and MSys support
 * File argument for specific OS should be in format of that OS (eg. Cygwin: kscript /cygdrive/c/file.kts)
@@ -57,14 +81,14 @@
 * Deprecation of comment based annotations
 * Report for deprecated features (–report option)
 
-*Bugfixes*
+=== Fixed
 
 * Fix for dependency resolution
 * Fix for creation of Gradle files and their indentation
 * Fix for handling potentially duplicated file names in Idea projects
 * Fix for Idea runtime configuration
 
-== [4.0.x] - (last 4.0.3 - 2022-05-28)
+== [4.0.3] - 2022-05-28
 
 **Rewrite by https://github.com/aartiPl**
 
@@ -115,31 +139,30 @@ Misc
 * Changes for kscript dir allow simple implementation of config file if needed. (.kscript/kscript.config); Not
  implemented by me, but might be useful e.g. for storing preambles
 
-INCOMPATIBLE CHANGES:
+=== Breaking changes
 
 * In annotations the only allowed delimiter is coma "," (to allow options with arguments, separated by space)
 * Resolution of env variables is more restrictive - only vars expected by kscript can be resolved (for security - it's
  not good to include arbitrary strings from user env into the script)
 * Reworked caching mechanism
 
-== [3.2]
+== [3.2.0]
 
 Not released - incorporated in 4.0
 
 Major changes &amp; enhancements
 
-* Improved for relative script inclusions (Thanks to PR by **
- aartiPI** https://github.com/holgerbrandl/kscript/pull/330[#330])
+* Improved for relative script inclusions (Thanks to PR by ** aartiPI** https://github.com/holgerbrandl/kscript/pull/330[#330])
 * Fixed bootstrap header support (https://github.com/holgerbrandl/kscript/issues/324[#324])
 
-== [3.1]
+== [3.1.0]
 
 Major changes &amp; enhancements
 
 * Removed jcenter as default dependency repository
 * Updated tests and build integration to function without jcenter
 
-== [3.0]
+== [3.0.0]
 
 Major Enhancements
 
@@ -168,7 +191,7 @@ Incompatible API changes
  as `org.javamoney:moneta:1.3@pom`)
 * Dynamic version dependencies must be now declared as `log4j:log4j:[1.2,)` (and no longer as `log4j:log4j:1.2+`)
 
-== [2.9]
+== [2.9.0]
 
 Support environment variables in repository credentials (https://github.com/holgerbrandl/kscript/issues/159[#248])
 
@@ -183,7 +206,7 @@ Minor enhancements &amp; fixes:
 * Fixed bootstrap header (https://github.com/holgerbrandl/kscript/issues/159[#234])
 * Improved and documented basic testing support (https://github.com/holgerbrandl/kscript/issues/159[#247])
 
-== [2.8]
+== [2.8.0]
 
 Improvements &amp; Fixes
 
@@ -191,7 +214,7 @@ Improvements &amp; Fixes
  annotation (thanks to https://github.com/meonlol[@meonlol]
  for providing the PR and his patience)
 
-== [2.7]
+== [2.7.0]
 
 Improvements &amp; Fixes
 
@@ -204,7 +227,7 @@ Improvements &amp; Fixes
  with `--add-bootstrap-header`
 * https://github.com/holgerbrandl/kscript/issues/200[#200]: Expose script file name to script
 
-== [2.6]
+== [2.6.0]
 
 Major Improvements
 
@@ -222,7 +245,7 @@ Notable Bug Fixes
 * Fixed usage `@file:CompilerOpts` in combination with `@file:Include`
 * Renamed `kshell_from_kscript` to `kshell_kts`
 
-== [2.5]
+== [2.5.0]
 
 Major Improvements
 
@@ -238,7 +261,7 @@ Minor Enhancements
 * Allow to include same file from multiple files
 * Fixed: Space-containing argument propagation
 
-== [2.4]
+== [2.4.0]
 
 Major Enhancements:
 
@@ -260,7 +283,7 @@ Minor Enhancements:
 * Simplify Gradle config for script bootstrapping with IDEA (#86)
 * Added Gradle wrapper to the project (#87 and #88)
 
-== [2.3]
+== [2.3.0]
 
 Major Enhancements:
 
@@ -288,7 +311,7 @@ Minor Enhancements:
 * Simplified build instructions (fixes https://github.com/holgerbrandl/kscript/issues/60[#60])
 * Document dependencies of kscript (fixes https://github.com/holgerbrandl/kscript/issues/69[#69])
 
-== [2.2]
+== [2.2.0]
 
 * Logging of maven artifact downloads to stderr (fixes https://github.com/holgerbrandl/kscript/issues/23[#23])
 * Added `-s` / `--silent` to suppress all logging
@@ -300,12 +323,12 @@ Minor Enhancements:
 
 See link:README.adoc[README] for usage details.
 
-== [2.1]
+== [2.1.0]
 
 * support for annotation-driven script configuration
 * refactored support api mode into `-t` parameter
 
-== [2.0]
+== [2.0.0]
 
 * Reimplemented in kotlin (fixes https://github.com/holgerbrandl/kscript/issues/36[#36])
 * Added cygwin support (fixes https://github.com/holgerbrandl/kscript/issues/39[#39])
@@ -319,12 +342,12 @@ See link:README.adoc[README] for usage details.
 * Fixed `--self-update`
 * More robust self-update on OSses with file-locking (e.g. windows)
 
-== [1.5]
+== [1.5.0]
 
 * removed `curl` dependency
 * more streamlined dependency lookup
 
-== [1.4]
+== [1.4.0]
 
 Major new features
 
@@ -332,7 +355,7 @@ Major new features
  processing. See http://holgerbrandl.github.io/kotlin/2017/05/08/kscript_as_awk_substitute.html[here] for an
  overview.
 
-== [1.3]
+== [1.3.0]
 
 Major new features
 
@@ -363,7 +386,7 @@ Other changes
 * More heuristics to guess `KOTLIN_HOME`
 * Cache cleanup `--clear-cache` now applies to jars, scripts, urls, and cached dependency lookups
 
-== [1.2]
+== [1.2.0]
 
 * Fixed compatibility with https://kotlinlang.org/docs/reference/whatsnew11.html[Kotlin v1.1]
  (fixes https://github.com/holgerbrandl/kscript/issues/15[#15])
@@ -372,7 +395,7 @@ Other changes
 * Compile jars should go to TEMP (fixes https://github.com/holgerbrandl/kscript/issues/13[#13])
 * started test-suite
 
-== [1.1]
+== [1.1.0]
 
 * Support for stdin and process substitution as script source. See link:examples[examples]
 * versioning and auto-update
@@ -381,6 +404,6 @@ Other changes
 * Added CLI help to `resdeps.kts`
 * Added option to clear dependency lookup cache: `resdeps.kts --clear-cache`
 
-== [1.0]
+== [1.0.0]
 
 Initial Release

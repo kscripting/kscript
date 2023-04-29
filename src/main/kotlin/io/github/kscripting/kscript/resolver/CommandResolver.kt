@@ -12,6 +12,12 @@ class CommandResolver(val osConfig: OsConfig) {
     private val classPathSeparator =
         if (osConfig.osType.isWindowsLike() || osConfig.osType.isPosixHostedOnWindows()) ";" else ":"
 
+    private val filePathQuotationMark = when (osConfig.osType) {
+        OsType.WINDOWS -> '"'
+        else -> '\''
+    }
+
+
     fun getKotlinJreVersion(): String {
         val kotlin = resolveKotlinBinary("kotlin")
         return "$kotlin -version"
@@ -90,41 +96,23 @@ class CommandResolver(val osConfig: OsConfig) {
     private fun resolveKotlinOpts(kotlinOpts: Set<KotlinOpt>) = kotlinOpts.joinToString(" ") { it.value }
 
     private fun resolveCompilerOpts(compilerOpts: Set<CompilerOpt>) = compilerOpts.joinToString(" ") { it.value }
-
     private fun resolveJarFile(jar: OsPath): String {
-        val jarFileQuotationMark: Char = when (osConfig.osType) {
-            OsType.WINDOWS -> '"'
-            else -> '\''
-        }
-
-        return "${jarFileQuotationMark}${resolveQuotedPath(jar)}${jarFileQuotationMark}"
+        return "${filePathQuotationMark}${resolveQuotedPath(jar)}${filePathQuotationMark}"
     }
 
     private fun resolveFiles(filePaths: Set<OsPath>): String {
-        val filePathQuotationMark: Char = when (osConfig.osType) {
-            OsType.WINDOWS -> '"'
-            else -> '\''
-        }
-
         return filePaths.joinToString(" ") {
-            "${filePathQuotationMark}${
-                resolveQuotedPath(it)
-            }${filePathQuotationMark}"
+            "${filePathQuotationMark}${resolveQuotedPath(it)}${filePathQuotationMark}"
         }
     }
 
     private fun resolveUserArgs(userArgs: List<String>): String {
-        val userArgQuotationMark: Char = when (osConfig.osType) {
-            OsType.WINDOWS -> '"'
-            else -> '\''
-        }
-
         return userArgs.joinToString(" ") {
-            "${userArgQuotationMark}${
+            "${filePathQuotationMark}${
                 it.replace(
                     "\"", "\\\""
                 )
-            }${userArgQuotationMark}"
+            }${filePathQuotationMark}"
         }
     }
 
@@ -133,14 +121,11 @@ class CommandResolver(val osConfig: OsConfig) {
             return ""
         }
 
-        val classpathParameterQuotationMark: Char = when (osConfig.osType) {
-            OsType.WINDOWS -> '"'
-            else -> '\''
-        }
-
-        val classpath = classpathParameterQuotationMark + dependencies.joinToString(classPathSeparator) {
-            resolveQuotedPath(it)
-        } + classpathParameterQuotationMark
+        val classpath = "${filePathQuotationMark}${
+            dependencies.joinToString(classPathSeparator) {
+                resolveQuotedPath(it)
+            }
+        }${filePathQuotationMark}"
 
         return "-classpath $classpath"
     }
@@ -148,8 +133,11 @@ class CommandResolver(val osConfig: OsConfig) {
     private fun resolveQuotedPath(osPath: OsPath): String = osPath.toNativeOsPath().stringPath()
 
     private fun resolveKotlinBinary(binary: String): String {
-        return osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
-            .convert(osConfig.osType)
-            .stringPath()
+        val pathToKotlinc =
+            osConfig.kotlinHomeDir.resolve("bin", if (osConfig.osType.isWindowsLike()) "$binary.bat" else binary)
+                .convert(osConfig.osType)
+                .stringPath()
+        val quotes = if (osConfig.osType == OsType.WINDOWS) filePathQuotationMark else ""
+        return "${quotes}${pathToKotlinc}${quotes}"
     }
 }

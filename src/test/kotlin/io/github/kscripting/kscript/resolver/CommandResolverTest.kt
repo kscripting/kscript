@@ -18,16 +18,16 @@ class CommandResolverTest {
         val (config, jarPath, jarArtifact, depPaths, filePaths) = createTestData(
             OsType.WINDOWS,
             "C:\\My Workspace\\Code",
-            "C:\\Users\\Admin\\scoop\\apps\\kotlin\\current"
+            "C:\\Users\\Admin With Spaces\\scoop\\apps\\kotlin\\current"
         )
         val commandResolver = CommandResolver(config.osConfig)
 
         assertThat(commandResolver.compileKotlin(jarPath, depPaths, filePaths, compilerOpts)).isEqualTo(
-            """C:\Users\Admin\scoop\apps\kotlin\current\bin\kotlinc.bat -abc -def --experimental -classpath "C:\My Workspace\Code\.m2\somepath\dep1.jar;C:\My Workspace\Code\.m2\somepath\dep2.jar;C:\My Workspace\Code\.m2\somepath\dep3.jar" -d "C:\My Workspace\Code\.kscript\cache\somefile.jar" "C:\My Workspace\Code\source\somepath\dep1.kt" "C:\My Workspace\Code\source\somepath\dep2.kts""""
+            """"C:\Users\Admin With Spaces\scoop\apps\kotlin\current\bin\kotlinc.bat" -abc -def --experimental -classpath "C:\My Workspace\Code\.m2\somepath\dep1.jar;C:\My Workspace\Code\.m2\somepath\dep2.jar;C:\My Workspace\Code\.m2\somepath\dep3.jar" -d "C:\My Workspace\Code\.kscript\cache\somefile.jar" "C:\My Workspace\Code\source\somepath\dep1.kt" "C:\My Workspace\Code\source\somepath\dep2.kts""""
         )
 
         assertThat(commandResolver.executeKotlin(jarArtifact, depPaths, userArgs, kotlinOpts)).isEqualTo(
-            """C:\Users\Admin\scoop\apps\kotlin\current\bin\kotlin.bat -k1 -k2 --disable -classpath "C:\My Workspace\Code\.m2\somepath\dep1.jar;C:\My Workspace\Code\.m2\somepath\dep2.jar;C:\My Workspace\Code\.m2\somepath\dep3.jar;C:\My Workspace\Code\.kscript\cache\somefile.jar;C:\Users\Admin\scoop\apps\kotlin\current\lib\kotlin-script-runtime.jar" mainClass "arg" "u" "ments""""
+            """"C:\Users\Admin With Spaces\scoop\apps\kotlin\current\bin\kotlin.bat" -k1 -k2 --disable -classpath "C:\My Workspace\Code\.m2\somepath\dep1.jar;C:\My Workspace\Code\.m2\somepath\dep2.jar;C:\My Workspace\Code\.m2\somepath\dep3.jar;C:\My Workspace\Code\.kscript\cache\somefile.jar;C:\Users\Admin With Spaces\scoop\apps\kotlin\current\lib\kotlin-script-runtime.jar" mainClass "arg" "u" "ments""""
         )
     }
 
