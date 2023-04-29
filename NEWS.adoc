@@ -11,6 +11,7 @@
 * Fixed handling path with spaces on Windows https://github.com/kscripting/kscript/issues/397[#397] (thanks to https://github.com/ckaag[ckaag])
 * Fixed build script (dependencies between tasks)
 * Fixed reading Unicode characters from executed scriptlets
+* Fixed Windows integration tests
 
 
 == [4.2.1] - 2023-01-26
