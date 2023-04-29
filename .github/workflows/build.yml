@@ -92,6 +92,7 @@ jobs:
         run: |
           echo "Windows test..."
           gradle clean assemble test
+          echo ErrorLevel: %errorlevel%
           if %errorlevel% NEQ 0 (
             exit /b %errorlevel%
           )
