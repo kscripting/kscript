@@ -92,7 +92,9 @@ jobs:
         run: |
           echo "Windows test..."
           gradle clean assemble test
-          if %errorlevel% neq 0 exit /b %errorlevel%
+          if %errorlevel% NEQ 0 (
+            exit /b %errorlevel%
+          )
           gradle -DosType=windows -DincludeTags="windows" integrationTest
 
       - name: Install Cygwin (only Windows)
