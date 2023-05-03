@@ -1,6 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -174,14 +174,11 @@ application {
 }
 
 fun adjustVersion(archiveVersion: String): String {
-    var newVersion = archiveVersion.toLowerCaseAsciiOnly()
+    var newVersion = archiveVersion.toUpperCaseAsciiOnly()
 
-    val temporaryVersion = newVersion.substringBeforeLast(".")
-
-    if (temporaryVersion.endsWith("-RC", true) || temporaryVersion.endsWith("-BETA", true) || temporaryVersion.endsWith("-ALPHA", true) ||
-        temporaryVersion.endsWith("-SNAPSHOT", true)
+    if (newVersion.endsWith("-RC") || newVersion.endsWith("-BETA") || newVersion.endsWith("-ALPHA")
     ) {
-        newVersion = temporaryVersion.substringBeforeLast("-") + "-SNAPSHOT"
+        newVersion = newVersion.substringBefore("-") + "-SNAPSHOT"
     }
 
     return newVersion
