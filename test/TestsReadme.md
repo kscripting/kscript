@@ -199,7 +199,7 @@ export auth_user="auth_user"
 export auth_password="password"
 
 echo '
-@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="{{auth_user}}", password="{{auth_password}}")
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="$auth_user", password="$auth_password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
 @file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
 println("Hello, World!")
@@ -213,11 +213,17 @@ export auth_user="auth_user"
 export auth_password="password"
 
 echo '
-@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="{{auth_user}}", password="{{auth_password}}")
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="$auth_user", password="$auth_password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
 @file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
 println("Hello, World!")
 ' |  kscript -c --package -
+```
+
+#### 6. (Optional) Cleanup Local Maven Cache
+
+```bash
+rm -fr ~/.m2/repository/group
 ```
 
 ### Additional info for manual testing

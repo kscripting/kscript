@@ -139,7 +139,7 @@ Two workarounds for ArchLinux exists, which can be used to make 'kscript' workin
 [source,bash]
 ----
 sudo mkdir /usr/share/kotlin/bin
-sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin   
+sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin
 sudo ln -s /usr/bin/kotlinc /usr/share/kotlin/bin/kotlinc
 ----
 
@@ -243,7 +243,7 @@ EOF
 
 [source,bash]
 ----
-kscript <(echo 'println("k-onliner")') arg1 arg2 arg3 
+kscript <(echo 'println("k-onliner")') arg1 arg2 arg3
 ----
 
 Inlined _kscripts_ are also cached based on `md5` checksum, so running the same snippet again will use a cached jar (
@@ -259,7 +259,7 @@ script for better readability)
 
 [source,bash]
 ----
-kscript https://git.io/v1cG6 my argu ments 
+kscript https://git.io/v1cG6 my argu ments
 ----
 
 To streamline the usage, the first part could be even aliased:
@@ -414,12 +414,12 @@ The latter is the default for `kt` files and could be omitted
 @file:DependsOnMaven("net.clearvolume:cleargl:2.0.1")
 // Note that for compatibility reasons, only one locator argument is allowed for @DependsOnMaven
 
-// also protected artifact repositories are supported, see <https://github.com/kscripting/kscript/blob/master/test/TestsReadme.md#manual-testing>
+// also protected repositories are supported, see <https://github.com/kscripting/kscript/blob/master/test/TestsReadme.md#manual-testing>
 // @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
-// You can use environment variables for user and password when string surrounded by double {} brackets 
-// @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{ARTIFACTORY_USER}}", password="{{ARTIFACTORY_PASSWORD}}")
+// You can use environment variables for user and password
+// @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="$ARTIFACTORY_USER", password="$ARTIFACTORY_PASSWORD")
 // will be use 'ARTIFACTORY_USER' and 'ARTIFACTORY_PASSWORD' environment variables
-// if the value doesn't found in the script environment  will fail
+// if a referenced environment variable is not found, the script will fail
 
 // Include helper scripts without deployment or prior compilation
 @file:Import("util.kt")
@@ -516,7 +516,7 @@ which will bring up the classpath-enhanced REPL:
 Creating REPL from CountRecords.kts
 Welcome to Kotlin version 1.1.51 (JRE 1.8.0_151-b12)
 >>> import de.mpicbg.scicomp.bioinfo.openFasta
->>> 
+>>>
 ----
 
 == Boostrap IDEA from a scriptlet
@@ -582,7 +582,7 @@ KScript follows XDG directory standard, so the file should be created in (paths 
 existing path is used):
 
 |===
-|OS |PATH 
+|OS |PATH
 
 |*Windows* | %LOCALAPPDATA%\kscript\kscript.properties; %USERPROFILE%.config\kscript\kscript.properties
 |*MacOs*   | ~/Library/Application Support/kscript/kscript.properties;
