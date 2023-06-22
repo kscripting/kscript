@@ -1,6 +1,7 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
+    id 'maven-publish'
 }
 
 group 'com.github.holgerbrandl.kscript.test'
@@ -10,11 +11,21 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    // for use with local artifactory for testing auth repo access, see artifactory_config and
+    // TestsReadme.md (Manual testing)
+    maven {
+        url "http://localhost:8081/artifactory/authenticated_repo"
+        allowInsecureProtocol = true
+        credentials {
+            username 'auth_user'
+            password 'password'
+        }
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 compileKotlin {
@@ -22,4 +33,22 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "http://localhost:8081/artifactory/authenticated_repo"
+            allowInsecureProtocol = true
+            credentials {
+                username 'auth_user'
+                password 'password'
+            }
+        }
+    }
 }
