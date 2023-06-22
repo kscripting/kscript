@@ -5,6 +5,9 @@ import io.github.kscripting.kscript.model.CompilerOpt
 import io.github.kscripting.kscript.model.Dependency
 import io.github.kscripting.kscript.model.Repository
 import io.github.kscripting.kscript.model.Script
+import io.github.kscripting.kscript.util.Logger.errorMsg
+import kotlin.onFailure
+import kotlin.script.experimental.api.*
 
 object GradleTemplates {
     fun createGradleIdeaScript(script: Script): String {
@@ -108,9 +111,15 @@ object GradleTemplates {
 
     private fun createGradleRepositoryCredentials(repository: Repository): String {
         if (repository.user.isNotBlank() && repository.password.isNotBlank()) {
+            fun getFinalValue(optionName: String, rawValue: String?): String? =
+                tryResolveEnvironmentVariable(rawValue, optionName)
+
+            val username = getFinalValue("username", repository.user)
+            val password = getFinalValue("password", repository.password)
+
             return """|credentials {
-                      |    username = "${repository.user}"
-                      |    password = "${repository.password}"
+                      |    username = "$username"
+                      |    password = "$password"
                       |}""".trimMargin()
         }
 
@@ -155,5 +164,23 @@ object GradleTemplates {
                   |        freeCompilerArgs = listOf(${freeCompilerArgs.joinToString(", ") { "\"$it\"" }})
                   |    }
                   |}""".trimMargin()
+    }
+
+    /**
+     * This is a variant of [kotlin.script.experimental.dependencies.maven.MavenDependenciesResolver.tryResolveEnvironmentVariable].
+     */
+    private fun tryResolveEnvironmentVariable(
+        str: String?,
+        optionName: String,
+    ): String? {
+        if (str == null) return null
+        if (!str.startsWith("$")) return str
+        val envName = str.substring(1)
+        val envValue: String? = System.getenv(envName)
+        if (envValue.isNullOrEmpty()) {
+            errorMsg("Environment variable '$envName' is not defined for option '$optionName'")
+            return null
+        }
+        return envValue
     }
 }
