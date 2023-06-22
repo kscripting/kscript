@@ -166,11 +166,7 @@ docker run --name artifactory -d -p 8081:8081 $modified_image
 #### 2. Create and upload a downloadable archive.
 
 ```bash
-tmpClass=$(mktemp --suffix ".class")
-tmpZipDir=$(mktemp -d)
-echo "public class something() {}" > $tmpClass
-zip $tmpZipDir/tmp.zip $tmpClass
-curl --request PUT -u admin:password -T $tmpZipDir/tmp.zip http://localhost:8081/artifactory/authenticated_repo/group/somejar/1.0/somejar-1.0.jar
+gradle --project-dir test/resources/jar_dependency publishAllPublicationsToMavenRepository
 ```
 
 #### 3. Then run the following kotlin script with the encrypted password
@@ -179,7 +175,7 @@ curl --request PUT -u admin:password -T $tmpZipDir/tmp.zip http://localhost:8081
 echo '
 @file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
-@file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
+@file:DependsOnMaven("com.github.holgerbrandl.kscript.test:jartester:1.0-SNAPSHOT") // If encrypted works.
 println("Hello, World!")
 ' |  kscript -c -
 ```
@@ -193,18 +189,12 @@ export auth_password="password"
 echo '
 @file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="$auth_user", password="$auth_password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
-@file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
+@file:DependsOnMaven("com.github.holgerbrandl.kscript.test:jartester:1.0-SNAPSHOT") // If encrypted works.
 println("Hello, World!")
 ' |  kscript -c -
 ```
 
 #### 5. Test environment variable substitution with packaging
-
-First publish a real package to our repository:
-
-```shell
-gradle --project-dir test/resources/jar_dependency publishAllPublicationsToMavenRepository
-```
 
 ```bash
 export auth_user="auth_user"
@@ -221,7 +211,7 @@ println("Hello, World!")
 #### 6. (Optional) Cleanup Local Maven Cache
 
 ```bash
-rm -fr ~/.m2/repository/group
+rm -fr ~/.m2/repository/com/github/holgerbrandl/kscript/test/
 ```
 
 ### Additional info for manual testing
