@@ -208,6 +208,12 @@ println("Hello, World!")
 
 #### 5. Test environment variable substitution with packaging
 
+First publish a real package to our repository:
+
+```shell
+gradle --project-dir test/resources/jar_dependency publishAllPublicationsToMavenRepository
+```
+
 ```bash
 export auth_user="auth_user"
 export auth_password="password"
@@ -215,7 +221,7 @@ export auth_password="password"
 echo '
 @file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="$auth_user", password="$auth_password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
-@file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
+@file:DependsOnMaven("com.github.holgerbrandl.kscript.test:jartester:1.0-SNAPSHOT") // If encrypted works.
 println("Hello, World!")
 ' |  kscript -c --package -
 ```
