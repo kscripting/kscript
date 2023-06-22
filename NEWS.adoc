@@ -1,5 +1,11 @@
 = Changes
 
+== [Future] - ?
+
+=== Fixed
+
+* (*Breaking*) Since migrating to a Kotlin Scripting backend, environment variables for repository authentication now use the `$FOO` syntax vs the `{{FOO}}` syntax. This has been broken since 4.2.0. (fixed thanks to https://github.com/rocketraman[rocketraman])
+
 == [4.2.2] - 2023-04-29
 
 === Added
