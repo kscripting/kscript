@@ -157,18 +157,10 @@ As of this writing, testing the credentials is only done manually with a dockeri
 
 ```bash
 # download and start artifactory container
-docker run --name artifactory -d -p 8081:8081 docker.bintray.io/jfrog/artifactory-oss:latest
-
-# Copy preconfigured gloabl config (with custom repo) and security config (with credentials user) into container.
-docker cp ./test/resources/artifactory_config/artifactory.config.xml artifactory:/var/opt/jfrog/artifactory/etc/artifactory/artifactory.config.import.xml
-docker cp ./test/resources/artifactory_config/security_descriptor.xml artifactory:/var/opt/jfrog/artifactory/etc/artifactory/security.import.xml
-
-# Make the configs accessable
-docker exec -u 0 -it artifactory sh -c 'chmod 777 /var/opt/jfrog/artifactory/etc/artifactory/*.import.xml'
-
-# Restart docker after is done with initial booting (otherwise restart breaks the container).
-echo "sleeping for 15..." && sleep 15
-docker restart artifactory
+modified_image=$(DOCKER_BUILDKIT=1 docker build -q \
+  -f test/resources/artifactory_config/Dockerfile \
+  test/resources/artifactory_config)
+docker run --name artifactory -d -p 8081:8081 $modified_image
 ```
 
 #### 2. Create and upload a downloadable archive.
