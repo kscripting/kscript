@@ -160,11 +160,11 @@ As of this writing, testing the credentials is only done manually with a dockeri
 docker run --name artifactory -d -p 8081:8081 docker.bintray.io/jfrog/artifactory-oss:latest
 
 # Copy preconfigured gloabl config (with custom repo) and security config (with credentials user) into container.
-docker cp ./test/resources/artifactory_config/artifactory.config.xml artifactory:/var/opt/jfrog/artifactory/etc/artifactory.config.import.xml
-docker cp ./test/resources/artifactory_config/security_descriptor.xml artifactory:/var/opt/jfrog/artifactory/etc/security.import.xml
+docker cp ./test/resources/artifactory_config/artifactory.config.xml artifactory:/var/opt/jfrog/artifactory/etc/artifactory/artifactory.config.import.xml
+docker cp ./test/resources/artifactory_config/security_descriptor.xml artifactory:/var/opt/jfrog/artifactory/etc/artifactory/security.import.xml
 
 # Make the configs accessable
-docker exec -u 0 -it artifactory sh -c 'chmod 777 $ARTIFACTORY_HOME/etc/*.import.xml'
+docker exec -u 0 -it artifactory sh -c 'chmod 777 /var/opt/jfrog/artifactory/etc/artifactory/*.import.xml'
 
 # Restart docker after is done with initial booting (otherwise restart breaks the container).
 echo "sleeping for 15..." && sleep 15
@@ -189,7 +189,35 @@ echo '
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
 @file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
 println("Hello, World!")
-' |  kscript -
+' |  kscript -c -
+```
+
+#### 4. Test environment variable substitution
+
+```bash
+export auth_user="auth_user"
+export auth_password="password"
+
+echo '
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="{{auth_user}}", password="{{auth_password}}")
+@file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
+@file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
+println("Hello, World!")
+' |  kscript -c -
+```
+
+#### 5. Test environment variable substitution with packaging
+
+```bash
+export auth_user="auth_user"
+export auth_password="password"
+
+echo '
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="{{auth_user}}", password="{{auth_password}}")
+@file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
+@file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
+println("Hello, World!")
+' |  kscript -c --package -
 ```
 
 ### Additional info for manual testing
