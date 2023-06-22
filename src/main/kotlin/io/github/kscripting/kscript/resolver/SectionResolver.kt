@@ -2,6 +2,7 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.Parser
+import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.UriUtils
 import io.github.kscripting.shell.model.ScriptLocation
 import io.github.kscripting.shell.model.ScriptSource
@@ -133,13 +134,25 @@ class SectionResolver(
 
             is Repository -> {
                 val repository = Repository(
-                    scriptAnnotation.id, scriptAnnotation.url.replace(
-                        "{{KSCRIPT_REPOSITORY_URL}}", scriptingConfig.providedRepositoryUrl
-                    ), scriptAnnotation.user.replace(
-                        "{{KSCRIPT_REPOSITORY_USER}}", scriptingConfig.providedRepositoryUser
-                    ), scriptAnnotation.password.replace(
-                        "{{KSCRIPT_REPOSITORY_PASSWORD}}", scriptingConfig.providedRepositoryPassword
-                    )
+                    id = scriptAnnotation.id,
+                    url = resolveRepositoryOption(
+                        scriptAnnotation.url,
+                        "url",
+                        "{{KSCRIPT_REPOSITORY_URL}}",
+                        scriptingConfig.providedRepositoryUrl,
+                    ),
+                    user = resolveRepositoryOption(
+                        scriptAnnotation.user,
+                        "user",
+                        "{{KSCRIPT_REPOSITORY_USER}}",
+                        scriptingConfig.providedRepositoryUser,
+                    ),
+                    password = resolveRepositoryOption(
+                        scriptAnnotation.password,
+                        "password",
+                        "{{KSCRIPT_REPOSITORY_PASSWORD}}",
+                        scriptingConfig.providedRepositoryPassword,
+                    ),
                 )
 
                 resolutionContext.repositories.add(repository)
@@ -162,5 +175,32 @@ class SectionResolver(
         }
 
         return result.normalize()
+    }
+
+    private fun resolveRepositoryOption(
+        str: String?,
+        optionName: String,
+        placeholder: String,
+        property: String
+    ): String = tryResolveEnvironmentVariable(str, optionName)
+        ?.replace(placeholder, property)
+        ?: error("Failed to resolve value for option '$optionName'")
+
+    /**
+     * This is a variant of [kotlin.script.experimental.dependencies.maven.MavenDependenciesResolver.tryResolveEnvironmentVariable].
+     */
+    private fun tryResolveEnvironmentVariable(
+        str: String?,
+        optionName: String,
+    ): String? {
+        if (str == null) return null
+        if (!str.startsWith("$")) return str
+        val envName = str.substring(1)
+        val envValue: String? = System.getenv(envName)
+        if (envValue.isNullOrEmpty()) {
+            Logger.errorMsg("Environment variable '$envName' is not defined for option '$optionName'")
+            return null
+        }
+        return envValue
     }
 }
