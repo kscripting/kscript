@@ -133,6 +133,7 @@ object GradleTemplates {
     private fun createGradleRepositoriesSection(repositories: Set<Repository>) = repositories.joinToString("\n") {
         """|maven {
            |    url = uri("${it.url}")
+           |    isAllowInsecureProtocol = true
            |${createGradleRepositoryCredentials(it).prependIndent()}
            |}
         """.trimMargin()
