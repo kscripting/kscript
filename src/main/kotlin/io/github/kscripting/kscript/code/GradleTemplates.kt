@@ -64,9 +64,9 @@ object GradleTemplates {
             |}
             |
             |repositories {
-            |    mavenLocal()
-            |    mavenCentral()
             |${createGradleRepositoriesSection(script.repositories).prependIndent()}
+            |    mavenCentral()
+            |    mavenLocal()
             |}
             |
             |tasks.jar {
