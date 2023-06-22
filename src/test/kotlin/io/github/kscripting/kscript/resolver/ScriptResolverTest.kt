@@ -1,10 +1,7 @@
 package io.github.kscripting.kscript.resolver
 
 import assertk.assertThat
-import assertk.assertions.endsWith
-import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
-import assertk.assertions.prop
+import assertk.assertions.*
 import io.github.kscripting.kscript.cache.Cache
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.Parser
@@ -12,6 +9,9 @@ import io.github.kscripting.shell.model.*
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
+
+import com.github.stefanbirkner.systemlambda.SystemLambda.*
+import java.util.concurrent.Callable
 
 class ScriptResolverTest {
     private val currentNativeOsType = OsType.native
@@ -161,6 +161,76 @@ class ScriptResolverTest {
 
             prop(Script::resolvedCode).transform { it.discardEmptyLines() }.isEqualTo(expected)
         }
+    }
+
+    @Test
+    fun `Should resolve environment variables in repository declarations`() {
+        val input = "test/resources/depends_on_env.kts"
+
+        val script = withEnvironmentVariable("REPO", "http://foo/bar")
+            .and("USER", "u")
+            .and("PASS", "p")
+            .execute(Callable { scriptResolver.resolve(input) })
+
+        assertThat(script).apply {
+            prop(Script::repositories).isEqualTo(
+                setOf(
+                    Repository("", "http://foo/bar","u", "p")
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Should resolve KSCRIPT_REPOSITORY placeholders in repository declarations`() {
+        val input = "test/resources/depends_on_repo_placeholders.kts"
+
+        val scriptingConfig = ScriptingConfig("", "", "http://foo/bar", "u", "p", null)
+        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig)
+        val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
+
+        val script = scriptResolver.resolve(input)
+
+        assertThat(script).apply {
+            prop(Script::repositories).isEqualTo(
+                setOf(
+                    Repository("", "http://foo/bar","u-suffix", "prefix-p")
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Should resolve KSCRIPT_REPOSITORY placeholders in repository declarations after resolving environment variables`() {
+        val input = "test/resources/depends_on_env.kts"
+
+        val scriptingConfig = ScriptingConfig("", "", "http://foo/bar", "u", "p", null)
+        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig)
+        val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
+
+        // this allows configuration to come from both the properties file and allows the environment to override
+        // properties by composing from it
+        val script = withEnvironmentVariable("REPO", "{{KSCRIPT_REPOSITORY_URL}}")
+            .and("USER", "{{KSCRIPT_REPOSITORY_USER}}-suffix")
+            .and("PASS", "prefix-{{KSCRIPT_REPOSITORY_PASSWORD}}")
+            .execute(Callable { scriptResolver.resolve(input) })
+
+        assertThat(script).apply {
+            prop(Script::repositories).isEqualTo(
+                setOf(
+                    Repository("", "http://foo/bar","u-suffix", "prefix-p")
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Unresolved environment variables in repository declarations result in an error`() {
+        val input = "test/resources/depends_on_env.kts"
+
+        assertThat {
+            scriptResolver.resolve(input)
+        }.isFailure()
     }
 
     private fun String.discardEmptyLines(): String = this.lines().filterNot { it.isEmpty() }.joinToString("\n")
