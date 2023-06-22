@@ -95,6 +95,7 @@ class GradleTemplatesTest {
             |    mavenCentral()
             |    maven {
             |        url = uri("https://url1")
+            |        isAllowInsecureProtocol = true
             |        credentials {
             |            username = "user1"
             |            password = "pass1"
@@ -102,6 +103,7 @@ class GradleTemplatesTest {
             |    }
             |    maven {
             |        url = uri("https://url2")
+            |        isAllowInsecureProtocol = true
             |        credentials {
             |            username = "user2"
             |            password = "pass2"
