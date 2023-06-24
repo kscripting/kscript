@@ -7,6 +7,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.prop
 import io.github.kscripting.kscript.cache.Cache
 import io.github.kscripting.kscript.model.*
+import io.github.kscripting.kscript.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptSource
+import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.kscript.parser.Parser
 import io.github.kscripting.shell.model.*
 import org.junit.jupiter.api.Test

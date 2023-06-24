@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.parser
 
 import io.github.kscripting.kscript.model.*
-import io.github.kscripting.shell.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptLocation
 
 @Suppress("UNUSED_PARAMETER")
 object LineParser {

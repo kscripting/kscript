@@ -2,6 +2,7 @@ package io.github.kscripting.kscript.cache
 
 import io.github.kscripting.kscript.creator.JarArtifact
 import io.github.kscripting.kscript.model.Content
+import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.shell.model.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils

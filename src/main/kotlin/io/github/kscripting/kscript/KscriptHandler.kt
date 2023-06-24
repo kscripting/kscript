@@ -14,7 +14,7 @@ import io.github.kscripting.kscript.util.FileUtils.getArtifactsRecursively
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
-import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.kscript.model.ScriptType
 import java.net.URI
 
 class KscriptHandler(

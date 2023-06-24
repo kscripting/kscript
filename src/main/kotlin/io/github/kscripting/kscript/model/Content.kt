@@ -1,7 +1,6 @@
 package io.github.kscripting.kscript.model
 
 import io.github.kscripting.shell.model.OsPath
-import io.github.kscripting.shell.model.ScriptType
 import java.net.URI
 
 data class Content(

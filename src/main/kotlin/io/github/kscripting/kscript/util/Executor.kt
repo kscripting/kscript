@@ -17,10 +17,7 @@ class Executor(private val commandResolver: CommandResolver) {
         val command = commandResolver.getKotlinJreVersion()
 
         return ShellExecutor.evalAndGobble(
-            commandResolver.osConfig.osType,
-            command,
-            null,
-            ShellUtils::environmentAdjuster
+            command, commandResolver.osConfig.osType, null, ShellUtils::environmentAdjuster
         ).stdout
     }
 
@@ -33,7 +30,10 @@ class Executor(private val commandResolver: CommandResolver) {
         devMsg("JAR compile command: $command")
 
         val processResult = ShellExecutor.evalAndGobble(
-            commandResolver.osConfig.osType, command, envAdjuster = ShellUtils::environmentAdjuster, waitTimeMinutes = 30
+            command,
+            commandResolver.osConfig.osType,
+            envAdjuster = ShellUtils::environmentAdjuster,
+            waitTimeMinutes = 30
         )
 
         devMsg("Script compilation result:\n$processResult")
@@ -50,8 +50,8 @@ class Executor(private val commandResolver: CommandResolver) {
         devMsg("Kotlin execute command: $command")
 
         val processResult = ShellExecutor.eval(
-            commandResolver.osConfig.osType,
             command,
+            commandResolver.osConfig.osType,
             envAdjuster = ShellUtils::environmentAdjuster,
             waitTimeMinutes = Int.MAX_VALUE,
             inheritInput = true
@@ -59,7 +59,7 @@ class Executor(private val commandResolver: CommandResolver) {
 
         devMsg("Script execution result:\n$processResult")
 
-        if (processResult.exitCode != 0) {
+        if (processResult != 0) {
             throw IllegalStateException("Execution of scriplet failed:\n$processResult")
         }
     }
@@ -73,8 +73,8 @@ class Executor(private val commandResolver: CommandResolver) {
         devMsg("REPL Kotlin command: $command")
 
         val processResult = ShellExecutor.eval(
-            commandResolver.osConfig.osType,
             command,
+            commandResolver.osConfig.osType,
             envAdjuster = ShellUtils::environmentAdjuster,
             waitTimeMinutes = Int.MAX_VALUE,
             inheritInput = true
@@ -86,7 +86,9 @@ class Executor(private val commandResolver: CommandResolver) {
     fun runGradleInIdeaProject(projectPath: OsPath) {
         if (isInPath(commandResolver.osConfig.osType, commandResolver.osConfig.gradleCommand)) {
             // Create gradle wrapper
-            ShellExecutor.evalAndGobble(commandResolver.osConfig.osType, "gradle wrapper", workingDirectory = projectPath)
+            ShellExecutor.evalAndGobble(
+                "gradle wrapper", commandResolver.osConfig.osType, workingDirectory = projectPath
+            )
         } else {
             warnMsg("Could not find '${commandResolver.osConfig.gradleCommand}' in your PATH. You must set the command used to launch your intellij as 'KSCRIPT_COMMAND_GRADLE' env property")
         }
@@ -95,9 +97,7 @@ class Executor(private val commandResolver: CommandResolver) {
             val command = commandResolver.executeIdea(projectPath)
             devMsg("Idea execute command: $command")
 
-            val processResult = ShellExecutor.evalAndGobble(
-                commandResolver.osConfig.osType, command
-            )
+            val processResult = ShellExecutor.evalAndGobble(command, commandResolver.osConfig.osType)
 
             devMsg("Script execution result:\n$processResult")
 
@@ -117,7 +117,8 @@ class Executor(private val commandResolver: CommandResolver) {
         val command = commandResolver.createPackage()
         devMsg("Create package command: $command")
 
-        val result = ShellExecutor.evalAndGobble(commandResolver.osConfig.osType, command, workingDirectory = projectPath)
+        val result =
+            ShellExecutor.evalAndGobble(command, commandResolver.osConfig.osType, workingDirectory = projectPath)
 
         if (result.exitCode != 0) {
             throw IllegalStateException("Packaging for path: '$projectPath' failed:$result")

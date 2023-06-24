@@ -1,7 +1,5 @@
 package io.github.kscripting.kscript.model
 
-import io.github.kscripting.shell.model.ScriptLocation
-
 sealed interface ScriptAnnotation
 
 @JvmInline

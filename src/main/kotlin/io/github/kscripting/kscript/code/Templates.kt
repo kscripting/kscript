@@ -2,7 +2,7 @@ package io.github.kscripting.kscript.code
 
 import io.github.kscripting.kscript.model.KotlinOpt
 import io.github.kscripting.kscript.model.PackageName
-import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.kscript.model.ScriptType
 import org.intellij.lang.annotations.Language
 import java.time.ZonedDateTime
 

@@ -3,9 +3,9 @@ package io.github.kscripting.kscript.code
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import io.github.kscripting.kscript.model.*
-import io.github.kscripting.shell.model.ScriptLocation
-import io.github.kscripting.shell.model.ScriptSource
-import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.kscript.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptSource
+import io.github.kscripting.kscript.model.ScriptType
 import org.junit.jupiter.api.Test
 import java.net.URI
 

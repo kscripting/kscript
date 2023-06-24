@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.creator
 
 import io.github.kscripting.kscript.model.DeprecatedItem
-import io.github.kscripting.shell.model.*
+import io.github.kscripting.kscript.model.ScriptLocation
 import net.igsoft.tablevis.TableBuilder
 import net.igsoft.tablevis.printer.text.TextTablePrinter
 import net.igsoft.tablevis.style.text.BoxTextTableStyleSet

@@ -1,6 +1,9 @@
 package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
+import io.github.kscripting.kscript.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptSource
+import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.kscript.parser.LineParser.extractValues
 import io.github.kscripting.kscript.util.ScriptUtils
 import io.github.kscripting.kscript.util.UriUtils
