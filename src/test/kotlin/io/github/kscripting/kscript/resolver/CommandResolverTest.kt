@@ -106,6 +106,7 @@ class CommandResolverTest {
             homeDir.resolve("./.config/"),
             homeDir.resolve("./.cache/"),
             kotlinDir,
+            emptyMap(),
         )
 
         val scriptingConfig = ScriptingConfig("", "", "", "", "", null)

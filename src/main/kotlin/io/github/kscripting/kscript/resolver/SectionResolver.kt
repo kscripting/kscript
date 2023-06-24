@@ -2,6 +2,7 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.Parser
+import io.github.kscripting.kscript.util.ScriptUtils.resolveRepositoryOption
 import io.github.kscripting.kscript.util.UriUtils
 import io.github.kscripting.shell.model.ScriptLocation
 import io.github.kscripting.shell.model.ScriptSource
@@ -10,14 +11,15 @@ import java.net.URI
 class SectionResolver(
     private val inputOutputResolver: InputOutputResolver,
     private val parser: Parser,
-    private val scriptingConfig: ScriptingConfig
+    private val scriptingConfig: ScriptingConfig,
+    private val osConfig: OsConfig,
 ) {
     fun resolve(
         scriptLocation: ScriptLocation,
         scriptText: String,
         allowLocalReferences: Boolean,
         maxResolutionLevel: Int,
-        resolutionContext: ResolutionContext
+        resolutionContext: ResolutionContext,
     ): List<Section> {
         val sections = parser.parse(scriptLocation, scriptText)
         val resultingSections = mutableListOf<Section>()
@@ -32,7 +34,7 @@ class SectionResolver(
                     allowLocalReferences,
                     scriptLocation.level,
                     maxResolutionLevel,
-                    resolutionContext
+                    resolutionContext,
                 )
             }
 
@@ -48,7 +50,7 @@ class SectionResolver(
         allowLocalReferences: Boolean,
         currentLevel: Int,
         maxResolutionLevel: Int,
-        resolutionContext: ResolutionContext
+        resolutionContext: ResolutionContext,
     ): List<ScriptAnnotation> {
         val resolvedScriptAnnotations = mutableListOf<ScriptAnnotation>()
 
@@ -82,7 +84,7 @@ class SectionResolver(
                         content.text,
                         allowLocalReferences && scriptSource == ScriptSource.FILE,
                         maxResolutionLevel,
-                        resolutionContext
+                        resolutionContext,
                     )
 
                     val scriptNode = ScriptNode(scriptLocation, newSections)
@@ -132,14 +134,30 @@ class SectionResolver(
             }
 
             is Repository -> {
+                val environment = osConfig.environment
                 val repository = Repository(
-                    scriptAnnotation.id, scriptAnnotation.url.replace(
-                        "{{KSCRIPT_REPOSITORY_URL}}", scriptingConfig.providedRepositoryUrl
-                    ), scriptAnnotation.user.replace(
-                        "{{KSCRIPT_REPOSITORY_USER}}", scriptingConfig.providedRepositoryUser
-                    ), scriptAnnotation.password.replace(
-                        "{{KSCRIPT_REPOSITORY_PASSWORD}}", scriptingConfig.providedRepositoryPassword
-                    )
+                    id = scriptAnnotation.id,
+                    url = resolveRepositoryOption(
+                        scriptAnnotation.url,
+                        "url",
+                        "{{KSCRIPT_REPOSITORY_URL}}",
+                        scriptingConfig.providedRepositoryUrl,
+                        environment,
+                    ),
+                    user = resolveRepositoryOption(
+                        scriptAnnotation.user,
+                        "user",
+                        "{{KSCRIPT_REPOSITORY_USER}}",
+                        scriptingConfig.providedRepositoryUser,
+                        environment,
+                    ),
+                    password = resolveRepositoryOption(
+                        scriptAnnotation.password,
+                        "password",
+                        "{{KSCRIPT_REPOSITORY_PASSWORD}}",
+                        scriptingConfig.providedRepositoryPassword,
+                        environment,
+                    ),
                 )
 
                 resolutionContext.repositories.add(repository)

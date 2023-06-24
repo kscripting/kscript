@@ -61,9 +61,9 @@ object GradleTemplates {
             |}
             |
             |repositories {
-            |    mavenLocal()
-            |    mavenCentral()
             |${createGradleRepositoriesSection(script.repositories).prependIndent()}
+            |    mavenCentral()
+            |    mavenLocal()
             |}
             |
             |tasks.jar {
@@ -124,6 +124,7 @@ object GradleTemplates {
     private fun createGradleRepositoriesSection(repositories: Set<Repository>) = repositories.joinToString("\n") {
         """|maven {
            |    url = uri("${it.url}")
+           |    isAllowInsecureProtocol = true
            |${createGradleRepositoryCredentials(it).prependIndent()}
            |}
         """.trimMargin()

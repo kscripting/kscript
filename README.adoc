@@ -139,7 +139,7 @@ Two workarounds for ArchLinux exists, which can be used to make 'kscript' workin
 [source,bash]
 ----
 sudo mkdir /usr/share/kotlin/bin
-sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin   
+sudo ln -s /usr/bin/kotlin /usr/share/kotlin/bin/kotlin
 sudo ln -s /usr/bin/kotlinc /usr/share/kotlin/bin/kotlinc
 ----
 
@@ -243,7 +243,7 @@ EOF
 
 [source,bash]
 ----
-kscript <(echo 'println("k-onliner")') arg1 arg2 arg3 
+kscript <(echo 'println("k-onliner")') arg1 arg2 arg3
 ----
 
 Inlined _kscripts_ are also cached based on `md5` checksum, so running the same snippet again will use a cached jar (
@@ -259,7 +259,7 @@ script for better readability)
 
 [source,bash]
 ----
-kscript https://git.io/v1cG6 my argu ments 
+kscript https://git.io/v1cG6 my argu ments
 ----
 
 To streamline the usage, the first part could be even aliased:
@@ -414,12 +414,12 @@ The latter is the default for `kt` files and could be omitted
 @file:DependsOnMaven("net.clearvolume:cleargl:2.0.1")
 // Note that for compatibility reasons, only one locator argument is allowed for @DependsOnMaven
 
-// also protected artifact repositories are supported, see <https://github.com/kscripting/kscript/blob/master/test/TestsReadme.md#manual-testing>
+// also protected repositories are supported, see <https://github.com/kscripting/kscript/blob/master/test/TestsReadme.md#manual-testing>
 // @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
-// You can use environment variables for user and password when string surrounded by double {} brackets 
-// @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="{{ARTIFACTORY_USER}}", password="{{ARTIFACTORY_PASSWORD}}")
+// You can use environment variables for user and password
+// @file:Repository("my-art", "http://localhost:8081/artifactory/authenticated_repo", user="$ARTIFACTORY_USER", password="$ARTIFACTORY_PASSWORD")
 // will be use 'ARTIFACTORY_USER' and 'ARTIFACTORY_PASSWORD' environment variables
-// if the value doesn't found in the script environment  will fail
+// if a referenced environment variable is not found, the script will fail
 
 // Include helper scripts without deployment or prior compilation
 @file:Import("util.kt")
@@ -516,7 +516,7 @@ which will bring up the classpath-enhanced REPL:
 Creating REPL from CountRecords.kts
 Welcome to Kotlin version 1.1.51 (JRE 1.8.0_151-b12)
 >>> import de.mpicbg.scicomp.bioinfo.openFasta
->>> 
+>>>
 ----
 
 == Boostrap IDEA from a scriptlet
@@ -582,7 +582,7 @@ KScript follows XDG directory standard, so the file should be created in (paths 
 existing path is used):
 
 |===
-|OS |PATH 
+|OS |PATH
 
 |*Windows* | %LOCALAPPDATA%\kscript\kscript.properties; %USERPROFILE%.config\kscript\kscript.properties
 |*MacOs*   | ~/Library/Application Support/kscript/kscript.properties;
@@ -621,6 +621,43 @@ scripting.kotlin.opts=-J-Xmx4g
 scripting.repository.url=https://repository.example
 scripting.repository.user=user
 scripting.repository.password=password
+----
+
+Various environment variables, if set, may override these properties or configure other behavior. See
+https://github.com/kscripting/kscript/blob/1c97c2197ddd08382834c014096ffe8b26727a4f/src/main/kotlin/io/github/kscripting/kscript/model/ConfigBuilder.kt#L42[ConfigBuilder]
+for all the possible environment overrides. The most common ones corresponding to the properties above will likely be:
+
+* `KSCRIPT_KOTLIN_OPTS`
+* `KSCRIPT_REPOSITORY_URL`
+* `KSCRIPT_REPOSITORY_USER`
+* `KSCRIPT_REPOSITORY_PASSWORD`
+
+In addition, environment lookups may be made dynamically in a script specifically for repository url, username, and
+password by prefixing the lookup with a literal `$`.
+
+NOTE: Unlike in Kotlin code, the '$' in a kscript is not escaped.
+
+In addition, ``KSCRIPT_REPOSITORY_*` values may be included in an override by using the double-brace syntax
+`{{KSCRIPT_REPOSITORY_URL}}`. For example, a repository declaration like:
+
+[source,kotlin]
+----
+#!/usr/bin/env kscript
+@file:Repository("$REPO", user="$USER", password="$PASS")
+----
+
+would obtain the user from the `USER` environment variable.
+If the `USER` environment variable contained a value like `foo-{{KSCRIPT_REPOSITORY_URL}}` and the value of
+`KSCRIPT_REPOSITORY_URL` (either also from the environment or from the kscript properties), was `bar`, then the resolved
+value for `user` would be `foo-bar`.
+
+The placeholder values `{{KSCRIPT_REPOSITORY_URL}}`, `{{KSCRIPT_REPOSITORY_USER}}`, and
+`{{KSCRIPT_REPOSITORY_PASSWORD}}` may also be used directly with optional prefixes or suffixes. For example:
+
+[source,kotlin]
+----
+#!/usr/bin/env kscript
+@file:Repository("{{KSCRIPT_REPOSITORY_URL}}", user="prefix-{{KSCRIPT_REPOSITORY_USER}}", password="{{KSCRIPT_REPOSITORY_PASSWORD}}-postfix")
 ----
 
 == FAQ

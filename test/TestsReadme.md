@@ -157,28 +157,16 @@ As of this writing, testing the credentials is only done manually with a dockeri
 
 ```bash
 # download and start artifactory container
-docker run --name artifactory -d -p 8081:8081 docker.bintray.io/jfrog/artifactory-oss:latest
-
-# Copy preconfigured gloabl config (with custom repo) and security config (with credentials user) into container.
-docker cp ./test/resources/artifactory_config/artifactory.config.xml artifactory:/var/opt/jfrog/artifactory/etc/artifactory.config.import.xml
-docker cp ./test/resources/artifactory_config/security_descriptor.xml artifactory:/var/opt/jfrog/artifactory/etc/security.import.xml
-
-# Make the configs accessable
-docker exec -u 0 -it artifactory sh -c 'chmod 777 $ARTIFACTORY_HOME/etc/*.import.xml'
-
-# Restart docker after is done with initial booting (otherwise restart breaks the container).
-echo "sleeping for 15..." && sleep 15
-docker restart artifactory
+modified_image=$(DOCKER_BUILDKIT=1 docker build -q \
+  -f test/resources/artifactory_config/Dockerfile \
+  test/resources/artifactory_config)
+docker run --name artifactory -d -p 8081:8081 $modified_image
 ```
 
 #### 2. Create and upload a downloadable archive.
 
 ```bash
-tmpClass=$(mktemp --suffix ".class")
-tmpZipDir=$(mktemp -d)
-echo "public class something() {}" > $tmpClass
-zip $tmpZipDir/tmp.zip $tmpClass
-curl --request PUT -u admin:password -T $tmpZipDir/tmp.zip http://localhost:8081/artifactory/authenticated_repo/group/somejar/1.0/somejar-1.0.jar
+gradle --project-dir test/resources/jar_dependency publishAllPublicationsToMavenRepository
 ```
 
 #### 3. Then run the following kotlin script with the encrypted password
@@ -187,9 +175,43 @@ curl --request PUT -u admin:password -T $tmpZipDir/tmp.zip http://localhost:8081
 echo '
 @file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="auth_user", password="password")
 @file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
-@file:DependsOnMaven("group:somejar:1.0") // If encrypted works.
+@file:DependsOnMaven("com.github.holgerbrandl.kscript.test:jartester:1.0-SNAPSHOT") // If encrypted works.
 println("Hello, World!")
-' |  kscript -
+' |  kscript -c -
+```
+
+#### 4. Test environment variable substitution
+
+```bash
+export auth_user="auth_user"
+export auth_password="password"
+
+echo '
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="$auth_user", password="$auth_password")
+@file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
+@file:DependsOnMaven("com.github.holgerbrandl.kscript.test:jartester:1.0-SNAPSHOT") // If encrypted works.
+println("Hello, World!")
+' |  kscript -c -
+```
+
+#### 5. Test environment variable substitution with packaging
+
+```bash
+export auth_user="auth_user"
+export auth_password="password"
+
+echo '
+@file:Repository("http://localhost:8081/artifactory/authenticated_repo", user="$auth_user", password="$auth_password")
+@file:DependsOn("com.jcabi:jcabi-aether:0.10.1") // If unencrypted works via jcenter
+@file:DependsOnMaven("com.github.holgerbrandl.kscript.test:jartester:1.0-SNAPSHOT") // If encrypted works.
+println("Hello, World!")
+' |  kscript -c --package -
+```
+
+#### 6. (Optional) Cleanup Local Maven Cache
+
+```bash
+rm -fr ~/.m2/repository/com/github/holgerbrandl/kscript/test/
 ```
 
 ### Additional info for manual testing
