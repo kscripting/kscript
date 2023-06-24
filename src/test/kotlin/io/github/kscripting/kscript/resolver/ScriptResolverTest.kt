@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 
-import com.github.stefanbirkner.systemlambda.SystemLambda.*
-import java.util.concurrent.Callable
-
 class ScriptResolverTest {
     private val currentNativeOsType = OsType.native
     private val testProperties = Properties()
@@ -28,7 +25,7 @@ class ScriptResolverTest {
     private val cache = Cache(testHome.resolve("cache"))
     private val inputOutputResolver = InputOutputResolver(config.osConfig, cache)
     private val scriptingConfig = ScriptingConfig("", "", "", "", "", null)
-    private val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig)
+    private val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig, config.osConfig)
     private val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
 
     private val defaultPackageName = PackageName("kscript.scriplet")
@@ -167,10 +164,16 @@ class ScriptResolverTest {
     fun `Should resolve environment variables in repository declarations`() {
         val input = "test/resources/depends_on_env.kts"
 
-        val script = withEnvironmentVariable("REPO", "http://foo/bar")
-            .and("USER", "u")
-            .and("PASS", "p")
-            .execute(Callable { scriptResolver.resolve(input) })
+        val osConfig = config.osConfig.copy(environment = mapOf(
+            "REPO" to "http://foo/bar",
+            "USER" to "u",
+            "PASS" to "p",
+        ))
+
+        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig, osConfig)
+        val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
+
+        val script = scriptResolver.resolve(input)
 
         assertThat(script).apply {
             prop(Script::repositories).isEqualTo(
@@ -186,7 +189,7 @@ class ScriptResolverTest {
         val input = "test/resources/depends_on_repo_placeholders.kts"
 
         val scriptingConfig = ScriptingConfig("", "", "http://foo/bar", "u", "p", null)
-        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig)
+        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig, config.osConfig)
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
 
         val script = scriptResolver.resolve(input)
@@ -205,15 +208,17 @@ class ScriptResolverTest {
         val input = "test/resources/depends_on_env.kts"
 
         val scriptingConfig = ScriptingConfig("", "", "http://foo/bar", "u", "p", null)
-        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig)
+        val osConfig = config.osConfig.copy(environment = mapOf(
+            "REPO" to "{{KSCRIPT_REPOSITORY_URL}}",
+            "USER" to "{{KSCRIPT_REPOSITORY_USER}}-suffix",
+            "PASS" to "prefix-{{KSCRIPT_REPOSITORY_PASSWORD}}",
+        ))
+        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), scriptingConfig, osConfig)
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, scriptingConfig)
 
         // this allows configuration to come from both the properties file and allows the environment to override
         // properties by composing from it
-        val script = withEnvironmentVariable("REPO", "{{KSCRIPT_REPOSITORY_URL}}")
-            .and("USER", "{{KSCRIPT_REPOSITORY_USER}}-suffix")
-            .and("PASS", "prefix-{{KSCRIPT_REPOSITORY_PASSWORD}}")
-            .execute(Callable { scriptResolver.resolve(input) })
+        val script = scriptResolver.resolve(input)
 
         assertThat(script).apply {
             prop(Script::repositories).isEqualTo(

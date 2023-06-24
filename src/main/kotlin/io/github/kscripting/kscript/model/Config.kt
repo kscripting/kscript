@@ -33,6 +33,7 @@ data class OsConfig(
     val configFile: OsPath,
     val cacheDir: OsPath,
     val kotlinHomeDir: OsPath,
+    val environment: ProcessEnvironment,
 ) {
     override fun toString(): String {
         return """|OsConfig {
@@ -44,6 +45,7 @@ data class OsConfig(
                   |  configFile:            $configFile
                   |  cacheDir:              $cacheDir
                   |  kotlinHomeDir:         $kotlinHomeDir
+                  |  environment:           ${environment.size} entries
                   |}
                """.trimMargin()
     }

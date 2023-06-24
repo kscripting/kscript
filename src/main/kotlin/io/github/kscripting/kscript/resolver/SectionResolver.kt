@@ -11,14 +11,15 @@ import java.net.URI
 class SectionResolver(
     private val inputOutputResolver: InputOutputResolver,
     private val parser: Parser,
-    private val scriptingConfig: ScriptingConfig
+    private val scriptingConfig: ScriptingConfig,
+    private val osConfig: OsConfig,
 ) {
     fun resolve(
         scriptLocation: ScriptLocation,
         scriptText: String,
         allowLocalReferences: Boolean,
         maxResolutionLevel: Int,
-        resolutionContext: ResolutionContext
+        resolutionContext: ResolutionContext,
     ): List<Section> {
         val sections = parser.parse(scriptLocation, scriptText)
         val resultingSections = mutableListOf<Section>()
@@ -33,7 +34,7 @@ class SectionResolver(
                     allowLocalReferences,
                     scriptLocation.level,
                     maxResolutionLevel,
-                    resolutionContext
+                    resolutionContext,
                 )
             }
 
@@ -49,7 +50,7 @@ class SectionResolver(
         allowLocalReferences: Boolean,
         currentLevel: Int,
         maxResolutionLevel: Int,
-        resolutionContext: ResolutionContext
+        resolutionContext: ResolutionContext,
     ): List<ScriptAnnotation> {
         val resolvedScriptAnnotations = mutableListOf<ScriptAnnotation>()
 
@@ -83,7 +84,7 @@ class SectionResolver(
                         content.text,
                         allowLocalReferences && scriptSource == ScriptSource.FILE,
                         maxResolutionLevel,
-                        resolutionContext
+                        resolutionContext,
                     )
 
                     val scriptNode = ScriptNode(scriptLocation, newSections)
@@ -133,6 +134,7 @@ class SectionResolver(
             }
 
             is Repository -> {
+                val environment = osConfig.environment
                 val repository = Repository(
                     id = scriptAnnotation.id,
                     url = resolveRepositoryOption(
@@ -140,18 +142,21 @@ class SectionResolver(
                         "url",
                         "{{KSCRIPT_REPOSITORY_URL}}",
                         scriptingConfig.providedRepositoryUrl,
+                        environment,
                     ),
                     user = resolveRepositoryOption(
                         scriptAnnotation.user,
                         "user",
                         "{{KSCRIPT_REPOSITORY_USER}}",
                         scriptingConfig.providedRepositoryUser,
+                        environment,
                     ),
                     password = resolveRepositoryOption(
                         scriptAnnotation.password,
                         "password",
                         "{{KSCRIPT_REPOSITORY_PASSWORD}}",
                         scriptingConfig.providedRepositoryPassword,
+                        environment,
                     ),
                 )
 
@@ -181,8 +186,9 @@ class SectionResolver(
         str: String?,
         optionName: String,
         placeholder: String,
-        property: String
-    ): String = tryResolveEnvironmentVariable(str, optionName)
+        property: String,
+        environment: ProcessEnvironment,
+    ): String = tryResolveEnvironmentVariable(str, optionName, environment)
         ?.replace(placeholder, property)
         ?: error("Failed to resolve value for option '$optionName'")
 
@@ -192,11 +198,12 @@ class SectionResolver(
     private fun tryResolveEnvironmentVariable(
         str: String?,
         optionName: String,
+        environment: ProcessEnvironment,
     ): String? {
         if (str == null) return null
         if (!str.startsWith("$")) return str
         val envName = str.substring(1)
-        val envValue: String? = System.getenv(envName)
+        val envValue: String? = environment[envName]
         if (envValue.isNullOrEmpty()) {
             Logger.errorMsg("Environment variable '$envName' is not defined for option '$optionName'")
             return null

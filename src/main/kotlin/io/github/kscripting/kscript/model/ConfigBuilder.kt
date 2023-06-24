@@ -87,6 +87,7 @@ class ConfigBuilder(
             configFile,
             cacheDir,
             kotlinHomeDir,
+            environment,
         )
 
         val configProperties = Properties().apply {

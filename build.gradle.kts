@@ -313,7 +313,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
-    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("io.mockk:mockk:1.13.2")
 
     testImplementation(kotlin("script-runtime"))

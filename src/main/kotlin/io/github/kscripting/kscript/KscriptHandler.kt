@@ -50,7 +50,7 @@ class KscriptHandler(
         }
 
         val inputOutputResolver = InputOutputResolver(config.osConfig, cache)
-        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), config.scriptingConfig)
+        val sectionResolver = SectionResolver(inputOutputResolver, Parser(), config.scriptingConfig, config.osConfig)
         val scriptResolver = ScriptResolver(inputOutputResolver, sectionResolver, config.scriptingConfig)
 
         if (options.containsKey("add-bootstrap-header")) {
