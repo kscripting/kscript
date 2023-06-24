@@ -2,7 +2,7 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.Parser
-import io.github.kscripting.kscript.util.Logger
+import io.github.kscripting.kscript.util.ScriptUtils.resolveRepositoryOption
 import io.github.kscripting.kscript.util.UriUtils
 import io.github.kscripting.shell.model.ScriptLocation
 import io.github.kscripting.shell.model.ScriptSource
@@ -180,34 +180,5 @@ class SectionResolver(
         }
 
         return result.normalize()
-    }
-
-    private fun resolveRepositoryOption(
-        str: String?,
-        optionName: String,
-        placeholder: String,
-        property: String,
-        environment: ProcessEnvironment,
-    ): String = tryResolveEnvironmentVariable(str, optionName, environment)
-        ?.replace(placeholder, property)
-        ?: error("Failed to resolve value for option '$optionName'")
-
-    /**
-     * This is a variant of [kotlin.script.experimental.dependencies.maven.MavenDependenciesResolver.tryResolveEnvironmentVariable].
-     */
-    private fun tryResolveEnvironmentVariable(
-        str: String?,
-        optionName: String,
-        environment: ProcessEnvironment,
-    ): String? {
-        if (str == null) return null
-        if (!str.startsWith("$")) return str
-        val envName = str.substring(1)
-        val envValue: String? = environment[envName]
-        if (envValue.isNullOrEmpty()) {
-            Logger.errorMsg("Environment variable '$envName' is not defined for option '$optionName'")
-            return null
-        }
-        return envValue
     }
 }

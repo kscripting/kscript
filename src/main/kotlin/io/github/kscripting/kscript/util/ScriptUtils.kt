@@ -3,6 +3,7 @@ package io.github.kscripting.kscript.util
 import io.github.kscripting.kscript.model.Code
 import io.github.kscripting.kscript.model.ImportName
 import io.github.kscripting.kscript.model.PackageName
+import io.github.kscripting.kscript.model.ProcessEnvironment
 import io.github.kscripting.kscript.model.ScriptNode
 import io.github.kscripting.kscript.resolver.ResolutionContext
 import io.github.kscripting.shell.model.ScriptType
@@ -55,6 +56,35 @@ object ScriptUtils {
         resolveSimpleCode(sb, scriptNode)
 
         return sb.toString()
+    }
+
+    fun resolveRepositoryOption(
+        str: String?,
+        optionName: String,
+        placeholder: String,
+        property: String,
+        environment: ProcessEnvironment,
+    ): String = tryResolveEnvironmentVariable(str, optionName, environment)
+        ?.replace(placeholder, property)
+        ?: error("Failed to resolve value for option '$optionName'")
+
+    /**
+     * This is a variant of [kotlin.script.experimental.dependencies.maven.MavenDependenciesResolver.tryResolveEnvironmentVariable].
+     */
+    private fun tryResolveEnvironmentVariable(
+        str: String?,
+        optionName: String,
+        environment: ProcessEnvironment,
+    ): String? {
+        if (str == null) return null
+        if (!str.startsWith("$")) return str
+        val envName = str.substring(1)
+        val envValue: String? = environment[envName]
+        if (envValue.isNullOrEmpty()) {
+            Logger.errorMsg("Environment variable '$envName' is not defined for option '$optionName'")
+            return null
+        }
+        return envValue
     }
 
     private fun resolveSimpleCode(sb: StringBuilder, scriptNode: ScriptNode, lastLineIsEmpty: Boolean = false) {
