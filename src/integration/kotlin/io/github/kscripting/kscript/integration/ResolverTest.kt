@@ -1,9 +1,8 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.kscript.integration.tools.TestAssertion.startsWith
-import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
-import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
-import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
+import io.github.kscripting.shell.integration.tools.TestAssertion.startsWith
+import io.github.kscripting.shell.integration.tools.TestAssertion.verify
+import io.github.kscripting.shell.integration.tools.TestContext.projectPath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -15,7 +14,7 @@ class ResolverTest : TestBase {
     fun `It should run kscript and resolve dependencies`() {
         // The first time artifact resolution is started because the cache is cleaned...
         verify(
-            "kscript ${resolvePath("$projectDir/test/resources/depends_on_annot.kts")}",
+            "kscript ${projectPath / "test/resources/depends_on_annot.kts"}",
             0,
             "kscript with annotations rocks!\n",
             startsWith("[kscript] Resolving log4j:log4j:1.2.14")
@@ -32,7 +31,7 @@ class ResolverTest : TestBase {
 
         // The second time it is because of removing artifact from cache...
         verify(
-            "kscript ${resolvePath("$projectDir/test/resources/depends_on_annot.kts")}",
+            "kscript ${projectPath / "test/resources/depends_on_annot.kts"}",
             0,
             "kscript with annotations rocks!\n",
             startsWith("[kscript] Resolving log4j:log4j:1.2.14")

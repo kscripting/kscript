@@ -1,7 +1,7 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
-import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
+import io.github.kscripting.shell.integration.tools.TestAssertion.verify
+import io.github.kscripting.shell.integration.tools.TestContext.projectPath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -18,7 +18,7 @@ class EnvironmentTest : TestBase {
     @Test
     @Tag("posix")
     fun `Run script that tries to find out its own filename via environment variable`() {
-        val path = "$projectDir/test/resources/uses_self_file_name.kts"
+        val path = (projectPath / "test/resources/uses_self_file_name.kts").toString()
         verify(path, 0, "Usage: uses_self_file_name.kts [-ae] [--foo] file+\n")
     }
 }

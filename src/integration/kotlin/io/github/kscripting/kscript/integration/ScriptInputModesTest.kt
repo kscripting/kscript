@@ -1,10 +1,9 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.kscript.integration.tools.TestAssertion.any
-import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
-import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
-import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
-import io.github.kscripting.kscript.integration.tools.TestContext.testDir
+import io.github.kscripting.shell.integration.tools.TestAssertion.any
+import io.github.kscripting.shell.integration.tools.TestAssertion.verify
+import io.github.kscripting.shell.integration.tools.TestContext.projectPath
+import io.github.kscripting.shell.integration.tools.TestContext.testPath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -12,7 +11,7 @@ class ScriptInputModesTest : TestBase {
     @Test
     @Tag("posix")
     fun `Make sure that scripts can be piped into kscript`() {
-        verify("source $projectDir/test/resources/direct_script_arg.sh", 0, "kotlin rocks\n", "")
+        verify("source ${projectPath / "test/resources/direct_script_arg.sh"}", 0, "kotlin rocks\n", "")
     }
 
     @Test
@@ -58,7 +57,7 @@ class ScriptInputModesTest : TestBase {
     @Test
     @Tag("posix")
     fun `Make sure that heredoc is accepted as argument`() {
-        verify("source ${projectDir}/test/resources/here_doc_test.sh", 0, "hello kotlin\n")
+        verify("source ${projectPath / "test/resources/here_doc_test.sh"}", 0, "hello kotlin\n")
     }
 
     @Test
@@ -66,13 +65,13 @@ class ScriptInputModesTest : TestBase {
     @Tag("macos")
     //Command substitution doesn't work on msys and cygwin
     fun `Make sure that command substitution works as expected`() {
-        verify("source ${projectDir}/test/resources/cmd_subst_test.sh", 0, "command substitution works as well\n")
+        verify("source ${projectPath / "test/resources/cmd_subst_test.sh"}", 0, "command substitution works as well\n")
     }
 
     @Test
     @Tag("posix")
     fun `Make sure that it runs with local bash script files`() {
-        verify("source ${projectDir}/test/resources/local_script_file.sh $testDir", 0, "kscript rocks!\n")
+        verify("source ${projectPath / "test/resources/local_script_file.sh"} $testPath", 0, "kscript rocks!\n")
     }
 
     @Test
@@ -80,7 +79,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("windows")
     fun `Make sure that it runs with local script files`() {
         verify(
-            "kscript ${resolvePath("${projectDir}/test/resources/multi_line_deps.kts")}",
+            "kscript ${projectPath / "test/resources/multi_line_deps.kts"}",
             0,
             "kscript is  cool!\n",
             "[kscript] Resolving com.offbytwo:docopt:0.6.0.20150202...\n[kscript] Resolving log4j:log4j:1.2.14...\n"
@@ -91,7 +90,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Scripts with dashes in the file name should work as well`() {
-        verify("kscript ${resolvePath("$projectDir/test/resources/dash-test.kts")}", 0, "dash alarm!\n")
+        verify("kscript ${projectPath / "test/resources/dash-test.kts"}", 0, "dash alarm!\n")
     }
 
     @Test
@@ -99,7 +98,7 @@ class ScriptInputModesTest : TestBase {
     @Tag("windows")
     fun `Scripts with additional dots in the file name should work as well`() {
         //We also test inner uppercase letters in file name here by using .*T*est
-        verify("kscript ${resolvePath("$projectDir/test/resources/dot.Test.kts")}", 0, "dot alarm!\n")
+        verify("kscript ${projectPath / "test/resources/dot.Test.kts"}", 0, "dot alarm!\n")
     }
 
     @Test

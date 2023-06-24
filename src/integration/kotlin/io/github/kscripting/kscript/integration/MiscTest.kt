@@ -1,11 +1,10 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.kscript.integration.tools.TestAssertion.any
-import io.github.kscripting.kscript.integration.tools.TestAssertion.contains
-import io.github.kscripting.kscript.integration.tools.TestAssertion.verify
-import io.github.kscripting.kscript.integration.tools.TestContext.projectDir
-import io.github.kscripting.kscript.integration.tools.TestContext.resolvePath
-import io.github.kscripting.kscript.integration.tools.TestContext.testDir
+import io.github.kscripting.shell.integration.tools.TestAssertion.any
+import io.github.kscripting.shell.integration.tools.TestAssertion.contains
+import io.github.kscripting.shell.integration.tools.TestAssertion.verify
+import io.github.kscripting.shell.integration.tools.TestContext.projectPath
+import io.github.kscripting.shell.integration.tools.TestContext.testPath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -49,7 +48,7 @@ class MiscTest : TestBase {
     @Test
     @Tag("posix")
     fun `Prevent regression of #181`() {
-        verify("""echo "println(123)" > $testDir/123foo.kts; kscript $testDir/123foo.kts""", 0, "123\n")
+        verify("""echo "println(123)" > $testPath/123foo.kts; kscript $testPath/123foo.kts""", 0, "123\n")
     }
 
     @Test
@@ -58,19 +57,19 @@ class MiscTest : TestBase {
     @Tag("msys")
     //TODO: @Tag("cygwin") - doesn't work on cygwin
     fun `Prevent regression of #185`() {
-        verify("source $projectDir/test/resources/home_dir_include.sh $testDir", 0, "42\n")
+        verify("source $projectPath/test/resources/home_dir_include.sh $testPath", 0, "42\n")
     }
 
     @Test
     @Tag("posix")
     fun `Prevent regression of #173`() {
-        verify("source $projectDir/test/resources/compiler_opts_with_includes.sh $testDir", 0, "hello42\n", any())
+        verify("source $projectPath/test/resources/compiler_opts_with_includes.sh $testPath", 0, "hello42\n", any())
     }
 
     @Test
     @Tag("posix")
     fun `Ensure relative includes with in shebang mode`() {
-        verify("$projectDir/test/resources/includes/shebang_mode_includes", 0, "include_1\n")
+        verify("$projectPath/test/resources/includes/shebang_mode_includes", 0, "include_1\n")
     }
 
     @Test
@@ -78,19 +77,19 @@ class MiscTest : TestBase {
     @Tag("windows")
     fun `Ensure that compilation errors are not cached #349`() {
         //first run (not yet cached)
-        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
+        verify("kscript $projectPath/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
         //real test
-        verify("kscript $projectDir/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
+        verify("kscript $projectPath/test/resources/invalid_script.kts", 1, "", contains("error: expecting ')'"))
     }
 
     @Test
     @Tag("posix")
     @Tag("windows")
     fun `Test local jar dir referenced in ENV variable`() {
-        val shellPath = resolvePath("$projectDir/test/resources/config/")
+        val shellPath = projectPath / "test/resources/config/"
 
         verify(
-            "kscript ${shellPath.resolve("script_with_local_jars.kts")}",
+            "kscript ${shellPath / "script_with_local_jars.kts"}",
             0,
             "I am living in Test1 class...\nAnd I come from Test2 class...\n",
             ""

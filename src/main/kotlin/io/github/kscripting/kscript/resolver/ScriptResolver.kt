@@ -68,7 +68,7 @@ class ScriptResolver(
         val filePath = inputOutputResolver.tryToCreateShellFilePath(string)
 
         if (filePath != null) {
-            val scriptType = ScriptType.findByExtension(filePath.leaf)
+            val scriptType = ScriptType.findByExtension(filePath.leaf ?: "")
 
             if (inputOutputResolver.isReadable(filePath)) {
                 if (scriptType != null) {
