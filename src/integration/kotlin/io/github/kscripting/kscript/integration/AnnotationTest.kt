@@ -1,8 +1,5 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.shell.integration.tools.TestAssertion.any
-import io.github.kscripting.shell.integration.tools.TestAssertion.startsWith
-import io.github.kscripting.shell.integration.tools.TestAssertion.verify
 import io.github.kscripting.shell.integration.tools.TestContext.projectPath
 import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Tag
@@ -17,7 +14,7 @@ class AnnotationTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/depends_on_with_type.kts"}",
             0,
-            "getBigDecimal(1L): 1\n",
+            "getBigDecimal(1L): 1[nl]",
             any()
         )
     }
@@ -29,7 +26,7 @@ class AnnotationTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/depends_on_annot.kts"}",
             0,
-            "kscript with annotations rocks!\n",
+            "kscript with annotations rocks![nl]",
             any()
         )
     }
@@ -41,7 +38,7 @@ class AnnotationTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/depends_on_maven_annot.kts"}",
             0,
-            "kscript with annotations rocks!\n",
+            "kscript with annotations rocks![nl]",
             any()
         )
     }
@@ -53,7 +50,7 @@ class AnnotationTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/depends_on_dynamic.kts"}",
             0,
-            "dynamic kscript rocks!\n",
+            "dynamic kscript rocks![nl]",
             any()
         )
     }
@@ -65,16 +62,16 @@ class AnnotationTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/custom_mvn_repo_annot.kts"}",
             0,
-            "kscript with annotations rocks!\n",
-            startsWith("[kscript] Adding repository: Repository(id=, url=http://maven.imagej.net/content/repositories/releases, user=, password=)\n")
+            "kscript with annotations rocks![nl]",
+            startsWith("[kscript] Adding repository: Repository(id=, url=http://maven.imagej.net/content/repositories/releases, user=, password=)[nl]")
         )
         verify(
             "kscript ${projectPath / "test/resources/illegal_depends_on_arg.kts"}",
             1,
             "",
-            "[kscript] [ERROR] Artifact locators must be provided as separate annotation arguments and not as comma-separated list: [com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0]\n\n"
+            "[kscript] [ERROR] Artifact locators must be provided as separate annotation arguments and not as comma-separated list: [com.squareup.moshi:moshi:1.5.0,com.squareup.moshi:moshi-adapters:1.5.0][nl][nl]"
         )
-        verify("kscript ${projectPath / "test/resources/script_with_compile_flags.kts"}", 0, " hoo_ray \n ", any())
+        verify("kscript ${projectPath / "test/resources/script_with_compile_flags.kts"}", 0, "hoo_ray[nl]", any())
     }
 
     @Test
@@ -89,8 +86,8 @@ class AnnotationTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/depends_on_klaxon.kts"}",
             0,
-            "Successfully resolved klaxon\n",
-            startsWith("[kscript] Resolving com.beust:klaxon:5.5...\n")
+            "Successfully resolved klaxon[nl]",
+            startsWith("[kscript] Resolving com.beust:klaxon:5.5...[nl]")
         )
     }
 }

@@ -1,7 +1,5 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.shell.integration.tools.TestAssertion.startsWith
-import io.github.kscripting.shell.integration.tools.TestAssertion.verify
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 

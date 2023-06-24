@@ -1,8 +1,5 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.shell.integration.tools.TestAssertion.contains
-import io.github.kscripting.shell.integration.tools.TestAssertion.startsWith
-import io.github.kscripting.shell.integration.tools.TestAssertion.verify
 import io.github.kscripting.shell.integration.tools.TestContext
 import io.github.kscripting.shell.integration.tools.TestContext.testPath
 import org.junit.jupiter.api.Tag
@@ -16,7 +13,7 @@ class BootstrapHeaderTest : TestBase {
     fun `Test adding bootstrap header`() {
         // ensure script works as is
         val testFile = testPath / "echo_stdin_args.kts"
-        verify("echo stdin | '$testFile' --foo bar", 0, "stdin | script --foo bar\n")
+        verify("echo stdin | '$testFile' --foo bar", 0, "stdin | script --foo bar[nl]")
 
         // add bootstrap header
         verify("kscript --add-bootstrap-header '$testFile'", 0, "", contains("echo_stdin_args.kts updated"))
@@ -30,10 +27,10 @@ class BootstrapHeaderTest : TestBase {
         )
 
         // ensure scripts works with header, including stdin
-        verify("echo stdin | '$testFile' --foo bar", 0, "stdin | script --foo bar\n")
+        verify("echo stdin | '$testFile' --foo bar", 0, "stdin | script --foo bar[nl]")
 
         // ensure scripts works with header invoked with explicit `kscript`
-        verify("echo stdin | kscript '$testFile' --foo bar", 0, "stdin | script --foo bar\n")
+        verify("echo stdin | kscript '$testFile' --foo bar", 0, "stdin | script --foo bar[nl]")
     }
 
     companion object {

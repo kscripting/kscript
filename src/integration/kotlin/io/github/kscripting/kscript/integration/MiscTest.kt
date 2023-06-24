@@ -1,8 +1,5 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.shell.integration.tools.TestAssertion.any
-import io.github.kscripting.shell.integration.tools.TestAssertion.contains
-import io.github.kscripting.shell.integration.tools.TestAssertion.verify
 import io.github.kscripting.shell.integration.tools.TestContext.projectPath
 import io.github.kscripting.shell.integration.tools.TestContext.testPath
 import org.junit.jupiter.api.Tag
@@ -13,7 +10,7 @@ class MiscTest : TestBase {
     @Tag("posix")
     @Tag("windows")
     fun `Clearing cache test`() {
-        verify("kscript --clear-cache", 0, "", "Cleaning up cache...\n")
+        verify("kscript --clear-cache", 0, "", "Cleaning up cache...[nl]")
     }
 
     @Test
@@ -48,7 +45,7 @@ class MiscTest : TestBase {
     @Test
     @Tag("posix")
     fun `Prevent regression of #181`() {
-        verify("""echo "println(123)" > $testPath/123foo.kts; kscript $testPath/123foo.kts""", 0, "123\n")
+        verify("""echo "println(123)" > $testPath/123foo.kts; kscript $testPath/123foo.kts""", 0, "123[nl]")
     }
 
     @Test
@@ -57,19 +54,19 @@ class MiscTest : TestBase {
     @Tag("msys")
     //TODO: @Tag("cygwin") - doesn't work on cygwin
     fun `Prevent regression of #185`() {
-        verify("source $projectPath/test/resources/home_dir_include.sh $testPath", 0, "42\n")
+        verify("source $projectPath/test/resources/home_dir_include.sh $testPath", 0, "42[nl]")
     }
 
     @Test
     @Tag("posix")
     fun `Prevent regression of #173`() {
-        verify("source $projectPath/test/resources/compiler_opts_with_includes.sh $testPath", 0, "hello42\n", any())
+        verify("source $projectPath/test/resources/compiler_opts_with_includes.sh $testPath", 0, "hello42[nl]", any())
     }
 
     @Test
     @Tag("posix")
     fun `Ensure relative includes with in shebang mode`() {
-        verify("$projectPath/test/resources/includes/shebang_mode_includes", 0, "include_1\n")
+        verify("$projectPath/test/resources/includes/shebang_mode_includes", 0, "include_1[nl]")
     }
 
     @Test
@@ -91,7 +88,7 @@ class MiscTest : TestBase {
         verify(
             "kscript ${shellPath / "script_with_local_jars.kts"}",
             0,
-            "I am living in Test1 class...\nAnd I come from Test2 class...\n",
+            "I am living in Test1 class...[nl]And I come from Test2 class...[nl]",
             ""
         ) { env ->
             env["KSCRIPT_DIRECTORY_ARTIFACTS"] = shellPath.resolve("jars").stringPath()

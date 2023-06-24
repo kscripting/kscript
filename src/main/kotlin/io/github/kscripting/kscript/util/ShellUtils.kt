@@ -61,7 +61,7 @@ object ShellUtils {
 
     fun which(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): List<String> =
         ShellExecutor.evalAndGobble(
-            "${if (osType == OsType.WINDOWS) "where" else "which"} $command", osType, null, envAdjuster
+            "${if (osType == OsType.WINDOWS) "where" else "which"} $command", osType, null, envAdjuster = envAdjuster
         ).stdout.trim().lines()
 
     fun isInPath(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): Boolean {

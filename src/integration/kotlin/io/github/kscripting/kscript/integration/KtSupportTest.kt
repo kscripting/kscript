@@ -1,7 +1,5 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.shell.integration.tools.TestAssertion.any
-import io.github.kscripting.shell.integration.tools.TestAssertion.verify
 import io.github.kscripting.shell.integration.tools.TestContext.projectPath
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -10,7 +8,7 @@ class KtSupportTest : TestBase {
     @Test
     @Tag("posix")
     fun `Run kt via interpreter mode`() {
-        verify((projectPath / "test/resources/kt_tests/simple_app.kt").stringPath(), 0, "main was called\n", any())
+        verify((projectPath / "test/resources/kt_tests/simple_app.kt").stringPath(), 0, "main was called[nl]", any())
     }
 
     @Test
@@ -20,8 +18,8 @@ class KtSupportTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/kt_tests/main_with_deps.kt"}",
             0,
-            "made it!\n",
-            "[kscript] Resolving log4j:log4j:1.2.14...\n"
+            "made it![nl]",
+            "[kscript] Resolving log4j:log4j:1.2.14...[nl]"
         )
     }
 
@@ -35,13 +33,13 @@ class KtSupportTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/kt_tests/default_entry_nopckg.kt"}",
             0,
-            "main was called\n",
+            "main was called[nl]",
             any()
         )
         verify(
             "kscript ${projectPath / "test/resources/kt_tests/default_entry_withpckg.kt"}",
             0,
-            "main was called\n",
+            "main was called[nl]",
             any()
         )
     }
@@ -53,18 +51,18 @@ class KtSupportTest : TestBase {
         verify(
             "kscript ${projectPath / "test/resources/kt_tests/custom_entry_nopckg.kt"}",
             0,
-            "foo companion was called\n"
+            "foo companion was called[nl]"
         )
         verify(
             "kscript ${projectPath / "test/resources/kt_tests/custom_entry_withpckg.kt"}",
             0,
-            "foo companion was called\n"
+            "foo companion was called[nl]"
         )
     }
 
     @Test
     @Tag("posix")
     fun `Also make sure that kts in package can be run via kscript`() {
-        verify((projectPath / "test/resources/script_in_pckg.kts").stringPath(), 0, "I live in a package!\n", any())
+        verify((projectPath / "test/resources/script_in_pckg.kts").stringPath(), 0, "I live in a package![nl]", any())
     }
 }

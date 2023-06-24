@@ -17,7 +17,7 @@ class Executor(private val commandResolver: CommandResolver) {
         val command = commandResolver.getKotlinJreVersion()
 
         return ShellExecutor.evalAndGobble(
-            command, commandResolver.osConfig.osType, null, ShellUtils::environmentAdjuster
+            command, commandResolver.osConfig.osType, null, envAdjuster = ShellUtils::environmentAdjuster
         ).stdout
     }
 

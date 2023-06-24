@@ -1,9 +1,7 @@
 package io.github.kscripting.kscript.integration
 
-import io.github.kscripting.shell.integration.tools.TestAssertion.any
-import io.github.kscripting.shell.integration.tools.TestAssertion.startsWith
-import io.github.kscripting.shell.integration.tools.TestAssertion.verify
 import io.github.kscripting.shell.integration.tools.TestContext.projectPath
+import io.github.kscripting.shell.util.Sanitizer
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -25,9 +23,9 @@ class PackagingTest : TestBase {
     //TODO: doesn't work on msys, cygwin, windows
     fun `Packaging of simple script`() {
         val result =
-            verify("kscript --package ${projectPath / "test/resources/package_example.kts"}", 0, "", any())
+            verify("kscript --package ${projectPath / "test/resources/package_example.kts"}", 0, "", any(), outputSanitizer = Sanitizer.EMPTY_SANITIZER)
         val command = result.stderr.trim().lines().last().removePrefix("[kscript] ")
-        verify("$command argument", 0, "package_me_args_1_mem_536870912\n")
+        verify("$command argument", 0, "package_me_args_1_mem_536870912[nl]")
     }
 
     @Test
@@ -35,8 +33,8 @@ class PackagingTest : TestBase {
     @Tag("macos")
     //TODO: doesn't work on msys, cygwin, windows
     fun `Packaging provided source code and execution with arguments`() {
-        val result = verify("""kscript --package "println(args.size)"""", 0, "", any())
+        val result = verify("""kscript --package "println(args.size)"""", 0, "", any(), outputSanitizer = Sanitizer.EMPTY_SANITIZER)
         val command = result.stderr.trim().lines().last().removePrefix("[kscript] ")
-        verify("$command three arg uments", 0, "3\n")
+        verify("$command three arg uments", 0, "3[nl]")
     }
 }
