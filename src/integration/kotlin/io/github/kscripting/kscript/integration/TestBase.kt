@@ -20,7 +20,7 @@ interface TestBase : ShellTestBase {
 
         override fun commonEnvAdjuster(specificEnvAdjuster: EnvAdjuster): EnvAdjuster {
             return { map ->
-                map[TestContext.pathEnvName] = TestContext.envPath
+                map[TestContext.pathEnvVariableName] = TestContext.pathEnvVariableCalculatedPath
                 specificEnvAdjuster(map)
                 ShellUtils.environmentAdjuster(map)
             }
