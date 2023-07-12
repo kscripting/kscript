@@ -1,10 +1,10 @@
 package io.github.kscripting.kscript.creator
 
-import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.Script
 import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.FileUtils
-import io.github.kscripting.shell.model.*
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.writeText
 
 data class JarArtifact(val path: OsPath, val execClassName: String)
 
@@ -19,14 +19,11 @@ class JarArtifactCreator(private val executor: Executor) {
                 .let { if ("^[0-9]".toRegex().containsMatchIn(it)) "_$it" else it }
 
         // Define the entrypoint for the scriptlet jar
-        val execClassName = if (script.scriptLocation.scriptType == ScriptType.KTS) {
-            "Main_${className}"
-        } else {
-            """${script.packageName.value}.${script.entryPoint?.value ?: "${className}Kt"}"""
-        }
+        val execClassName = "${script.entryPoint.value}Kt"
+
 
         val jarFile = basePath.resolve("scriplet.jar")
-        val scriptFile = basePath.resolve(className + script.scriptLocation.scriptType.extension)
+        val scriptFile = basePath.resolve("$className.kt")
         val execClassNameFile = basePath.resolve("scripletExecClassName.txt")
 
         execClassNameFile.writeText(execClassName)
@@ -35,14 +32,6 @@ class JarArtifactCreator(private val executor: Executor) {
 
         val filesToCompile = mutableSetOf<OsPath>()
         filesToCompile.add(scriptFile)
-
-        // create main-wrapper for kts scripts
-        if (script.scriptLocation.scriptType == ScriptType.KTS) {
-            val wrapper = FileUtils.createFile(
-                basePath.resolve("$execClassName.kt"), Templates.createWrapperForScript(script.packageName, className)
-            )
-            filesToCompile.add(wrapper)
-        }
 
         executor.compileKotlin(jarFile, resolvedDependencies, filesToCompile, script.compilerOpts)
 

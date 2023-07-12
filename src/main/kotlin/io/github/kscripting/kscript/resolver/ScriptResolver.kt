@@ -12,7 +12,7 @@ class ScriptResolver(
     private val sectionResolver: SectionResolver,
     private val scriptingConfig: ScriptingConfig
 ) {
-    private val scripletName = "scriplet"
+    private val scripletName = "Scriplet"
 
     //level parameter - for how many levels should include be resolved
     //level 0       -   do not resolve includes in base file and any other embedded
@@ -148,9 +148,17 @@ class ScriptResolver(
                 resolutionContext
             )
 
+        // Even if we just need and support the @file:EntryPoint directive in case of kt-class
+        // files, we extract it here to fail if it was used in kts files.
+        if (resolutionContext.entryPoint != null && scriptLocation.scriptType == ScriptType.KTS) {
+            throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
+        }
+
         val scriptNode = ScriptNode(scriptLocation, sections)
         resolutionContext.scriptNodes.add(scriptNode)
+
         resolutionContext.packageName = resolutionContext.packageName ?: PackageName("kscript.scriplet")
+        resolutionContext.entryPoint = resolutionContext.entryPoint ?: Entry("${resolutionContext.packageName!!.value}.${scriptLocation.scriptName}")
 
         val code = ScriptUtils.resolveCode(resolutionContext.packageName, resolutionContext.importNames, scriptNode)
 
@@ -166,7 +174,7 @@ class ScriptResolver(
             scriptLocation,
             code,
             resolutionContext.packageName!!,
-            resolutionContext.entryPoint,
+            resolutionContext.entryPoint!!,
             resolutionContext.importNames,
             resolutionContext.includes,
             resolutionContext.dependencies,

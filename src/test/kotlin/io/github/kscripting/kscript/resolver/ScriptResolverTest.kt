@@ -54,7 +54,7 @@ class ScriptResolverTest {
 
         assertThat(script).apply {
             prop(Script::packageName).isEqualTo(defaultPackageName)
-            prop(Script::entryPoint).isEqualTo(null)
+            prop(Script::entryPoint).isEqualTo(Entry("kscript.scriplet.template"))
             prop(Script::importNames).isEqualTo(
                 setOf(
                     ImportName("java.io.BufferedReader"),
@@ -103,7 +103,7 @@ class ScriptResolverTest {
 
         assertThat(script).apply {
             prop(Script::packageName).isEqualTo(defaultPackageName)
-            prop(Script::entryPoint).isEqualTo(null)
+            prop(Script::entryPoint).isEqualTo(Entry("kscript.scriplet.include_variations"))
             prop(Script::importNames).isEmpty()
             prop(Script::includes).isEqualTo(
                 setOf(
@@ -149,7 +149,7 @@ class ScriptResolverTest {
 
         assertThat(script).apply {
             prop(Script::packageName).isEqualTo(defaultPackageName)
-            prop(Script::entryPoint).isEqualTo(null)
+            prop(Script::entryPoint).isEqualTo(Entry("kscript.scriplet.dup_include"))
             prop(Script::importNames).isEmpty()
             prop(Script::includes).isEqualTo(
                 setOf(Include("dup_include_1.kt"), Include("dup_include_2.kt"))
@@ -163,5 +163,5 @@ class ScriptResolverTest {
         }
     }
 
-    private fun String.discardEmptyLines(): String = this.lines().filterNot { it.isEmpty() }.joinToString("\n")
+    private fun String.discardEmptyLines(): String = this.lines().filterNot { it.isBlank() }.joinToString("\n")
 }

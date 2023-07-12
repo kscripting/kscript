@@ -1,7 +1,6 @@
 package io.github.kscripting.kscript.code
 
 import io.github.kscripting.kscript.model.KotlinOpt
-import io.github.kscripting.kscript.model.PackageName
 import io.github.kscripting.shell.model.ScriptType
 import org.intellij.lang.annotations.Language
 import java.time.ZonedDateTime
@@ -43,21 +42,6 @@ object Templates {
             |#!/usr/bin/env bash
             |exec java $opts -jar ${'$'}0 "${'$'}@"
             """.trimStart().trimMargin()
-    }
-
-    fun createWrapperForScript(packageName: PackageName, className: String): String {
-        val classReference = packageName.value + "." + className
-
-        return """
-            |class Main_${className}{
-            |    companion object {
-            |        @JvmStatic
-            |        fun main(args: Array<String>) {
-            |            val script = Main_${className}::class.java.classLoader.loadClass("$classReference")
-            |            script.getDeclaredConstructor(Array<String>::class.java).newInstance(args);
-            |        }
-            |    }
-            |}""".trimStart().trimMargin()
     }
 
     fun createRunConfig(rootScriptName: String, rootScriptType: ScriptType, userArgs: List<String>): String {
@@ -104,14 +88,14 @@ object Templates {
 
 
     fun createUsageInfo(selfName: String) =
-         """|Usage:
+        """|Usage:
             |  $selfName [options] <script> [<script_args>]...
             |  $selfName --clear-cache [--development]
             |  $selfName (--help | --version) [--development]""".trimMargin()
 
 
     fun createFooterInfo() =
-         """|
+        """|
             |Copyright : 2022 Holger Brandl, Marcin Kuszczak
             |Website   : https://github.com/kscripting/kscript
             |License   : MIT""".trimMargin()

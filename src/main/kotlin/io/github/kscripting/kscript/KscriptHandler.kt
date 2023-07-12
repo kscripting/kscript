@@ -14,7 +14,6 @@ import io.github.kscripting.kscript.util.FileUtils.getArtifactsRecursively
 import io.github.kscripting.kscript.util.Logger.info
 import io.github.kscripting.kscript.util.Logger.infoMsg
 import io.github.kscripting.kscript.util.Logger.warnMsg
-import io.github.kscripting.shell.model.ScriptType
 import java.net.URI
 
 class KscriptHandler(
@@ -88,12 +87,6 @@ class KscriptHandler(
             infoMsg("Idea project available at:")
             infoMsg(path.convert(config.osConfig.osType).stringPath())
             return
-        }
-
-        // Even if we just need and support the @file:EntryPoint directive in case of kt-class
-        // files, we extract it here to fail if it was used in kts files.
-        if (script.entryPoint != null && script.scriptLocation.scriptType == ScriptType.KTS) {
-            throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
         }
 
         val jar = cache.getOrCreateJar(script.digest) { basePath ->
