@@ -41,11 +41,6 @@ jobs:
         with:
           version: 1.7.21
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 8.0.2
-
       - name: Install dependencies for ${{ runner.os }}
         shell: bash
         run: |
@@ -64,23 +59,25 @@ jobs:
           
           echo "OsType:         $OSTYPE"
           
-          gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
+          chmod +x ./gradlew
+          
+          ./gradlew clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
           
           if [[ "$OSTYPE" == "linux"* ]]; then
             echo "Linux test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | linux' integrationTest
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | linux' integrationTest
           elif [[ "$OSTYPE" == "darwin"* ]]; then
             echo "MacOs test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | macos' integrationTest
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | macos' integrationTest
           elif [[ "$OSTYPE" == "cygwin" ]]; then
             echo "Cygwin test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integrationTest
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | cygwin' integrationTest
           elif [[ "$OSTYPE" == "msys" ]]; then
             echo "MSys test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix | msys' integrationTest
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix | msys' integrationTest
           elif [[ "$OSTYPE" == "freebsd"* ]]; then
             echo "FreeBsd test..."
-            gradle -DosType=$OSTYPE -DincludeTags='posix' integrationTest
+            ./gradlew -DosType=$OSTYPE -DincludeTags='posix' integrationTest
           else
             echo "Unknown OS"
             exit 1
@@ -91,7 +88,7 @@ jobs:
         shell: cmd
         run: |
           echo "Windows test..."
-          gradle -DosType=windows -DincludeTags="windows" clean assemble test integrationTest
+          .\gradlew -DosType=windows -DincludeTags="windows" clean assemble test integrationTest
 
       - name: Install Cygwin (only Windows)
         if: matrix.variant == 'cygwin'
@@ -105,5 +102,5 @@ jobs:
           echo "Cygwin test..."
           echo "Changing directory to $GITHUB_WORKSPACE ..."
           cd $GITHUB_WORKSPACE
-          gradle clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
-          gradle -DosType=$OSTYPE -DincludeTags='posix | cygwin' integrationTest
+          ./gradlew clean assemble test || { echo 'Compilation or Unit tests failed' ; exit 1; }
+          ./gradlew -DosType=$OSTYPE -DincludeTags='posix | cygwin' integrationTest
