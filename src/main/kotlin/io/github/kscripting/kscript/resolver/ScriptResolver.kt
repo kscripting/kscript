@@ -2,6 +2,7 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.LineParser.extractValues
+import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.ScriptUtils
 import io.github.kscripting.kscript.util.UriUtils
 import io.github.kscripting.shell.model.*
@@ -12,7 +13,7 @@ class ScriptResolver(
     private val sectionResolver: SectionResolver,
     private val scriptingConfig: ScriptingConfig
 ) {
-    private val scripletName = "Scriplet"
+    private val defaultScripletFileName = "Scriplet"
 
     //level parameter - for how many levels should include be resolved
     //level 0       -   do not resolve includes in base file and any other embedded
@@ -34,7 +35,7 @@ class ScriptResolver(
                     scriptType,
                     null,
                     inputOutputResolver.resolveCurrentDir(),
-                    scripletName
+                    defaultScripletFileName
                 )
 
             return createScript(
@@ -100,7 +101,7 @@ class ScriptResolver(
                         content.scriptType,
                         content.uri,
                         content.contextUri,
-                        scripletName
+                        defaultScripletFileName
                     )
 
                 return createScript(
@@ -124,7 +125,7 @@ class ScriptResolver(
                 scriptType,
                 null,
                 inputOutputResolver.resolveCurrentDir(),
-                scripletName
+                defaultScripletFileName
             )
 
         return createScript(
@@ -158,7 +159,9 @@ class ScriptResolver(
         resolutionContext.scriptNodes.add(scriptNode)
 
         resolutionContext.packageName = resolutionContext.packageName ?: PackageName("kscript.scriplet")
-        resolutionContext.entryPoint = resolutionContext.entryPoint ?: Entry("${resolutionContext.packageName!!.value}.Scriplet")
+
+        Logger.devMsg("packageName: ${resolutionContext.packageName}")
+        Logger.devMsg("entryPoint: ${resolutionContext.entryPoint}")
 
         val code = ScriptUtils.resolveCode(resolutionContext.packageName, resolutionContext.importNames, scriptNode)
 
@@ -174,7 +177,7 @@ class ScriptResolver(
             scriptLocation,
             code,
             resolutionContext.packageName!!,
-            resolutionContext.entryPoint!!,
+            resolutionContext.entryPoint,
             resolutionContext.importNames,
             resolutionContext.includes,
             resolutionContext.dependencies,

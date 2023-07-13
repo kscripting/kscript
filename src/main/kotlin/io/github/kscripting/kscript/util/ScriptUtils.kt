@@ -54,6 +54,7 @@ object ScriptUtils {
 
         var indent = ""
         var shouldPrependEmptyLine = false
+
         if (scriptNode.scriptLocation.scriptType == ScriptType.KTS) {
             sb.appendLine("fun main(args: Array<String>) {")
             indent = "    "

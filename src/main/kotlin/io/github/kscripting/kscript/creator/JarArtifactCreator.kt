@@ -11,7 +11,9 @@ data class JarArtifact(val path: OsPath, val execClassName: String)
 class JarArtifactCreator(private val executor: Executor) {
 
     fun create(basePath: OsPath, script: Script, resolvedDependencies: Set<OsPath>): JarArtifact {
-        val execClassName = "${script.entryPoint.value}Kt"
+        val entryPoint = script.entryPoint?.value ?: "ScripletKt"
+        val execClassName = script.packageName.value + "." + entryPoint
+
         val jarFile = basePath.resolve("scriplet.jar")
         val scriptFile = basePath.resolve("Scriplet.kt")
         val execClassNameFile = basePath.resolve("scripletExecClassName.txt")
