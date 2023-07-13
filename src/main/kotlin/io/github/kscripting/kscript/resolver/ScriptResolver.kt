@@ -158,7 +158,7 @@ class ScriptResolver(
         resolutionContext.scriptNodes.add(scriptNode)
 
         resolutionContext.packageName = resolutionContext.packageName ?: PackageName("kscript.scriplet")
-        resolutionContext.entryPoint = resolutionContext.entryPoint ?: Entry("${resolutionContext.packageName!!.value}.${scriptLocation.scriptName}")
+        resolutionContext.entryPoint = resolutionContext.entryPoint ?: Entry("${resolutionContext.packageName!!.value}.Scriplet")
 
         val code = ScriptUtils.resolveCode(resolutionContext.packageName, resolutionContext.importNames, scriptNode)
 
