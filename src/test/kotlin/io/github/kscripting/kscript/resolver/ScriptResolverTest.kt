@@ -54,7 +54,7 @@ class ScriptResolverTest {
 
         assertThat(script).apply {
             prop(Script::packageName).isEqualTo(defaultPackageName)
-            prop(Script::entryPoint).isEqualTo(Entry("kscript.scriplet.Scriplet"))
+            prop(Script::entryPoint).isEqualTo(null)
             prop(Script::importNames).isEqualTo(
                 setOf(
                     ImportName("java.io.BufferedReader"),
@@ -103,7 +103,7 @@ class ScriptResolverTest {
 
         assertThat(script).apply {
             prop(Script::packageName).isEqualTo(defaultPackageName)
-            prop(Script::entryPoint).isEqualTo(Entry("kscript.scriplet.Scriplet"))
+            prop(Script::entryPoint).isEqualTo(null)
             prop(Script::importNames).isEmpty()
             prop(Script::includes).isEqualTo(
                 setOf(
@@ -149,7 +149,7 @@ class ScriptResolverTest {
 
         assertThat(script).apply {
             prop(Script::packageName).isEqualTo(defaultPackageName)
-            prop(Script::entryPoint).isEqualTo(Entry("kscript.scriplet.Scriplet"))
+            prop(Script::entryPoint).isEqualTo(null)
             prop(Script::importNames).isEmpty()
             prop(Script::includes).isEqualTo(
                 setOf(Include("dup_include_1.kt"), Include("dup_include_2.kt"))
