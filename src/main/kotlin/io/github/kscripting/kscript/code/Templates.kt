@@ -96,7 +96,7 @@ object Templates {
 
     fun createFooterInfo() =
         """|
-            |Copyright : 2022 Holger Brandl, Marcin Kuszczak
+            |Copyright : 2023 Holger Brandl, Marcin Kuszczak
             |Website   : https://github.com/kscripting/kscript
             |License   : MIT""".trimMargin()
 
