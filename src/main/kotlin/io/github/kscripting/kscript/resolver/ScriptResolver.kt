@@ -2,7 +2,6 @@ package io.github.kscripting.kscript.resolver
 
 import io.github.kscripting.kscript.model.*
 import io.github.kscripting.kscript.parser.LineParser.extractValues
-import io.github.kscripting.kscript.util.Logger
 import io.github.kscripting.kscript.util.ScriptUtils
 import io.github.kscripting.kscript.util.UriUtils
 import io.github.kscripting.shell.model.*
@@ -149,19 +148,9 @@ class ScriptResolver(
                 resolutionContext
             )
 
-        // Even if we just need and support the @file:EntryPoint directive in case of kt-class
-        // files, we extract it here to fail if it was used in kts files.
-        if (resolutionContext.entryPoint != null && scriptLocation.scriptType == ScriptType.KTS) {
-            throw IllegalStateException("@file:EntryPoint directive is just supported for kt class files")
-        }
-
         val scriptNode = ScriptNode(scriptLocation, sections)
         resolutionContext.scriptNodes.add(scriptNode)
-
         resolutionContext.packageName = resolutionContext.packageName ?: PackageName("kscript.scriplet")
-
-        Logger.devMsg("packageName: ${resolutionContext.packageName}")
-        Logger.devMsg("entryPoint: ${resolutionContext.entryPoint}")
 
         val code = ScriptUtils.resolveCode(resolutionContext.packageName, resolutionContext.importNames, scriptNode)
 

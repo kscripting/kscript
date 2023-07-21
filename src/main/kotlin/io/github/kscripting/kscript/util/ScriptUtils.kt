@@ -52,38 +52,20 @@ object ScriptUtils {
             sb.append("import ${it.value}\n")
         }
 
-        var indent = ""
-        var shouldPrependEmptyLine = false
-
-        if (scriptNode.scriptLocation.scriptType == ScriptType.KTS) {
-            sb.appendLine("fun main(args: Array<String>) {")
-            indent = "    "
-            shouldPrependEmptyLine = true
-        }
-
-        resolveSimpleCode(sb, scriptNode, shouldPrependEmptyLine = shouldPrependEmptyLine, indent = indent)
-
-        if (scriptNode.scriptLocation.scriptType == ScriptType.KTS) {
-            sb.appendLine("}")
-        }
+        resolveSimpleCode(sb, scriptNode)
 
         return sb.toString()
     }
 
-    private fun resolveSimpleCode(
-        sb: StringBuilder,
-        scriptNode: ScriptNode,
-        shouldPrependEmptyLine: Boolean = false,
-        indent: String = ""
-    ) {
-        var isLastLineEmpty = shouldPrependEmptyLine
+    private fun resolveSimpleCode(sb: StringBuilder, scriptNode: ScriptNode, lastLineIsEmpty: Boolean = false) {
+        var isLastLineEmpty = lastLineIsEmpty
 
         for (section in scriptNode.sections) {
             val scriptNodes = section.scriptAnnotations.filterIsInstance<ScriptNode>()
 
             if (scriptNodes.isNotEmpty()) {
                 val subNode = scriptNodes.single()
-                resolveSimpleCode(sb, subNode, isLastLineEmpty, indent = indent)
+                resolveSimpleCode(sb, subNode, isLastLineEmpty)
                 continue
             }
 
@@ -93,7 +75,7 @@ object ScriptUtils {
             }
 
             if (section.code.isNotEmpty() || (!isLastLineEmpty && section.code.isEmpty())) {
-                sb.append(indent).append(section.code).append('\n')
+                sb.append(section.code).append('\n')
             }
 
             isLastLineEmpty = section.code.isEmpty()
