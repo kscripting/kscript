@@ -15,8 +15,8 @@ class PackagingTest : TestBase {
     //TODO: doesn't work on msys, cygwin, windows
     fun `Packaged script is cached`() {
         //@formatter:off
-        verify("kscript --package \"println(1+1)\"", 0, "", startsWith("[kscript] Packaging script 'Scriplet' into standalone executable..."))
-        verify("kscript --package \"println(1+1)\"", 0, "", startsWith("[kscript] Packaged script 'Scriplet' available at path:"))
+        verify("kscript --package \"println(1+1)\"", 0, "", startsWith("[kscript] Packaging script 'scriplet' into standalone executable..."))
+        verify("kscript --package \"println(1+1)\"", 0, "", startsWith("[kscript] Packaged script 'scriplet' available at path:"))
         //@formatter:on
     }
 
