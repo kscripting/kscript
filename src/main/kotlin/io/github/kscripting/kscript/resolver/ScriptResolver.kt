@@ -12,7 +12,7 @@ class ScriptResolver(
     private val sectionResolver: SectionResolver,
     private val scriptingConfig: ScriptingConfig
 ) {
-    private val defaultScripletFileName = "Scriplet"
+    private val scripletName = "scriplet"
 
     //level parameter - for how many levels should include be resolved
     //level 0       -   do not resolve includes in base file and any other embedded
@@ -34,7 +34,7 @@ class ScriptResolver(
                     scriptType,
                     null,
                     inputOutputResolver.resolveCurrentDir(),
-                    defaultScripletFileName
+                    scripletName
                 )
 
             return createScript(
@@ -100,7 +100,7 @@ class ScriptResolver(
                         content.scriptType,
                         content.uri,
                         content.contextUri,
-                        defaultScripletFileName
+                        scripletName
                     )
 
                 return createScript(
@@ -124,7 +124,7 @@ class ScriptResolver(
                 scriptType,
                 null,
                 inputOutputResolver.resolveCurrentDir(),
-                defaultScripletFileName
+                scripletName
             )
 
         return createScript(

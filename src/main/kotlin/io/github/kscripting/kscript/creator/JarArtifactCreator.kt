@@ -28,7 +28,7 @@ class JarArtifactCreator(private val executor: Executor) {
             """${script.packageName.value}.${script.entryPoint?.value ?: "${className}Kt"}"""
         }
 
-        val jarFile = basePath.resolve("Scriplet.jar")
+        val jarFile = basePath.resolve("scriplet.jar")
         val scriptFile = basePath.resolve(className + script.scriptLocation.scriptType.extension)
         val execClassNameFile = basePath.resolve("scripletExecClassName.txt")
 
@@ -51,7 +51,9 @@ class JarArtifactCreator(private val executor: Executor) {
             jarFile,
             resolvedDependencies,
             filesToCompile,
-            script.compilerOpts + CompilerOpt("-Xallow-any-scripts-in-source-roots")
+            script.compilerOpts +
+            // This options allows to work with Kotlin 1.9.x, where scripts in source roots are ignored
+            CompilerOpt("-Xallow-any-scripts-in-source-roots")
         )
 
         return JarArtifact(jarFile, execClassName)
