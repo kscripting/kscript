@@ -1,11 +1,14 @@
 package io.github.kscripting.kscript.creator
 
 import io.github.kscripting.kscript.code.Templates
+import io.github.kscripting.kscript.model.CompilerOpt
 import io.github.kscripting.kscript.model.Script
 import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.FileUtils
-import io.github.kscripting.shell.model.*
+import io.github.kscripting.shell.model.OsPath
+import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.shell.model.writeText
 
 data class JarArtifact(val path: OsPath, val execClassName: String)
 
@@ -45,7 +48,14 @@ class JarArtifactCreator(private val executor: Executor) {
             filesToCompile.add(wrapper)
         }
 
-        executor.compileKotlin(jarFile, resolvedDependencies, filesToCompile, script.compilerOpts)
+        executor.compileKotlin(
+            jarFile,
+            resolvedDependencies,
+            filesToCompile,
+            script.compilerOpts +
+            // This options allows to work with Kotlin 1.9.x, where scripts in source roots are ignored
+            CompilerOpt("-Xallow-any-scripts-in-source-roots")
+        )
 
         return JarArtifact(jarFile, execClassName)
     }

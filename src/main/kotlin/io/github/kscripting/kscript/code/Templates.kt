@@ -104,24 +104,24 @@ object Templates {
 
 
     fun createUsageInfo(selfName: String) =
-         """|Usage:
-            |  $selfName [options] <script> [<script_args>]...
-            |  $selfName --clear-cache [--development]
-            |  $selfName (--help | --version) [--development]""".trimMargin()
+        """|Usage:
+           |  $selfName [options] <script> [<script_args>]...
+           |  $selfName --clear-cache [--development]
+           |  $selfName (--help | --version) [--development]""".trimMargin()
 
 
     fun createFooterInfo() =
-         """|
-            |Copyright : 2022 Holger Brandl, Marcin Kuszczak
-            |Website   : https://github.com/kscripting/kscript
-            |License   : MIT""".trimMargin()
+        """|
+           |Copyright : 2023 Holger Brandl, Marcin Kuszczak
+           |Website   : https://github.com/kscripting/kscript
+           |License   : MIT""".trimMargin()
 
     fun createVersionInfo(
         buildDateTime: ZonedDateTime, version: String, newVersion: String, kotlinVersion: String, jreVersion: String
     ): String =
         """|Version   : $version ${if (newVersion.isNotBlank()) "(new version v$newVersion is available)" else ""}
-                    |Build     : $buildDateTime
-                    |Kotlin    : $kotlinVersion
-                    |Java      : $jreVersion
-                    |""".trimMargin().trim()
+           |Build     : $buildDateTime
+           |Kotlin    : $kotlinVersion
+           |Java      : $jreVersion
+           |""".trimMargin().trim()
 }
