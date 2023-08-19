@@ -2,7 +2,7 @@ package io.github.kscripting.kscript.parser
 
 import io.github.kscripting.kscript.model.Code
 import io.github.kscripting.kscript.model.Section
-import io.github.kscripting.shell.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptLocation
 
 class Parser {
     private val annotationParsers = listOf(

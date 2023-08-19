@@ -3,6 +3,7 @@ package io.github.kscripting.kscript.creator
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.CompilerOpt
 import io.github.kscripting.kscript.model.Script
+import io.github.kscripting.kscript.model.ScriptType
 import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.FileUtils
 import io.github.kscripting.shell.model.OsPath

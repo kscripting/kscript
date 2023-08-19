@@ -10,9 +10,9 @@ import io.github.kscripting.kscript.parser.LineParser.parseEntry
 import io.github.kscripting.kscript.parser.LineParser.parseImport
 import io.github.kscripting.kscript.parser.LineParser.parseKotlinOpts
 import io.github.kscripting.kscript.parser.LineParser.parseRepository
-import io.github.kscripting.shell.model.ScriptLocation
-import io.github.kscripting.shell.model.ScriptSource
-import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.kscript.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptSource
+import io.github.kscripting.kscript.model.ScriptType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

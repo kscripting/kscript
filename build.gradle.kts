@@ -303,7 +303,8 @@ dependencies {
     implementation("com.konghq:unirest-java:3.14.2")
 
     implementation("net.igsoft:tablevis:0.6.0")
-    implementation("io.github.kscripting:shell:0.5.2")
+    implementation("io.github.kscripting:shell:0.6.0-SNAPSHOT")
+    implementation("io.github.kscripting:shell:0.6.0-SNAPSHOT:test")
 
     implementation("org.slf4j:slf4j-nop:2.0.7")
 

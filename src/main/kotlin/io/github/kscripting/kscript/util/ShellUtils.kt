@@ -15,7 +15,7 @@ object ShellUtils {
     }
 
     fun guessPosixKotlinHome(osType: OsType): String? {
-        val kotlinHome = ShellExecutor.evalAndGobble(osType, "KOTLIN_RUNNER=1 JAVACMD=echo kotlinc").stdout.run {
+        val kotlinHome = ShellExecutor.evalAndGobble("KOTLIN_RUNNER=1 JAVACMD=echo kotlinc", osType).stdout.run {
             "kotlin.home=([^\\s]*)".toRegex().find(this)?.groups?.get(1)?.value
         } ?: return null
 
@@ -59,9 +59,10 @@ object ShellUtils {
         return null
     }
 
-    fun which(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): List<String> = ShellExecutor.evalAndGobble(
-        osType, "${if (osType == OsType.WINDOWS) "where" else "which"} $command", null, envAdjuster
-    ).stdout.trim().lines()
+    fun which(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): List<String> =
+        ShellExecutor.evalAndGobble(
+            "${if (osType == OsType.WINDOWS) "where" else "which"} $command", osType, null, envAdjuster = envAdjuster
+        ).stdout.trim().lines()
 
     fun isInPath(osType: OsType, command: String, envAdjuster: EnvAdjuster = {}): Boolean {
         val paths = which(osType, command, envAdjuster)

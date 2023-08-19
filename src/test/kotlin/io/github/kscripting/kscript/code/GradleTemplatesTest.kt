@@ -3,13 +3,14 @@ package io.github.kscripting.kscript.code
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import io.github.kscripting.kscript.model.*
-import io.github.kscripting.shell.model.ScriptLocation
-import io.github.kscripting.shell.model.ScriptSource
-import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.kscript.model.ScriptLocation
+import io.github.kscripting.kscript.model.ScriptSource
+import io.github.kscripting.kscript.model.ScriptType
 import org.junit.jupiter.api.Test
 import java.net.URI
 
 class GradleTemplatesTest {
+    private val kotlinVersion = KotlinVersion.CURRENT
 
     @Test
     fun `Create Idea script without any Gradle additions`() {
@@ -36,7 +37,7 @@ class GradleTemplatesTest {
         assertThat(scriptText).isEqualTo(
             """
             |plugins {
-            |    id("org.jetbrains.kotlin.jvm") version "1.7.21"
+            |    id("org.jetbrains.kotlin.jvm") version "$kotlinVersion"
             |}
             |
             |repositories {
@@ -47,7 +48,7 @@ class GradleTemplatesTest {
             |
             |dependencies {
             |    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.21")
+            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
             |    implementation("io.github.kscripting:kscript-annotations:1.5.0")
             |}
             |
@@ -87,7 +88,7 @@ class GradleTemplatesTest {
         assertThat(scriptText).isEqualTo(
             """
             |plugins {
-            |    id("org.jetbrains.kotlin.jvm") version "1.7.21"
+            |    id("org.jetbrains.kotlin.jvm") version "$kotlinVersion"
             |}
             |
             |repositories {
@@ -111,7 +112,7 @@ class GradleTemplatesTest {
             |
             |dependencies {
             |    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.7.21")
+            |    implementation("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
             |    implementation("io.github.kscripting:kscript-annotations:1.5.0")
             |}
             |

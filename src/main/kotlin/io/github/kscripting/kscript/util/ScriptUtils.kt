@@ -5,7 +5,7 @@ import io.github.kscripting.kscript.model.ImportName
 import io.github.kscripting.kscript.model.PackageName
 import io.github.kscripting.kscript.model.ScriptNode
 import io.github.kscripting.kscript.resolver.ResolutionContext
-import io.github.kscripting.shell.model.ScriptType
+import io.github.kscripting.kscript.model.ScriptType
 import org.apache.commons.codec.digest.DigestUtils
 import java.net.URI
 
