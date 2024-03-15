@@ -78,6 +78,12 @@ class KscriptHandler(
             DependencyResolver(script.repositories).resolve(script.dependencies) + localArtifacts
         }
 
+        if (options.containsKey("dependencies")) {
+            info("Dependencies:")
+            info(resolvedDependencies.joinToString("\n"))
+            return
+        }
+
         //  Create temporary dev environment
         if (options.containsKey("idea")) {
             val path = cache.getOrCreateIdeaProject(script.digest) { basePath ->
