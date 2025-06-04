@@ -40,19 +40,19 @@ object ScriptUtils {
         return if (code.contains("fun main")) ScriptType.KT else ScriptType.KTS
     }
 
+    // Restored original logic
     fun resolveCode(packageName: PackageName?, importNames: Set<ImportName>, scriptNode: ScriptNode): String {
         val sortedImports = importNames.sortedBy { it.value }.toList()
         val sb = StringBuilder()
 
-        // Force our desired package
-        sb.append("package kscript.scriplet;\n\n") // Added semicolon for robustness
+        if (packageName != null) {
+            sb.append("package ${packageName.value}\n\n")
+        }
 
-        // Add imports AFTER the package
         sortedImports.forEach {
             sb.append("import ${it.value}\n")
         }
 
-        // Then append the actual script code (which should NOT contain its own package declaration now)
         resolveSimpleCode(sb, scriptNode)
 
         return sb.toString()
