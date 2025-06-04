@@ -44,14 +44,15 @@ object ScriptUtils {
         val sortedImports = importNames.sortedBy { it.value }.toList()
         val sb = StringBuilder()
 
-        if (packageName != null) {
-            sb.append("package ${packageName.value}\n\n")
-        }
+        // Force our desired package
+        sb.append("package kscript.scriplet;\n\n") // Added semicolon for robustness
 
+        // Add imports AFTER the package
         sortedImports.forEach {
             sb.append("import ${it.value}\n")
         }
 
+        // Then append the actual script code (which should NOT contain its own package declaration now)
         resolveSimpleCode(sb, scriptNode)
 
         return sb.toString()
