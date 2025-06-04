@@ -46,22 +46,18 @@ object Templates {
     }
 
     fun createWrapperForScript(packageName: PackageName, className: String): String {
-        // className is the base name of the script, e.g., "Simple_test"
-        // The user script (first KOTLINC_INPUT_CODE block) is already being put into "package kscript.scriplet;"
-        // by ScriptUtils.resolveCode (due to default packageName in ScriptResolver or if script has this package).
-        // So, if kotlinc compiles it as <className>Kt, its FQCN should be "kscript.scriplet.<className>Kt".
-        val targetClassInPackage = "kscript.scriplet.${className}Kt"
+        // val classReference = packageName.value + "." + className // Original
+        // Assuming the script class compiled by kotlinc will be named <className>Kt
+        // and be at the root of the JAR if the input script had no package declaration
+        // and ScriptUtils.resolveCode also doesn't add one (if packageName is null/empty).
+        val targetClassName = "${className}Kt"
 
-        // This wrapper class itself will now also be in "package kscript.scriplet;"
-        // The '|' are for Kotlin's trimMargin() on multiline strings.
-        return """package kscript.scriplet;
-
-            |
+        return """
             |class Main_${className}{
             |    companion object {
             |        @JvmStatic
             |        fun main(args: Array<String>) {
-            |            val script = Main_${className}::class.java.classLoader.loadClass("$targetClassInPackage")
+            |            val script = Main_${className}::class.java.classLoader.loadClass("$targetClassName")
             |            script.getDeclaredConstructor(Array<String>::class.java).newInstance(args);
             |        }
             |    }
