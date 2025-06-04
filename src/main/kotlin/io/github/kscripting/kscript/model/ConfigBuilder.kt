@@ -61,7 +61,16 @@ class ConfigBuilder(
         val kotlinHomeDir: OsPath =
             kotlinHomeDir ?: environment.getEnvVariableOrNull("KOTLIN_HOME")?.toOsPathFromNative()
             ?: ShellUtils.guessKotlinHome(osType)?.toOsPathFromNative()
-            ?: throw IllegalStateException("KOTLIN_HOME is not set and could not be inferred from context.")
+            ?: throw IllegalStateException(
+                "kscript requires a Kotlin installation.\n" +
+                "KOTLIN_HOME is not set and it could not be inferred from the system PATH.\n\n" +
+                "Please take one of the following actions:\n" +
+                "  1. Set the KOTLIN_HOME environment variable to point to your Kotlin installation directory.\n" +
+                "     Example: export KOTLIN_HOME=/path/to/your/kotlin/kotlinc\n" +
+                "  2. Ensure 'kotlinc' is available in your system PATH. Installing Kotlin via SDKMAN (sdk install kotlin) or Homebrew (brew install kotlin) usually handles this.\n\n" +
+                "Note: Even if your script specifies a specific Kotlin version using the '//KOTLIN_VERSION' directive, \n" +
+                "kscript currently needs a base Kotlin installation to be discoverable to operate."
+            )
 
         val configFile: OsPath = configFile ?: kscriptDir?.resolve("kscript.properties") ?: when {
             osType.isWindowsLike() -> environment.getEnvVariableOrNull("LOCALAPPDATA")?.toOsPathFromNative()
