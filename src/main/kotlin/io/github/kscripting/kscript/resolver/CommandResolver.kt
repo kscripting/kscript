@@ -7,6 +7,7 @@ import io.github.kscripting.kscript.model.OsConfig
 import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.OsType
 import io.github.kscripting.shell.model.toNativeOsPath
+import java.io.File // ADDED IMPORT
 
 class CommandResolver(val osConfig: OsConfig) {
     private val classPathSeparator =
@@ -49,8 +50,22 @@ class CommandResolver(val osConfig: OsConfig) {
         val compilerOptsStr = resolveCompilerOpts(compilerOpts)
         val classpath = resolveClasspath(dependencies)
         val jarFile = resolveJarFile(jar)
-        val files = resolveFiles(filePaths)
+        val files = resolveFiles(filePaths) // This 'files' variable contains the paths to the script(s) to be compiled
         val kotlinc = resolveKotlinBinary("kotlinc")
+
+        // START OF MODIFICATION: Print content of files to be compiled
+        filePaths.forEach { osPath ->
+            try {
+                val actualFilePath = osPath.toNativeOsPath().stringPath()
+                val content = File(actualFilePath).readText(Charsets.UTF_8) // Use actualFilePath
+                println(" KOTLINC_INPUT_CODE_START ")
+                println(content)
+                println(" KOTLINC_INPUT_CODE_END ")
+            } catch (e: Exception) {
+                println(" KOTLINC_INPUT_CODE_ERROR Failed to read content of $osPath: ${e.message} ")
+            }
+        }
+        // END OF MODIFICATION
 
         return "$kotlinc $compilerOptsStr $classpath -d $jarFile $files"
     }
