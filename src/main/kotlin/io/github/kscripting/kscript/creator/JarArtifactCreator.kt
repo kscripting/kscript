@@ -43,17 +43,20 @@ class JarArtifactCreator(private val executor: Executor) {
             scriptContent = "package ${script.packageName.value}\n\n$scriptContent"
         }
 
-        FileUtils.createFile(scriptFile, scriptContent)
-
         val filesToCompile = mutableSetOf<OsPath>()
-        filesToCompile.add(scriptFile)
 
-        // create main-wrapper for kts scripts
         if (script.scriptLocation.scriptType == ScriptType.KTS) {
-            val wrapper = FileUtils.createFile(
-                basePath.resolve("$execClassName.kt"), Templates.createWrapperForScript(script.packageName, className)
-            )
-            filesToCompile.add(wrapper)
+            // For KTS scripts, combine script content and wrapper code into a single file.
+            // The package declaration is handled by Templates.createWrapperForScript.
+            val wrapperContent = Templates.createWrapperForScript(script.packageName, className)
+            scriptContent = "$scriptContent\n\n$wrapperContent"
+
+            FileUtils.createFile(scriptFile, scriptContent)
+            filesToCompile.add(scriptFile)
+        } else {
+            // For KT files, keep the existing logic.
+            FileUtils.createFile(scriptFile, scriptContent)
+            filesToCompile.add(scriptFile)
         }
 
         executor.compileKotlin(
