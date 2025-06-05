@@ -2,40 +2,59 @@ package io.github.kscripting.kscript.creator
 
 import io.github.kscripting.kscript.code.Templates
 import io.github.kscripting.kscript.model.CompilerOpt
+import io.github.kscripting.kscript.model.CompilerOpt
+import io.github.kscripting.kscript.model.KotlinOpt // Assuming KotlinOpt might be needed, or it's part of Script
 import io.github.kscripting.kscript.model.Script
 import io.github.kscripting.kscript.util.Executor
 import io.github.kscripting.kscript.util.FileUtils
 import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.ScriptType
 import io.github.kscripting.shell.model.writeText
+import java.io.File
 
 data class JarArtifact(val path: OsPath, val execClassName: String)
 
 class JarArtifactCreator(private val executor: Executor) {
 
-    fun create(basePath: OsPath, script: Script, resolvedDependencies: Set<OsPath>): JarArtifact {
-        // Capitalize first letter and get rid of dashes (since this is what kotlin compiler is doing for the wrapper to create a valid java class name)
-        // For valid characters see https://stackoverflow.com/questions/4814040/allowed-characters-in-filename
-        val className =
-            script.scriptLocation.scriptName.replace("[^A-Za-z0-9]".toRegex(), "_").replaceFirstChar { it.titlecase() }
-                // also make sure that it is a valid identifier by avoiding an initial digit (to stay in sync with what the kotlin script compiler will do as well)
-                .let { if ("^[0-9]".toRegex().containsMatchIn(it)) "_$it" else it }
+    // Signature changed: basePath and resolvedDependencies (Set<OsPath>) are replaced by sandboxDir and m2RepoDependencies (List<File>)
+    fun create(script: Script, sandboxDir: File, m2RepoDependencies: List<File>): JarArtifact {
+        val outDir = sandboxDir.resolve("out").also { it.mkdirs() }
 
-        // Define the entrypoint for the scriptlet jar
+        // Capitalize first letter and get rid of dashes
+        val baseClassName = script.scriptLocation.scriptName
+            .replace("[^A-Za-z0-9]".toRegex(), "_")
+            .replaceFirstChar { it.titlecase() }
+            .let { if ("^[0-9]".toRegex().containsMatchIn(it)) "_$it" else it }
+
+        // Revised execClassName logic
         val execClassName = if (script.scriptLocation.scriptType == ScriptType.KTS) {
-            "Main_${className}"
-        } else {
-            """${script.packageName.value}.${script.entryPoint?.value ?: "${className}Kt"}"""
+            if (script.packageName.value.isNotBlank()) {
+                "${script.packageName.value}.${baseClassName}Kt"
+            } else {
+                "${baseClassName}Kt"
+            }
+        } else { // For .kt files
+            script.entryPoint?.value ?: if (script.packageName.value.isNotBlank()) {
+                "${script.packageName.value}.${baseClassName}Kt"
+            } else {
+                "${baseClassName}Kt"
+            }
         }
 
-        val jarFile = basePath.resolve("scriplet.jar")
-        val scriptFile = basePath.resolve(className + script.scriptLocation.scriptType.extension)
-        val execClassNameFile = basePath.resolve("scripletExecClassName.txt")
+        val jarFileOsPath = OsPath.createOrThrow(outDir.resolve("scriplet.jar").absolutePath) // Output JAR path
+        val tempScriptFileName = baseClassName + script.scriptLocation.scriptType.extension
+        val tempScriptFile = outDir.resolve(tempScriptFileName) // Temporary script file in sandbox/out
 
+        // Write execClassName to a file in the sandbox for potential use by executor
+        // (though BasicJvmScriptingHost might not need this if execClassName is standard)
+        val execClassNameFile = outDir.resolve("scripletExecClassName.txt")
         execClassNameFile.writeText(execClassName)
 
         var scriptContent = script.resolvedCode
 
+        // Package declaration for KTS: This logic might need to be revisited.
+        // If KscriptBase handles packaging, or if @file:Package is used, this might be redundant
+        // or conflict. For now, keeping it as it was for the script's own content.
         if (script.scriptLocation.scriptType == ScriptType.KTS &&
             script.packageName.value.isNotBlank() &&
             !scriptContent.trimStart().startsWith("package ")
@@ -43,31 +62,22 @@ class JarArtifactCreator(private val executor: Executor) {
             scriptContent = "package ${script.packageName.value}\n\n$scriptContent"
         }
 
-        val filesToCompile = mutableSetOf<OsPath>()
+        // Write the (potentially modified) script content to the temporary file in sandbox/out
+        FileUtils.createFile(OsPath.createOrThrow(tempScriptFile.absolutePath), scriptContent)
 
-        if (script.scriptLocation.scriptType == ScriptType.KTS) {
-            // For KTS scripts, combine script content and wrapper code into a single file.
-            // The package declaration is handled by Templates.createWrapperForScript.
-            val wrapperContent = Templates.createWrapperForScript(script.packageName, className)
-            scriptContent = "$scriptContent\n\n$wrapperContent"
+        val filesToCompile = setOf(OsPath.createOrThrow(tempScriptFile.absolutePath))
 
-            FileUtils.createFile(scriptFile, scriptContent)
-            filesToCompile.add(scriptFile)
-        } else {
-            // For KT files, keep the existing logic.
-            FileUtils.createFile(scriptFile, scriptContent)
-            filesToCompile.add(scriptFile)
-        }
+        // Convert m2RepoDependencies (List<File>) to Set<OsPath> for executor.compileKotlin
+        val dependenciesToCompile = m2RepoDependencies.map { OsPath.createOrThrow(it.absolutePath) }.toSet()
 
         executor.compileKotlin(
-            jarFile,
-            resolvedDependencies,
-            filesToCompile,
-            script.compilerOpts +
-            // This options allows to work with Kotlin 1.9.x, where scripts in source roots are ignored
-            CompilerOpt("-Xallow-any-scripts-in-source-roots")
+            jarFileOsPath,
+            dependenciesToCompile, // Compile classpath from m2RepoDependencies
+            filesToCompile,        // Only the user's script file
+            script.compilerOpts + CompilerOpt("-Xallow-any-scripts-in-source-roots") // Retain this important opt
+            // Note: script.kotlinOpts are runtime options, not typically for kotlinc
         )
 
-        return JarArtifact(jarFile, execClassName)
+        return JarArtifact(jarFileOsPath, execClassName)
     }
 }
