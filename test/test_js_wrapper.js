@@ -3,87 +3,101 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const projectRoot = path.resolve(__dirname, '..');
-const jsWrapperPath = path.join(projectRoot, 'wrappers', 'kscript_js_wrapper.js');
-const testScriptPath = path.join(projectRoot, 'examples', 'test_wrapper.kts');
+function runKscriptTest(kscriptFile, expectedOutputSubstring) {
+    return new Promise((resolve) => { // Removed reject, will resolve with true/false
+        console.log(`Running Node.js kscript test: ${kscriptFile}...`);
 
-console.log(`Project root: ${projectRoot}`);
-console.log(`Executing: node ${jsWrapperPath} ${testScriptPath}`);
+        const projectRoot = path.resolve(__dirname, '..');
+        const jarPath = path.join(projectRoot, 'wrappers', 'kscript.jar');
+        const wrapperScriptPath = path.join(projectRoot, 'wrappers', 'kscript_js_wrapper.js');
+        const kscriptFilePath = path.join(projectRoot, 'examples', kscriptFile);
 
-// Check if wrapper exists
-if (!fs.existsSync(jsWrapperPath)) {
-    console.error(`JavaScript wrapper not found at ${jsWrapperPath}`);
-    process.exit(1);
+        if (!fs.existsSync(jarPath)) {
+            console.error(`ERROR: kscript.jar not found at ${jarPath}`);
+            console.log(`Node.js wrapper test for ${kscriptFile} SKIPPED due to missing kscript.jar.`);
+            resolve(false);
+            return;
+        }
+
+        if (!fs.existsSync(wrapperScriptPath)) {
+            console.error(`ERROR: Node.js wrapper script not found at ${wrapperScriptPath}`);
+            resolve(false);
+            return;
+        }
+
+        if (!fs.existsSync(kscriptFilePath)) {
+            console.error(`ERROR: Test kscript file not found at ${kscriptFilePath}`);
+            resolve(false);
+            return;
+        }
+
+        console.log(`Executing command: node ${wrapperScriptPath} ${kscriptFilePath}`);
+        const kscriptProcess = spawn('node', [wrapperScriptPath, kscriptFilePath], {
+            stdio: ['pipe', 'pipe', 'pipe'],
+            timeout: 60000 // 60 seconds timeout, increased for kscript compilation
+        });
+
+        let stdoutData = '';
+        let stderrData = '';
+
+        kscriptProcess.stdout.on('data', (data) => { stdoutData += data.toString(); });
+        kscriptProcess.stderr.on('data', (data) => { stderrData += data.toString(); });
+
+        // Timeout handling is implicitly done by spawn's timeout option, which emits 'error' with err.code 'ETIMEDOUT'
+        // or kills the process and it closes with a signal code.
+
+        kscriptProcess.on('close', (code, signal) => {
+            stdoutData = stdoutData.trim();
+            stderrData = stderrData.trim();
+
+            if (stdoutData) console.log(`Stdout:\n${stdoutData}`);
+            if (stderrData) console.error(`Stderr:\n${stderrData}`);
+
+            if (signal) { // Process was killed, e.g. by timeout
+                console.error(`Test FAILED for ${kscriptFile} due to signal: ${signal}`);
+                resolve(false);
+            } else if (code === 0 && stdoutData.includes(expectedOutputSubstring)) {
+                console.log(`Test PASSED for ${kscriptFile}!`);
+                resolve(true);
+            } else {
+                console.error(`Test FAILED for ${kscriptFile}. Exit code: ${code}`);
+                if (!stdoutData.includes(expectedOutputSubstring)) {
+                    console.error(`Expected substring '${expectedOutputSubstring}' not found in stdout.`);
+                }
+                resolve(false);
+            }
+        });
+
+        kscriptProcess.on('error', (err) => {
+            // This 'error' event usually means the process could not be spawned or was killed due to timeout.
+            if (err.code === 'ETIMEDOUT') {
+                 console.error(`Test TIMEOUT for ${kscriptFile}`);
+            } else {
+                 console.error(`Test ERRORED for ${kscriptFile}: ${err.message}`);
+            }
+            // Ensure stderrData from the process is also logged if available
+            if (stderrData.trim()) console.error(`Stderr (on error event):\n${stderrData.trim()}`);
+            resolve(false);
+        });
+    });
 }
 
-// Check if test kts script exists
-if (!fs.existsSync(testScriptPath)) {
-    console.error(`Test kts script not found at ${testScriptPath}`);
-    process.exit(1);
-}
+async function main() {
+    console.log("Starting Node.js wrapper tests...");
+    // Similar to the Python test, this version is stricter and expects kscript.jar to be present.
+    // If java and kscript.jar are not functional, the wrapper will likely forward an error from java,
+    // which will be caught as a test failure.
 
-const kscriptProcess = spawn('node', [jsWrapperPath, testScriptPath], {
-    stdio: ['pipe', 'pipe', 'pipe'], // Pipe stdin, stdout, stderr
-    timeout: 30000 // 30 seconds timeout
-});
+    const test1Success = await runKscriptTest('test_wrapper.kts', 'kscript wrapper test successful!');
+    const test2Success = await runKscriptTest('test_kotlin2_feature.kts', 'Kotlin 2.x feature (value class) test successful!');
 
-let stdoutData = '';
-let stderrData = '';
-
-kscriptProcess.stdout.on('data', (data) => {
-    stdoutData += data.toString();
-});
-
-kscriptProcess.stderr.on('data', (data) => {
-    stderrData += data.toString();
-});
-
-kscriptProcess.on('close', (code) => {
-    stdoutData = stdoutData.trim();
-    stderrData = stderrData.trim();
-
-    console.log(`Return Code: ${code}`);
-    console.log(`Stdout:\n${stdoutData}`);
-    if (stderrData) {
-        console.log(`Stderr:\n${stderrData}`);
-    }
-
-    // Similar to the Python test, kscript.jar and Java might not be available.
-    // We're checking if the wrapper attempts the execution.
-
-    if (stdoutData.includes("kscript wrapper test successful!")) {
-        console.log("JavaScript wrapper test potentially successful (if kscript.jar was runnable)!");
-        // In a real test environment:
-        // if (code === 0 && stdoutData.includes("kscript wrapper test successful!")) {
-        //     console.log("JavaScript wrapper test successful!");
-        //     process.exit(0);
-        // } else {
-        //     console.error("JavaScript wrapper test failed: Output or return code mismatch.");
-        //     process.exit(1);
-        // }
-        process.exit(0); // For now, assume success if output is seen
-
-    } else if (stderrData.includes("ENOENT") && stderrData.includes("java")) {
-        // This error (ENOENT spawn java ENOENT) means the system couldn't find 'java' command
-        console.log("JavaScript wrapper test partially passed: 'java' command not found, as might be expected in a limited test env.");
+    if (test1Success && test2Success) {
+        console.log("All Node.js wrapper tests PASSED!");
         process.exit(0);
-    } else if (stderrData.toLowerCase().includes("error executing jar") || (stderrData.includes("kscript.jar") && (stderrData.includes("not found") || stderrData.includes("no such file")))) {
-        console.log("JavaScript wrapper test partially passed: kscript.jar not found or error during Java execution, as might be expected (no Java/JAR in test env).");
-        process.exit(0);
-    }
-    else {
-        console.error("JavaScript wrapper test failed: Did not see expected success message or known error conditions for missing Java/JAR.");
+    } else {
+        console.error("One or more Node.js wrapper tests FAILED or were SKIPPED.");
         process.exit(1);
     }
-});
+}
 
-kscriptProcess.on('error', (err) => {
-    console.error(`Failed to start subprocess: ${err.message}`);
-    process.exit(1);
-});
-
-kscriptProcess.on('timeout', () => {
-    console.error('JavaScript wrapper test failed: Timeout expired.');
-    kscriptProcess.kill(); // Ensure the process is killed on timeout
-    process.exit(1);
-});
+main();
