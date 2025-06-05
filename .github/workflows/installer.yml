@@ -55,7 +55,7 @@ jobs:
         if: matrix.variant == 'sdkman'
         shell: bash
         run: |
-          bash -c "curl -s "https://get.sdkman.io" | bash"
+          bash -c "curl -s "https://get.sdkman.io?ci=true" | bash"
           source "$HOME/.sdkman/bin/sdkman-init.sh"
           
           sdk install kscript ${{ env.KSCRIPT_VERSION }}
