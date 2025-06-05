@@ -1,13 +1,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import java.util.Locale // Added for toLowerCase
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget // Moved import to top
 
-val kotlinVersion: String = "2.1.21-embedded"
+val kotlinVersion: String = "2.2.0-RC2"
 
 plugins {
-    kotlin("jvm") version "2.1.21-embedded"
+    kotlin("jvm") version "2.2.0-RC2"
     application
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
@@ -72,16 +73,16 @@ idea {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 
     withJavadocJar()
     withSourcesJar()
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "11"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach { // Changed .all to .configureEach as per modern practice
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
@@ -132,22 +133,35 @@ tasks.test {
     useJUnitPlatform()
 }
 
+val copyJarToWrappers by tasks.register<Copy>("copyJarToWrappers") {
+    dependsOn(tasks.shadowJar)
+    from(tasks.shadowJar.get().archiveFile)
+    into(project.projectDir.resolve("wrappers"))
+}
+
 val createKscriptLayout by tasks.register<Copy>("createKscriptLayout") {
-    dependsOn(shadowJar)
+    dependsOn(copyJarToWrappers)
 
     into(layout.buildDirectory.dir("kscript"))
 
-    from(shadowJar) {
+    from(tasks.shadowJar.get().archiveFile) { // kscript.jar from shadowJar output
         into("bin")
     }
 
-    from("src/kscript") {
+    from("src/kscript") { // kscript shell script
         into("bin")
     }
 
-    from("src/kscript.bat") {
+    from("src/kscript.bat") { // kscript batch script
         into("bin")
     }
+
+    from("wrappers") { // Python and Nodejs wrappers + kscript.jar
+        into("wrappers")
+    }
+
+    from("setup.py") // Python packaging script
+    from("package.json") // Nodejs packaging manifest
 }
 
 val packageKscriptDistribution by tasks.register<Zip>("packageKscriptDistribution") {
@@ -174,7 +188,7 @@ application {
 }
 
 fun adjustVersion(archiveVersion: String): String {
-    var newVersion = archiveVersion.toLowerCaseAsciiOnly()
+    var newVersion = archiveVersion.lowercase(Locale.ROOT) // Changed to lowercase(Locale.ROOT)
 
     val temporaryVersion = newVersion.substringBeforeLast(".")
 
@@ -291,11 +305,12 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0") // Updated for Kotlin 2.0.0
 
     implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven-all:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.0-RC2") // Added as requested
 
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.11.0")

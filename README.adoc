@@ -574,6 +574,78 @@ scripts.
 On the other hand this doesn't embed dependencies within the script("fat jar"), so internet connection may be required
 on its first run.
 
+== Python and NPM Packaging
+
+Starting with version 4.2.3, the main `kscript` binary distribution ZIP file (e.g., `kscript-4.2.3-bin.zip`) now includes helper files to allow users to easily build and install `kscript` as a Python package or an NPM package. This provides a convenient way to integrate `kscript` into Python or Node.js project environments and makes `kscript` available as a command-line tool through `pip` or `npm`.
+
+The necessary files (`setup.py` for Python, `package.json` for Node.js, and various wrapper scripts) are located in the extracted distribution archive. When you extract the main kscript zip, these files will be in the root directory, and the wrappers along with `kscript.jar` will be in the `wrappers/` subdirectory.
+
+=== Python (pip)
+
+To build and install `kscript` as a Python package:
+
+1. Download and extract the `kscript-4.2.3-bin.zip` (or the appropriate version) distribution.
+2. Navigate to the root of the extracted directory in your terminal.
+3. The `setup.py` script expects `kscript.jar` to be in the `wrappers/` subdirectory, where it should be placed automatically by the build process.
+4. Build the wheel package:
++
+[source,bash]
+----
+python setup.py bdist_wheel
+----
++
+Alternatively, you can create a source distribution:
++
+[source,bash]
+----
+python setup.py sdist
+----
+5. Install the generated package (the exact filename will depend on the version and build tags):
++
+[source,bash]
+----
+pip install dist/kscript-*.whl
+----
+6. After installation, `kscript` should be available as a command-line tool, using the Python wrapper to execute `kscript.jar`.
+
+=== Node.js (npm)
+
+To build and install `kscript` as an NPM package:
+
+1. Download and extract the `kscript-4.2.3-bin.zip` (or the appropriate version) distribution.
+2. Navigate to the root of the extracted directory in your terminal.
+3. The `package.json` file expects `kscript.jar` to be in the `wrappers/` subdirectory, where it should be by default.
+4. Create the NPM package:
++
+[source,bash]
+----
+npm pack
+----
++
+This will create a `kscript-4.2.3.tgz` file (the version comes from `package.json`).
+5. Install the package. For global installation:
++
+[source,bash]
+----
+npm install -g kscript-4.2.3.tgz
+----
++
+Or, to install it as a project dependency, navigate to your project directory and run (adjust path as necessary):
++
+[source,bash]
+----
+npm install /path/to/extracted_kscript_dist/kscript-4.2.3.tgz
+----
+6. After installation (globally, or locally if `node_modules/.bin` is in your PATH), `kscript` should be available as a command-line tool, using the Node.js wrapper.
+
+=== Direct Wrapper Usage
+
+Advanced users can also utilize the wrapper scripts directly if they prefer to manage their environment and `kscript.jar` location manually:
+* Python wrapper: `wrappers/kscript_py_wrapper.py`
+* Node.js wrapper: `wrappers/kscript_js_wrapper.js` (make it executable or run with `node`)
+
+These wrappers expect `kscript.jar` to be in the same directory (`wrappers/`) by default. This approach requires `java` to be available in the system PATH.
+
 == kscript configuration file
 
 To keep some options stored permanently in configuration you can create kscript configuration file.

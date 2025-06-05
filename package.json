@@ -1,0 +1,27 @@
+{
+  "name": "kscript",
+  "version": "4.2.3",
+  "description": "KScript - easy scripting with Kotlin",
+  "author": "Holger Brandl, Marcin Kuszczak",
+  "license": "MIT",
+  "homepage": "https://github.com/kscripting/kscript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kscripting/kscript.git"
+  },
+  "keywords": [
+    "kotlin",
+    "scripting",
+    "kscript"
+  ],
+  "bin": {
+    "kscript": "./wrappers/kscript_js_wrapper.js"
+  },
+  "files": [
+    "wrappers/kscript_js_wrapper.js",
+    "wrappers/kscript.jar"
+  ],
+  "engines": {
+    "node": ">=12"
+  }
+}
