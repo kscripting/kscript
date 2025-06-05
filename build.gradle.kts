@@ -4,10 +4,10 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
-val kotlinVersion: String = "1.7.21"
+val kotlinVersion: String = "2.0.0"
 
 plugins {
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "2.0.0"
     application
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
@@ -291,11 +291,13 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0") // Updated version
 
-    implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven-all:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinVersion") // Retained, will use new kotlinVersion
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinVersion") // Retained, will use new kotlinVersion
+    // Replaced kotlin-scripting-dependencies-maven-all with more specific artifacts as per subtask
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:$kotlinVersion")
 
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.11.0")

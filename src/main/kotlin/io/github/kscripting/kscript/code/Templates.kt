@@ -48,7 +48,7 @@ object Templates {
     fun createWrapperForScript(packageName: PackageName, className: String): String {
         val classReference = packageName.value + "." + className
 
-        return """
+        var wrapperTemplate = """
             |class Main_${className}{
             |    companion object {
             |        @JvmStatic
@@ -58,6 +58,12 @@ object Templates {
             |        }
             |    }
             |}""".trimStart().trimMargin()
+
+        if (packageName.value.isNotBlank()) {
+            wrapperTemplate = "package ${packageName.value};\n\n$wrapperTemplate"
+        }
+
+        return wrapperTemplate
     }
 
     fun createRunConfig(rootScriptName: String, rootScriptType: ScriptType, userArgs: List<String>): String {
