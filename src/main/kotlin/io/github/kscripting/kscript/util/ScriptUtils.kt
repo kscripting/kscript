@@ -40,6 +40,7 @@ object ScriptUtils {
         return if (code.contains("fun main")) ScriptType.KT else ScriptType.KTS
     }
 
+    // Restored original logic
     fun resolveCode(packageName: PackageName?, importNames: Set<ImportName>, scriptNode: ScriptNode): String {
         val sortedImports = importNames.sortedBy { it.value }.toList()
         val sb = StringBuilder()
