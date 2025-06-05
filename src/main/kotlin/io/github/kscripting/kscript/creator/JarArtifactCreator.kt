@@ -34,7 +34,16 @@ class JarArtifactCreator(private val executor: Executor) {
 
         execClassNameFile.writeText(execClassName)
 
-        FileUtils.createFile(scriptFile, script.resolvedCode)
+        var scriptContent = script.resolvedCode
+
+        if (script.scriptLocation.scriptType == ScriptType.KTS &&
+            script.packageName.value.isNotBlank() &&
+            !scriptContent.trimStart().startsWith("package ")
+        ) {
+            scriptContent = "package ${script.packageName.value}\n\n$scriptContent"
+        }
+
+        FileUtils.createFile(scriptFile, scriptContent)
 
         val filesToCompile = mutableSetOf<OsPath>()
         filesToCompile.add(scriptFile)
