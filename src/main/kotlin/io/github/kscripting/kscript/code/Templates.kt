@@ -46,14 +46,18 @@ object Templates {
     }
 
     fun createWrapperForScript(packageName: PackageName, className: String): String {
-        val classReference = packageName.value + "." + className
+        // val classReference = packageName.value + "." + className // Original
+        // Assuming the script class compiled by kotlinc will be named <className>Kt
+        // and be at the root of the JAR if the input script had no package declaration
+        // and ScriptUtils.resolveCode also doesn't add one (if packageName is null/empty).
+        val targetClassName = "${className}Kt"
 
         return """
             |class Main_${className}{
             |    companion object {
             |        @JvmStatic
             |        fun main(args: Array<String>) {
-            |            val script = Main_${className}::class.java.classLoader.loadClass("$classReference")
+            |            val script = Main_${className}::class.java.classLoader.loadClass("$targetClassName")
             |            script.getDeclaredConstructor(Array<String>::class.java).newInstance(args);
             |        }
             |    }
