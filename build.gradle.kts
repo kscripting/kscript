@@ -132,22 +132,35 @@ tasks.test {
     useJUnitPlatform()
 }
 
+val copyJarToWrappers by tasks.register<Copy>("copyJarToWrappers") {
+    dependsOn(tasks.shadowJar)
+    from(tasks.shadowJar.get().archiveFile)
+    into(project.projectDir.resolve("wrappers"))
+}
+
 val createKscriptLayout by tasks.register<Copy>("createKscriptLayout") {
-    dependsOn(shadowJar)
+    dependsOn(copyJarToWrappers)
 
     into(layout.buildDirectory.dir("kscript"))
 
-    from(shadowJar) {
+    from(tasks.shadowJar.get().archiveFile) { // kscript.jar from shadowJar output
         into("bin")
     }
 
-    from("src/kscript") {
+    from("src/kscript") { // kscript shell script
         into("bin")
     }
 
-    from("src/kscript.bat") {
+    from("src/kscript.bat") { // kscript batch script
         into("bin")
     }
+
+    from("wrappers") { // Python and Nodejs wrappers + kscript.jar
+        into("wrappers")
+    }
+
+    from("setup.py") // Python packaging script
+    from("package.json") // Nodejs packaging manifest
 }
 
 val packageKscriptDistribution by tasks.register<Zip>("packageKscriptDistribution") {
