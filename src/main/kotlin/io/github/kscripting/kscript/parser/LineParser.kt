@@ -8,6 +8,12 @@ object LineParser {
     private const val deprecatedAnnotation = "Deprecated annotation:"
     private val sheBang = listOf(SheBang)
 
+    // Regex for @file:ProjectCoordinates(group="...", artifact="...", version="...")
+    private val PROJECT_COORDINATES_ANNOTATION_REGEX = Regex("""^@file:ProjectCoordinates\s*\((.*)\)""")
+    // Regex for parsing individual attributes like group="value", artifact='value', version=value
+    // It captures the key, and then one of the possible quote types for the value, or unquoted value.
+    private val ATTRIBUTE_REGEX = Regex("""(group|artifact|version)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s,)]+))""")
+
     fun parseSheBang(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
         if (text.startsWith("#!/")) {
             return sheBang
@@ -357,4 +363,49 @@ object LineParser {
         scriptLocation: ScriptLocation, line: Int, introText: String, existing: String, replacement: String
     ): DeprecatedItem =
         DeprecatedItem(scriptLocation, line, "$introText\n$existing\nshould be replaced with:\n$replacement")
+
+    fun parseProjectCoordinates(scriptLocation: ScriptLocation, line: Int, text: String): List<ScriptAnnotation> {
+        val trimmedText = text.trim()
+        val matchResult = PROJECT_COORDINATES_ANNOTATION_REGEX.find(trimmedText)
+
+        if (matchResult != null) {
+            val attributesString = matchResult.groupValues[1]
+            try {
+                val projectCoordinates = extractProjectCoordinatesFromAttributes(attributesString)
+                // It's possible to return an empty ProjectCoordinates if attributesString is empty or only whitespace
+                // We might want to consider if an empty coordinate set is a valid annotation or should be an error/emptyList()
+                return listOf(projectCoordinates)
+            } catch (e: ParseException) {
+                // Augment parse exception with location context
+                throw ParseException("Invalid @file:ProjectCoordinates annotation at $scriptLocation line $line: ${e.messageOriginal}", e)
+            }
+        }
+        return emptyList()
+    }
+
+    private fun extractProjectCoordinatesFromAttributes(attributesString: String): ProjectCoordinates {
+        var group: String? = null
+        var artifact: String? = null
+        var version: String? = null
+
+        if (attributesString.isBlank()) {
+            // Return default (all null) if attributes string is empty or blank
+            return ProjectCoordinates(null, null, null)
+        }
+
+        ATTRIBUTE_REGEX.findAll(attributesString).forEach { matchResult ->
+            val key = matchResult.groupValues[1]
+            // Value can be in group 2 (double-quoted), 3 (single-quoted), or 4 (unquoted)
+            val value = matchResult.groupValues[2].takeIf { it.isNotEmpty() }
+                ?: matchResult.groupValues[3].takeIf { it.isNotEmpty() }
+                ?: matchResult.groupValues[4]
+
+            when (key) {
+                "group" -> group = value
+                "artifact" -> artifact = value
+                "version" -> version = value
+            }
+        }
+        return ProjectCoordinates(group, artifact, version)
+    }
 }

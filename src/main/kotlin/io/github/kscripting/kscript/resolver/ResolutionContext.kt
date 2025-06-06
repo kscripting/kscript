@@ -20,4 +20,5 @@ data class ResolutionContext(
     val compilerOpts: MutableSet<CompilerOpt> = mutableSetOf(),
     val importNames: MutableSet<ImportName> = mutableSetOf(),
     val deprecatedItems: MutableSet<DeprecatedItem> = mutableSetOf(),
+    var projectCoordinates: ProjectCoordinates? = null, // Added for @file:ProjectCoordinates
 )

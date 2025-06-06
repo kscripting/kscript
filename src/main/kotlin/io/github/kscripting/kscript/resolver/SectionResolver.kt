@@ -149,6 +149,18 @@ class SectionResolver(
             is DeprecatedItem -> {
                 resolutionContext.deprecatedItems.add(scriptAnnotation)
             }
+
+            is ProjectCoordinates -> {
+                if (resolutionContext.projectCoordinates == null) { // Process only the first one found
+                    resolutionContext.projectCoordinates = scriptAnnotation
+                }
+                // else {
+                // Potentially log a warning if multiple @file:ProjectCoordinates are found,
+                // but for now, we just keep the first one encountered.
+                // io.github.kscripting.kscript.util.Logger.warnMsg("Multiple @file:ProjectCoordinates annotations found. Using the first one: ${resolutionContext.projectCoordinates}")
+                // }
+                resolvedScriptAnnotations += scriptAnnotation // Add to section's annotations
+            }
         }
 
         return resolvedScriptAnnotations

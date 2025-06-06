@@ -48,21 +48,37 @@ fun exportToGradleProject(scriptFilePathString: String, outputDir: Path, cliOpti
             infoMsg("Successfully created directory: $outputDir")
         }
 
-        // 1. Determine Project Properties
-        val projectName = outputDir.fileName.toString()
-        // Try to use script package name for group, fallback to default
-        val projectGroup = if (script.packageName.value.isNotBlank()) script.packageName.value else "com.example"
-        val projectVersion = "1.0-SNAPSHOT" // Default version
+        // 1. Determine Project Properties, prioritizing @file:ProjectCoordinates
+        val scriptCoordinates = script.projectCoordinates
 
-        infoMsg("Project Name: $projectName")
-        infoMsg("Project Group: $projectGroup")
-        infoMsg("Project Version: $projectVersion")
+        if (scriptCoordinates != null && (scriptCoordinates.group != null || scriptCoordinates.artifact != null || scriptCoordinates.version != null)) {
+            infoMsg("Using project coordinates from @file:ProjectCoordinates annotation:")
+            scriptCoordinates.group?.let { infoMsg("  Group: $it") }
+            scriptCoordinates.artifact?.let { infoMsg("  Artifact: $it") }
+            scriptCoordinates.version?.let { infoMsg("  Version: $it") }
+        }
+
+        val effectiveProjectGroup = scriptCoordinates?.group?.takeIf { it.isNotBlank() }
+            ?: script.packageName.value.takeIf { it.isNotBlank() }
+            ?: "com.example"
+
+        val effectiveArtifactId = scriptCoordinates?.artifact?.takeIf { it.isNotBlank() }
+            ?: outputDir.fileName.toString()
+
+        val effectiveProjectVersion = scriptCoordinates?.version?.takeIf { it.isNotBlank() }
+            ?: "1.0-SNAPSHOT"
+
+        val projectNameForSettings = effectiveArtifactId // For settings.gradle.kts rootProject.name
+
+        infoMsg("Effective Project Name (for settings.gradle.kts): $projectNameForSettings")
+        infoMsg("Effective Project Group: $effectiveProjectGroup")
+        infoMsg("Effective Project Version: $effectiveProjectVersion")
 
         // 2. Create standard project directories
-        val srcMainKotlinPath = projectGroup.replace(".", "/")
-        val srcMainKotlinDir = outputDir.resolve("src/main/kotlin").resolve(srcMainKotlinPath)
+        val packagePath = effectiveProjectGroup.replace(".", "/")
+        val srcMainKotlinDir = outputDir.resolve("src/main/kotlin").resolve(packagePath)
         val srcMainResourcesDir = outputDir.resolve("src/main/resources")
-        val srcTestKotlinDir = outputDir.resolve("src/test/kotlin").resolve(srcMainKotlinPath)
+        val srcTestKotlinDir = outputDir.resolve("src/test/kotlin").resolve(packagePath)
         val srcTestResourcesDir = outputDir.resolve("src/test/resources")
 
         Files.createDirectories(srcMainKotlinDir)
@@ -77,7 +93,7 @@ fun exportToGradleProject(scriptFilePathString: String, outputDir: Path, cliOpti
         // 3. Generate settings.gradle.kts
         val settingsFile = outputDir.resolve("settings.gradle.kts")
         val settingsContent = """
-            |rootProject.name = "$projectName"
+            |rootProject.name = "$projectNameForSettings"
             |""".trimMargin()
         Files.writeString(settingsFile, settingsContent)
         infoMsg("Successfully generated: $settingsFile")
@@ -87,8 +103,8 @@ fun exportToGradleProject(scriptFilePathString: String, outputDir: Path, cliOpti
         val customReposString = script.repositories.joinToString("\n            ") { "maven { url = uri(\"${it.value}\") }" }
 
         // Determine main class name
-        val scriptBaseName = scriptFile.nameWithoutExtension.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-        val mainClassName = script.entryPoint?.value ?: "${projectGroup}.${scriptBaseName}Kt"
+        val scriptBaseName = scriptFile.nameWithoutExtension.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        val mainClassName = script.entryPoint?.value?.takeIf { it.isNotBlank() } ?: "${effectiveProjectGroup}.${scriptBaseName}Kt"
 
         // Kotlin options and compiler options (basic for now)
         // More complex mapping can be done later. For now, just ensure jvmTarget.
@@ -100,8 +116,8 @@ fun exportToGradleProject(scriptFilePathString: String, outputDir: Path, cliOpti
         |    application
         |}
         |
-        |group = "$projectGroup"
-        |version = "$projectVersion"
+        |group = "$effectiveProjectGroup"
+        |version = "$effectiveProjectVersion"
         |
         |repositories {
         |    mavenCentral()
@@ -149,8 +165,8 @@ fun exportToGradleProject(scriptFilePathString: String, outputDir: Path, cliOpti
         val contentLines = mutableListOf<String>()
 
         // Add package declaration
-        if (projectGroup.isNotBlank()) {
-            contentLines.add("package $projectGroup")
+        if (effectiveProjectGroup.isNotBlank()) {
+            contentLines.add("package $effectiveProjectGroup")
             contentLines.add("") // Add a blank line after package
         }
 
@@ -234,7 +250,7 @@ fun exportToGradleProject(scriptFilePathString: String, outputDir: Path, cliOpti
             warnMsg("gradle-wrapper.properties not found in kscript project, skipping copy. Project will need 'gradle wrapper' task run manually.")
         }
 
-        infoMsg("Project generation for '$projectName' is complete.")
+        infoMsg("Project generation for '$projectNameForSettings' is complete.")
 
     } catch (e: Exception) {
         errorMsg("Error during project generation for $scriptFilePathString: ${e.message}")
