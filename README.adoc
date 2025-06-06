@@ -1,4 +1,6 @@
-= kscript - Having fun with Kotlin scripting
+= k2script - Having fun with Kotlin scripting
+
+
 
 image:https://img.shields.io/github/release/kscripting/kscript.svg[GitHub release,link=https://github.com/kscripting/kscript/releases]
 image:https://github.com/kscripting/kscript/actions/workflows/build.yml/badge.svg[Build Status,link=https://github.com/kscripting/kscript/actions/workflows/build.yml]
@@ -7,6 +9,8 @@ image:https://badges.gitter.im/kscripting/kscript.svg[Gitter,link=https://gitter
 Enhanced scripting support for https://kotlinlang.org/[Kotlin] on *nix-based and Windows systems.
 
 Kotlin has some built-in support for scripting already, but it is not yet feature-rich enough to be a viable alternative in the shell.
+
+this is a great kotlin feature that has been updated for kotlin2 and the scripting api and has to be a little more clever and bring options to mitigate hosting and vm challanges and kotlin adveristies.
 
 In particular this wrapper around `kotlinc` adds
 
