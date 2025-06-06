@@ -18,6 +18,8 @@ data class Script(
     val compilerOpts: Set<CompilerOpt>,
     val deprecatedItems: Set<DeprecatedItem>,
 
+    val projectCoordinates: ProjectCoordinates? = null, // Added new field
+
     val scriptNodes: Set<ScriptNode>,
     val rootNode: ScriptNode,
 
