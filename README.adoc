@@ -20,9 +20,7 @@ In particular this wrapper around `kotlinc` adds
 Taken all these features together, `kscript` provides an easy-to-use, very flexible, and almost zero-overhead solution
 to write self-contained mini-applications with Kotlin.
 
-*Good News*: Kotlin https://kotlinlang.org/docs/reference/whatsnew14.html#scripting-and-repl[v1.4] finally ships with a much improved - and needed - scripting integration. See https://github.com/Kotlin/kotlin-script-examples/blob/master/jvm/main-kts/MainKts.md[here] for examples and documentation. Still, we think that `kscript` has various benefits compared this new platform-bundled improved toolstack, so we'll plan to support `kscript` until the kotlin platform will ship with an even more rich and versatile kotlin scripting interpreter.
-
-*https://holgerbrandl.github.io/kscript_kotlinconf_2017/kscript_kotlinconf.html[`kscript` presentation from KotlinConf2017!]*
+Kotlin's native scripting capabilities have continually improved, providing a solid foundation. `kscript` builds upon this by offering a rich set of features to enhance the scripting experience, including simplified dependency management, compiled script caching, flexible script input modes, and deployment options. While Kotlin's own scripting support is powerful, `kscript` aims to provide additional conveniences and power tools for scripters.
 
 '''
 * <<Installation>>
@@ -59,6 +57,8 @@ Once Kotlin is ready, you can install `kscript` with
 ----
 sdk install kscript
 ----
+
+Package managers like SDKMAN, Homebrew, and Scoop provide convenient ways to install `kscript`. Note that the version they provide might not always be the absolute latest. For the most recent updates or to use `kscript` with very new Kotlin/Java versions, consider the <<Build it yourself>> section.
 
 To test your installation simply run
 
@@ -165,8 +165,11 @@ To install `scoop` use the https://github.com/ScoopInstaller/Install[official gu
 
 === Build it yourself
 
-To build `kscript` yourself, simply clone the repo and do
+To build `kscript` yourself, which can be useful for accessing the very latest features or using it with specific modern Kotlin/Java versions (like Kotlin 2.2.0+ and Java 21+ which have been tested):
 
+Ensure you have a modern JDK installed (e.g., JDK 17 or newer, JDK 21 recommended for recent Kotlin versions). The build uses the Gradle wrapper (`gradlew`), which will download the appropriate Gradle version.
+
+Clone the repository and then run:
 [source,bash]
 ----
 ./gradlew assemble
@@ -441,9 +444,9 @@ dependencies:
 ----
 io.github.kscripting:kscript-annotations:1.5
 ----
+// (Note: The `kscript-annotations` artifact version `1.5` is from an older release cycle. While it may still work for basic annotations, for projects using newer Kotlin versions (like 2.x), you might need to check for a more recent version of `kscript-annotations` if available, or be mindful of potential Kotlin standard library version misalignments if this artifact pulls in an older one.)
 
-`kscript` will automatically detect an annotation-driven script, and if so will declare a dependency on this artifact
-internally.
+`kscript` will automatically detect an annotation-driven script, and if so will declare a dependency on `io.github.kscripting:kscript-annotations` (historically version 1.5) internally.
 
 Note, that if a script is located in a package other than the root package, you need to import the annotations with (
 e.g. `import DependsOn`).
@@ -725,21 +728,7 @@ the `@file:Entry`.
 
 === What are performance and resource usage difference between scripting with kotlin and python?
 
-Kotlin is a compiled language, so there is a compilation overhead when you run a script/application written in Kotlin
-for the first time.
-
-Kotlin runs (mainly) on the JVM which needs some time (~200ms) to start up. In contrast, the python interpreter has
-close to zero warmup time.
-
-I think there is a consensus that JVM programs execute much faster than python equivalents. Still, python might be
-faster depending on your specific usecase. Also, with kotlin-native becoming more mature, you could compile into native
-binaries directly, which should bring it close to C/C++ performance.
-
-Main motivations for using Kotlin over Python for scripting and development are
-
-* Kotlin is the better designed, more fluent language with much better tooling around it
-* The JVM dependency ecosystem allows for strict versioning. No more messing around with virtualenv, e.g. to run a short
- 10liner against a specific version of numpy.
+Kotlin scripts involve a JVM startup and, for the first run of a script, a compilation step. While the JVM offers excellent peak performance for longer-running or complex tasks, the initial overhead might be noticeable for very short-lived, simple scripts when compared to languages like Python that have minimal startup time. The best choice often depends on the specific use case, script complexity, access to Java/Kotlin libraries, and developer familiarity with the ecosystems.
 
 === Does kscript work with java?
 
@@ -770,16 +759,7 @@ Help to spread the word. Great community articles about `kscript` include
  -using kscript
 
 You could also show your support by upvoting `kscript` here on github, or by voting for issues in Intellij IDEA which
-impact `kscript`ing. Here are our top 2 tickets/annoyances that we would love to see fixed:
-
-* https://youtrack.jetbrains.com/issue/KT-13347[KT-13347] Good code is red in injected kotlin language snippets
-
-To allow for more interactive script development, you could also vote/comment on the most annoying REPL issues.
-
-* https://youtrack.jetbrains.net/issue/KT-24789[KT-24789] "Unresolved reference" when running a script which is a
- symlink to a script outside of source roots
-* https://youtrack.jetbrains.com/issue/KT-12583[KT-12583] IDE REPL should run in project root directory
-* https://youtrack.jetbrains.com/issue/KT-11409[KT-11409] Allow to "Send Selection To Kotlin Console"
+impact `kscript`ing. For specific kscript issues or feature proposals, please use the kscript GitHub issue tracker. For broader Kotlin language or IDE-related issues, the official JetBrains YouTrack is the appropriate place.
 
 == Acknowledgements
 
