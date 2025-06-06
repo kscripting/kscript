@@ -23,6 +23,7 @@ object OptionsUtils {
             .addOption("h", "help", false, "Prints help information")
             .addOption("v", "version", false, "Prints version information")
             .addOption("c", "clear-cache", false, "Wipes out cached script jars and urls")
+            .addOption(null, "export-to-gradle-project", true, "Generate a Gradle project from <script> into <output_dir>.")
     }
 
     fun createHelpText(selfName: String, options: Options): String {

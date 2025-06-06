@@ -7,6 +7,8 @@ import io.github.kscripting.kscript.model.OsConfig
 import io.github.kscripting.shell.model.OsPath
 import io.github.kscripting.shell.model.OsType
 import io.github.kscripting.shell.model.toNativeOsPath
+import java.nio.file.Files
+import kotlin.io.path.writeLines
 
 class CommandResolver(val osConfig: OsConfig) {
     private val classPathSeparator =
@@ -17,6 +19,10 @@ class CommandResolver(val osConfig: OsConfig) {
         else -> '\''
     }
 
+    companion object {
+        private const val ARGFILE_PATHS_CHAR_THRESHOLD = 4096
+        private const val ARGFILE_PATHS_COUNT_THRESHOLD = 100
+    }
 
     fun getKotlinJreVersion(): String {
         val kotlin = resolveKotlinBinary("kotlin")
@@ -47,12 +53,51 @@ class CommandResolver(val osConfig: OsConfig) {
         jar: OsPath, dependencies: Set<OsPath>, filePaths: Set<OsPath>, compilerOpts: Set<CompilerOpt>
     ): String {
         val compilerOptsStr = resolveCompilerOpts(compilerOpts)
-        val classpath = resolveClasspath(dependencies)
+        val classpath = resolveClasspath(dependencies) // Keep classpath on command line for now
         val jarFile = resolveJarFile(jar)
-        val files = resolveFiles(filePaths)
         val kotlinc = resolveKotlinBinary("kotlinc")
 
-        return "$kotlinc $compilerOptsStr $classpath -d $jarFile $files"
+        // Calculate total length of all resolved file paths and classpath entries for character threshold
+        val totalPathLength = filePaths.sumOf { it.stringPath().length } +
+                dependencies.sumOf { it.stringPath().length } +
+                compilerOptsStr.length +
+                classpath.length // Approx length of classpath string itself
+
+        // Calculate total number of files/options for count threshold
+        val totalItemsCount = filePaths.size + dependencies.size + compilerOpts.size
+
+        if (totalPathLength > ARGFILE_PATHS_CHAR_THRESHOLD || totalItemsCount > ARGFILE_PATHS_COUNT_THRESHOLD) {
+            val tempArgFile = Files.createTempFile("kscript-kotlinc-args-", ".txt")
+            try {
+                val argFileLines = mutableListOf<String>()
+
+                // Add compiler options (if any)
+                if (compilerOptsStr.isNotBlank()) {
+                    argFileLines.add(compilerOptsStr)
+                }
+
+                // Add classpath string (if any)
+                // resolveClasspath() returns "-classpath \"foo:bar\"" or empty string
+                if (classpath.isNotBlank()) {
+                    argFileLines.add(classpath)
+                }
+
+                // Add source files, native and unquoted, one per line
+                filePaths.mapTo(argFileLines) { it.toNativeOsPath().stringPath() }
+
+                tempArgFile.writeLines(argFileLines)
+
+                val argFileArgument = "@${tempArgFile.toAbsolutePath().toString()}"
+
+                // -d $jarFile must remain on command line as it's an output specifier
+                return "$kotlinc $argFileArgument -d $jarFile"
+            } finally {
+                Files.deleteIfExists(tempArgFile)
+            }
+        } else {
+            val files = resolveFiles(filePaths) // Only resolve files if not using argfile
+            return "$kotlinc $compilerOptsStr $classpath -d $jarFile $files"
+        }
     }
 
     fun executeKotlin(

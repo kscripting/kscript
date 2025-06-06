@@ -1,4 +1,6 @@
-= kscript - Having fun with Kotlin scripting
+= k2script - Having fun with Kotlin scripting
+
+
 
 image:https://img.shields.io/github/release/kscripting/kscript.svg[GitHub release,link=https://github.com/kscripting/kscript/releases]
 image:https://github.com/kscripting/kscript/actions/workflows/build.yml/badge.svg[Build Status,link=https://github.com/kscripting/kscript/actions/workflows/build.yml]
@@ -7,6 +9,8 @@ image:https://badges.gitter.im/kscripting/kscript.svg[Gitter,link=https://gitter
 Enhanced scripting support for https://kotlinlang.org/[Kotlin] on *nix-based and Windows systems.
 
 Kotlin has some built-in support for scripting already, but it is not yet feature-rich enough to be a viable alternative in the shell.
+
+this is a great kotlin feature that has been updated for kotlin2 and the scripting api and has to be a little more clever and bring options to mitigate hosting and vm challanges and kotlin adveristies.
 
 In particular this wrapper around `kotlinc` adds
 
@@ -20,9 +24,7 @@ In particular this wrapper around `kotlinc` adds
 Taken all these features together, `kscript` provides an easy-to-use, very flexible, and almost zero-overhead solution
 to write self-contained mini-applications with Kotlin.
 
-*Good News*: Kotlin https://kotlinlang.org/docs/reference/whatsnew14.html#scripting-and-repl[v1.4] finally ships with a much improved - and needed - scripting integration. See https://github.com/Kotlin/kotlin-script-examples/blob/master/jvm/main-kts/MainKts.md[here] for examples and documentation. Still, we think that `kscript` has various benefits compared this new platform-bundled improved toolstack, so we'll plan to support `kscript` until the kotlin platform will ship with an even more rich and versatile kotlin scripting interpreter.
-
-*https://holgerbrandl.github.io/kscript_kotlinconf_2017/kscript_kotlinconf.html[`kscript` presentation from KotlinConf2017!]*
+Kotlin's native scripting capabilities have continually improved, providing a solid foundation. `kscript` builds upon this by offering a rich set of features to enhance the scripting experience, including simplified dependency management, compiled script caching, flexible script input modes, and deployment options. While Kotlin's own scripting support is powerful, `kscript` aims to provide additional conveniences and power tools for scripters.
 
 '''
 * <<Installation>>
@@ -59,6 +61,8 @@ Once Kotlin is ready, you can install `kscript` with
 ----
 sdk install kscript
 ----
+
+Package managers like SDKMAN, Homebrew, and Scoop provide convenient ways to install `kscript`. Note that the version they provide might not always be the absolute latest. For the most recent updates or to use `kscript` with very new Kotlin/Java versions, consider the <<Build it yourself>> section.
 
 To test your installation simply run
 
@@ -165,8 +169,11 @@ To install `scoop` use the https://github.com/ScoopInstaller/Install[official gu
 
 === Build it yourself
 
-To build `kscript` yourself, simply clone the repo and do
+To build `kscript` yourself, which can be useful for accessing the very latest features or using it with specific modern Kotlin/Java versions (like Kotlin 2.2.0+ and Java 21+ which have been tested):
 
+Ensure you have a modern JDK installed (e.g., JDK 17 or newer, JDK 21 recommended for recent Kotlin versions). The build uses the Gradle wrapper (`gradlew`), which will download the appropriate Gradle version.
+
+Clone the repository and then run:
 [source,bash]
 ----
 ./gradlew assemble
@@ -441,9 +448,9 @@ dependencies:
 ----
 io.github.kscripting:kscript-annotations:1.5
 ----
+// (Note: The `kscript-annotations` artifact version `1.5` is from an older release cycle. While it may still work for basic annotations, for projects using newer Kotlin versions (like 2.x), you might need to check for a more recent version of `kscript-annotations` if available, or be mindful of potential Kotlin standard library version misalignments if this artifact pulls in an older one.)
 
-`kscript` will automatically detect an annotation-driven script, and if so will declare a dependency on this artifact
-internally.
+`kscript` will automatically detect an annotation-driven script, and if so will declare a dependency on `io.github.kscripting:kscript-annotations` (historically version 1.5) internally.
 
 Note, that if a script is located in a package other than the root package, you need to import the annotations with (
 e.g. `import DependsOn`).
@@ -574,6 +581,78 @@ scripts.
 On the other hand this doesn't embed dependencies within the script("fat jar"), so internet connection may be required
 on its first run.
 
+== Python and NPM Packaging
+
+Starting with version 4.2.3, the main `kscript` binary distribution ZIP file (e.g., `kscript-4.2.3-bin.zip`) now includes helper files to allow users to easily build and install `kscript` as a Python package or an NPM package. This provides a convenient way to integrate `kscript` into Python or Node.js project environments and makes `kscript` available as a command-line tool through `pip` or `npm`.
+
+The necessary files (`setup.py` for Python, `package.json` for Node.js, and various wrapper scripts) are located in the extracted distribution archive. When you extract the main kscript zip, these files will be in the root directory, and the wrappers along with `kscript.jar` will be in the `wrappers/` subdirectory.
+
+=== Python (pip)
+
+To build and install `kscript` as a Python package:
+
+1. Download and extract the `kscript-4.2.3-bin.zip` (or the appropriate version) distribution.
+2. Navigate to the root of the extracted directory in your terminal.
+3. The `setup.py` script expects `kscript.jar` to be in the `wrappers/` subdirectory, where it should be placed automatically by the build process.
+4. Build the wheel package:
++
+[source,bash]
+----
+python setup.py bdist_wheel
+----
++
+Alternatively, you can create a source distribution:
++
+[source,bash]
+----
+python setup.py sdist
+----
+5. Install the generated package (the exact filename will depend on the version and build tags):
++
+[source,bash]
+----
+pip install dist/kscript-*.whl
+----
+6. After installation, `kscript` should be available as a command-line tool, using the Python wrapper to execute `kscript.jar`.
+
+=== Node.js (npm)
+
+To build and install `kscript` as an NPM package:
+
+1. Download and extract the `kscript-4.2.3-bin.zip` (or the appropriate version) distribution.
+2. Navigate to the root of the extracted directory in your terminal.
+3. The `package.json` file expects `kscript.jar` to be in the `wrappers/` subdirectory, where it should be by default.
+4. Create the NPM package:
++
+[source,bash]
+----
+npm pack
+----
++
+This will create a `kscript-4.2.3.tgz` file (the version comes from `package.json`).
+5. Install the package. For global installation:
++
+[source,bash]
+----
+npm install -g kscript-4.2.3.tgz
+----
++
+Or, to install it as a project dependency, navigate to your project directory and run (adjust path as necessary):
++
+[source,bash]
+----
+npm install /path/to/extracted_kscript_dist/kscript-4.2.3.tgz
+----
+6. After installation (globally, or locally if `node_modules/.bin` is in your PATH), `kscript` should be available as a command-line tool, using the Node.js wrapper.
+
+=== Direct Wrapper Usage
+
+Advanced users can also utilize the wrapper scripts directly if they prefer to manage their environment and `kscript.jar` location manually:
+* Python wrapper: `wrappers/kscript_py_wrapper.py`
+* Node.js wrapper: `wrappers/kscript_js_wrapper.js` (make it executable or run with `node`)
+
+These wrappers expect `kscript.jar` to be in the same directory (`wrappers/`) by default. This approach requires `java` to be available in the system PATH.
+
 == kscript configuration file
 
 To keep some options stored permanently in configuration you can create kscript configuration file.
@@ -653,21 +732,7 @@ the `@file:Entry`.
 
 === What are performance and resource usage difference between scripting with kotlin and python?
 
-Kotlin is a compiled language, so there is a compilation overhead when you run a script/application written in Kotlin
-for the first time.
-
-Kotlin runs (mainly) on the JVM which needs some time (~200ms) to start up. In contrast, the python interpreter has
-close to zero warmup time.
-
-I think there is a consensus that JVM programs execute much faster than python equivalents. Still, python might be
-faster depending on your specific usecase. Also, with kotlin-native becoming more mature, you could compile into native
-binaries directly, which should bring it close to C/C++ performance.
-
-Main motivations for using Kotlin over Python for scripting and development are
-
-* Kotlin is the better designed, more fluent language with much better tooling around it
-* The JVM dependency ecosystem allows for strict versioning. No more messing around with virtualenv, e.g. to run a short
- 10liner against a specific version of numpy.
+Kotlin scripts involve a JVM startup and, for the first run of a script, a compilation step. While the JVM offers excellent peak performance for longer-running or complex tasks, the initial overhead might be noticeable for very short-lived, simple scripts when compared to languages like Python that have minimal startup time. The best choice often depends on the specific use case, script complexity, access to Java/Kotlin libraries, and developer familiarity with the ecosystems.
 
 === Does kscript work with java?
 
@@ -698,16 +763,7 @@ Help to spread the word. Great community articles about `kscript` include
  -using kscript
 
 You could also show your support by upvoting `kscript` here on github, or by voting for issues in Intellij IDEA which
-impact `kscript`ing. Here are our top 2 tickets/annoyances that we would love to see fixed:
-
-* https://youtrack.jetbrains.com/issue/KT-13347[KT-13347] Good code is red in injected kotlin language snippets
-
-To allow for more interactive script development, you could also vote/comment on the most annoying REPL issues.
-
-* https://youtrack.jetbrains.net/issue/KT-24789[KT-24789] "Unresolved reference" when running a script which is a
- symlink to a script outside of source roots
-* https://youtrack.jetbrains.com/issue/KT-12583[KT-12583] IDE REPL should run in project root directory
-* https://youtrack.jetbrains.com/issue/KT-11409[KT-11409] Allow to "Send Selection To Kotlin Console"
+impact `kscript`ing. For specific kscript issues or feature proposals, please use the kscript GitHub issue tracker. For broader Kotlin language or IDE-related issues, the official JetBrains YouTrack is the appropriate place.
 
 == Acknowledgements
 

@@ -10,7 +10,7 @@ object GradleTemplates {
     fun createGradleIdeaScript(script: Script): String {
         val kotlinVersion = KotlinVersion.CURRENT
         val extendedDependencies = setOf(
-            Dependency("org.jetbrains.kotlin:kotlin-stdlib"),
+            Dependency("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"),
             Dependency("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion"),
             Dependency("io.github.kscripting:kscript-annotations:1.5.0"),
         ) + script.dependencies
@@ -42,7 +42,7 @@ object GradleTemplates {
 
         val kotlinVersion = KotlinVersion.CURRENT
         val extendedDependencies = setOf(
-            Dependency("org.jetbrains.kotlin:kotlin-stdlib"),
+            Dependency("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"),
             Dependency("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
         ) + script.dependencies
 

@@ -15,6 +15,7 @@ class Parser {
         LineParser::parseCompilerOpts,
         LineParser::parseImport,
         LineParser::parsePackage,
+        LineParser::parseProjectCoordinates, // Added new parser function
     )
 
     fun parse(scriptLocation: ScriptLocation, string: String): List<Section> {

@@ -93,6 +93,46 @@ fun main(args: Array<String>) {
             return
         }
 
+        // Handle --export-to-gradle-project
+        if (parsedOptions.containsKey("export-to-gradle-project")) {
+            val outputDirPathValue = parsedOptions["export-to-gradle-project"]
+            val scriptPathValue = parsedOptions["script"] // Script path is taken from remaining args
+
+            // Basic validation
+            if (scriptPathValue == null || scriptPathValue.isBlank()) {
+                errorMsg("The <script> argument is required for --export-to-gradle-project.")
+                exitProcess(1)
+            }
+            if (outputDirPathValue == null || outputDirPathValue.isBlank()) {
+                errorMsg("The <output_dir> argument for --export-to-gradle-project is required.")
+                exitProcess(1)
+            }
+
+            val scriptFile = java.nio.file.Paths.get(scriptPathValue).toFile()
+            if (!scriptFile.exists()) {
+                errorMsg("Script file not found: $scriptPathValue")
+                exitProcess(1)
+            }
+
+            // scriptPathValue is already validated to be non-null/blank
+            // outputDirPathValue is also validated
+
+            try {
+                io.github.kscripting.kscript.generator.exportToGradleProject(
+                    scriptFilePathString = scriptPathValue!!, // scriptPathValue is a String
+                    outputDir = java.nio.file.Paths.get(outputDirPathValue!!),
+                    cliOptions = parsedOptions.toMap(),
+                    config = config // Pass the config object
+                )
+                info("Gradle project export process finished for '$scriptPathValue' to '$outputDirPathValue'.")
+                exitProcess(0)
+            } catch (e: Exception) {
+                errorMsg("Error during --export-to-gradle-project for script '$scriptPathValue': ${e.message}")
+                e.printStackTrace() // For detailed debugging during development
+                exitProcess(1)
+            }
+        }
+
         KscriptHandler(executor, config, parsedOptions).handle(userArgs)
     } catch (e: Exception) {
         errorMsg(e)
